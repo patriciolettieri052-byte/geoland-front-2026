@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter);
+  
+  --color-background: #0D0E12;
+  --color-foreground: #F8FAFC;
+  
+  --color-card: rgba(20, 21, 28, 0.4);
+  --color-card-border: rgba(255, 255, 255, 0.1);
+  
+  --color-primary: #10b981; /* Emerald/Accent for ISV and G-Score */
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #1E222B;
+  --color-accent: #38bdf8; /* Blue accent for contrast */
+}
+
+@layer base {
+  :root {
+    --background: #0D0E12;
+    --foreground: #F8FAFC;
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    /* Soft noise texture or gradient could be applied here */
+    background-image: radial-gradient(circle at top right, rgba(30,34,43,0.8), transparent 40%),
+                      radial-gradient(circle at bottom left, rgba(16,185,129,0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-[var(--color-card)] backdrop-blur-xl border border-[var(--color-card-border)] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
+}

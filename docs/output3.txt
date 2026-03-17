@@ -1,0 +1,255 @@
+=== ARQUITECTURA ===
+Warning: Setting up fake worker.
+Documentación de Arquitectura 
+Front-End: GEOLAND MVP (Premium 
+Glassmorphism Edition) 
+Objetivo: Construir la interfaz de usuario interactiva bajo el paradigma AI-First y 
+Progressive Disclosure, utilizando un sistema de diseño "Titanium Glassmorphism" para 
+proyectar exclusividad institucional y tecnología profunda ante inversores (VCs). 
+ 
+1. Sistema de Diseño (Design System) 
+La plataforma abandona el estilo tradicional de "portal inmobiliario" (fondos blancos, listas 
+planas) para adoptar una estética inmersiva, translúcida y de alto contraste. 
+●  Tema Base (Dark Mode Nativo): Fondos abstractos, texturizados o de gradientes 
+muy sutiles en tonos oscuros (Grafito, Obsidiana, Midnight Blue). Cuando se analiza 
+un activo (Capa 2), el fondo es la fotografía del activo en alta resolución a pantalla 
+completa. 
+●  Efecto "Frosted Glass" (Glassmorphism): Todos los contenedores de información 
+son paneles translúcidos. 
+○  Regla CSS Core: Uso de backdrop-filter: blur(16px) o superior, 
+fondos semi-transparentes (rgba(255, 255, 255, 0.05)), y bordes 
+ultradefinidos de 1px (border: 1px solid rgba(255, 255, 255, 
+0.1)). 
+●  Tipografía: Inter o SF Pro Display para limpieza absoluta. Tamaños de fuente 
+masivos para las métricas core (G-Score, IRR) y pesos ligeros (Light/Regular) para 
+el texto descriptivo. 
+●  Paleta de Acentos: Uso restringido del color. Tonos oro pálido, esmeralda suave o 
+azul eléctrico únicamente para el G-Score, las barras del radar ISV y los controles de 
+los sliders. 
+ 
+2. Stack Tecnológico Front-End 
+●  Framework: Next.js (App Router, React 18+). Optimizado para precarga de 
+imágenes de alta resolución y routing instantáneo. 
+●  Estilos: Tailwind CSS. Se extenderá la configuración para incluir utilidades 
+personalizadas de backdrop-blur y degradados de cristal. 
+----------------Page (0) Break----------------
+●  Animaciones (El "Efecto Wow"): Framer Motion. Obligatorio para la expansión 
+suave del radar ISV en tiempo real, las transiciones fluidas entre la Capa 1 y la Capa 
+2 (animaciones de Shared Layout), y los micro-interacciones de los sliders. 
+●  Gestión de Estado: Zustand. Maneja el estado reactivo del chat, el cálculo en vivo 
+del vector de inversión y la recalibración instantánea de métricas en la Capa 2. 
+●  Gráficos: Recharts o visx (para el gráfico de radar animado del ISV). 
+ 
+3. Árbol de Componentes y Vistas (Hero Flow) 
+Plaintext 
+/src 
+├── /components 
+│   ├── /ui                   (Componentes base: GlassCard, GlassSlider, Typography) 
+│   ├── /onboarding 
+│   │   ├── AiChatProfiler.tsx   (Interfaz conversacional transparente) 
+│   │   └── DynamicIsvRadar.tsx  (Gráfico de vector reactivo al estado) 
+│   ├── /orchestrator 
+│   │   └── TheOracleLoader.tsx  (Transición algorítmica inmersiva) 
+│   ├── /marketplace          (Progressive Disclosure) 
+│   │   ├── Layer1_GlassGrid.tsx (Grilla de resultados) 
+│   │   ├── Layer1_AssetCard.tsx (Tarjeta con el G-Score heroico) 
+│   │   ├── Layer2_Immersion.tsx (Vista Capa 2 a pantalla completa) 
+│   │   ├── Layer2_MetricsPanel.tsx (Cristales flotantes sobre la imagen) 
+│   │   └── SensitivitySlider.tsx (Controlador reactivo de estado) 
+│   └── /transparency 
+│       └── Layer3_DataRoomModal.tsx (Generador de Artifacts) 
+├── /store 
+│   └── useGeolandStore.ts    (Zustand store central) 
+└── /lib 
+    └── mockEngine.ts         (Contratos de datos del Excel estático) 
+ 
+ 
+4. Estructura de las Pantallas Principales 
+Vista 1: AI-First Profiler (El Onboarding) 
+●  Layout: Pantalla dividida asimétricamente. 
+●  Lado Izquierdo (60%): AiChatProfiler. Una interfaz de chat limpia y sin bordes 
+marcados. Las burbujas de la IA tienen el efecto cristal; las del usuario son más 
+tenues. Aquí el Agente Perfilador extrae las 4 variables clave. 
+●  Lado Derecho (40%): DynamicIsvRadar. Un panel flotante centrado que muestra 
+el polígono del Investor Strategy Vector. Sus vértices se animan suavemente hacia 
+los extremos a medida que el estado global de Zustand recibe el JSON oculto de la 
+IA. 
+----------------Page (1) Break----------------
+Vista 2: Layer 1 - Executive View 
+●  Layout: Grilla horizontal centrada. 
+●  Componente Core: Layer1_AssetCard. 
+●  Diseño Visual: Tarjetas de cristal. El número del G-Score ocupa un tercio de la 
+tarjeta visualmente. Debajo, 3 métricas minimalistas (IRR, Liquidez, Riesgo). En la 
+base, un párrafo de 2 líneas con el racional algorítmico generado por la IA. Todo flota 
+sobre un fondo oscuro texturizado. 
+Vista 3: Layer 2 - Analytical View (El "Aha Moment") 
+●  Layout: Inmersivo total (Full Screen). Al hacer clic en una tarjeta de la Capa 1, la 
+imagen de la propiedad se expande para ocupar todo el fondo de la pantalla. 
+●  Componentes Core: Múltiples Layer2_MetricsPanel flotando como "widgets" 
+sobre la foto de fondo. 
+○  W idget Izquierdo: Gráfico de líneas (Escenarios Base, Optimista, Estrés). 
+○  W idget Derecho Superior: Métricas específicas de la estrategia (ej. 
+Cash-on-Cash, Yield on Cost). 
+○  W idget Derecho Inferior: SensitivitySlider. Al arrastrar el control de 
+"Costo de Reforma" o "Tasa de Salida", los números del widget superior y las 
+líneas del gráfico izquierdo se actualizan instantáneamente a 60fps, 
+calculados localmente en el front-end. 
+ 
+5. Gestión de Estado Global (Zustand) 
+El store es la columna vertebral de la interactividad inmediata para la demostración ante 
+VCs. 
+TypeScript 
+// /store/useGeolandStore.ts 
+import create from 'zustand'; 
+ 
+interface GeolandState { 
+  // 1. Estado del AI Profiler 
+  isvScores: { capital: number; horizon: number; risk: number; operational: number }; 
+  updateIsv: (scores: Partial<GeolandState['isvScores']>) => void; 
+   
+  // 2. Estado de la Vista Analítica (Capa 2) 
+  activeAssetId: string | null; 
+  setActiveAsset: (id: string | null) => void; 
+   
+  // 3. Parámetros de Sensibilidad en Vivo 
+  sensitivity: { 
+    exitCapRate: number; 
+    capexOverrun: number; 
+----------------Page (2) Break----------------
+    timeOnMarket: number; 
+  }; 
+  updateSensitivity: (key: keyof GeolandState['sensitivity'], value: number) => void; 
+} 
+ 
+ 
+6. Contrato de Datos Base (Mock JSON) 
+Para que el desarrollador pueda maquetar la Capa 1 y Capa 2 sin depender del motor 
+algorítmico, este es el JSON estático que consumirá el front-end inicialmente. 
+JSON 
+{ 
+  "assets": [ 
+    { 
+      "id": "ES_MAD_88", 
+      "location": "Madrid, Spain", 
+      "strategy": "Fix & Flip", 
+      "layer1": { 
+        "gScore": 88, 
+        "expectedIrr": 0.18, 
+        "liquidity": "Media", 
+        "riskLevel": "Moderado", 
+        "rationale": "Compensación perfecta: Ejecución corta (12m) maximizando el capital en 
+Euros frente a tu perfil de riesgo.", 
+        "backgroundImageUrl": "/images/madrid_villa_highres.jpg" 
+      }, 
+      "layer2": { 
+        "metrics": { 
+          "roiTotal": 0.18, 
+          "netMargin": 0.15, 
+          "baseCapex": 45000 
+        }, 
+        "sensitivityConfig": { 
+          "capexRange": [30000, 80000], 
+          "exitRateRange": [4.0, 6.5] 
+        } 
+      } 
+    } 
+  ] 
+} 
+ 
+Esta documentación proporciona todo el contexto arquitectónico, estético y estructural. 
+Estás listo para ingresar este documento en Google Antigravity e indicarle al orquestador 
+que inicie la construcción guiada por interfaces (UI-Driven Development). 
+----------------Page (3) Break----------------
+ 
+----------------Page (4) Break----------------
+
+=== PROMPT ===
+Warning: Setting up fake worker.
+Warning: Found Type3 font (custom Glyph) - g_font_6_0, trying to decode
+Warning: Found Type3 font (custom Glyph) - g_font_7_0, trying to decode
+Warning: Found Type3 font (custom Glyph) - g_font_8_0, trying to decode
+Warning: Found Type3 font (custom Glyph) - g_font_12_0, trying to decode
+El Prompt Maestro: "The Oracle - GEOLAND Wealth Manager" 
+Plaintext 
+Eres "The Oracle", el Agente Perfilador Senior y W ealth Manager de GEOLAND, una 
+plataforma de inteligencia patrimonial inmobiliaria impulsada por IA.  
+ 
+Tu único objetivo es perfilar al inversor de manera conversacional y calcular su "Investor 
+Strategy Vector" (ISV) extrayendo 4 variables clave. Debes actuar con la sofisticación de un 
+banquero de inversión (BlackRock/Goldman Sachs), pero con la fluidez y claridad de un 
+producto de Apple. 
+ 
+ LAS 4 VARIABLES A EXTRAER (ISV): 
+1. Capital y Apalancamiento: Rango de inversión y disposición a usar deuda (LTV). 
+2. Horizonte y Liquidez: Tiempo de inmovilización del capital (<1 año, 1-3 años, 3-7 años, >7 
+años) y necesidad de flujo de caja. 
+3. Riesgo: Reacción ante la volatilidad (Conservador, Moderado, Agresivo). 
+4. Estrategia Preferida (opcional pero inferible): Renta pasiva (Buy & Hold), Value Add (Fix & 
+Flip/Rent), Desarrollo de suelo, o Farmland/Agro. 
+ 
+易 REGLAS DE COMPORTAMIENTO (ESTRICTAS): 
+- CERO FORMULARIOS: NUNCA envíes una lista de preguntas. Haz una sola pregunta a 
+la vez. Haz que se sienta como una charla de café de alto nivel. 
+- INFERENCIA ACTIVA (VITAL): Eres hiper-inteligente. Si el usuario dice "quiero comprar 
+un terreno para construir", YA SABES que la estrategia es Desarrollo, el horizonte es 
+medio/largo, y el riesgo es moderado/alto. NO le preguntes su horizonte ni su riesgo de 
+nuevo. Confírmalo sutilmente ("Veo que tienes apetito para el desarrollo, lo que asume un 
+riesgo moderado..."). 
+- ESPEJO LINGÜÍSTICO: Si el usuario dice "Cap Rate, IRR, Equity Multiple", responde con 
+jerga institucional. Si el usuario dice "quiero comprar un pisito para alquilar", usa lenguaje 
+coloquial, educativo y cercano, sin perder la elegancia. 
+- CIERRE DE MANDATO: En cuanto el ISV esté completo (tengas datos suficientes para las 
+4 variables), DETÉN las preguntas. Haz un resumen ejecutivo brillante de 2 líneas de su 
+"Mandato de Inversión" e indícale que estás buscando los activos en el mercado global. 
+ 
+⚙ FORMATO DE RESPUESTA OBLIGATORIO (JSON ESTRICTO): 
+Tu respuesta JAMÁS debe ser texto plano. SIEMPRE debes responder con un objeto JSON 
+válido. El sistema front-end depende de esto para animar los gráficos en tiempo real.  
+ 
+Estructura requerida: 
+{ 
+  "dialogo_ui": "La respuesta conversacional que leerá el usuario. Con empatía, elegancia y 
+la siguiente pregunta (si aplica).", 
+  "isv_data": { 
+    "capital_score": [Número del 0 al 100. 0 = Bajo capital/Sin deuda. 100 = Alto capital/Alto 
+LTV. null si no lo sabes], 
+    "horizonte_score": [Número del 0 al 100. 0 = Fix&Flip/Corto plazo. 100 = Farmland/>7 
+años. null si no lo sabes], 
+----------------Page (0) Break----------------
+    "riesgo_score": [Número del 0 al 100. 0 = Conservador absoluto. 100 = 
+Agresivo/Desarrollo. null si no lo sabes], 
+    "estrategia_inferida": ["Buy & Hold", "Fix & Flip", "Desarrollo", "Farmland", o null], 
+    "perfil_completado": [Booleano: true solo si ya tienes las 4 variables claras y te despides] 
+  } 
+} 
+ 
+ 
+ Notas de Implementación para el Front-End (Next.js) 
+1. El Primer Mensaje (El Rompehielos): Para que la interfaz no empiece en blanco, 
+tu front-end debe enviarle un mensaje "invisible" de inicio a la API al cargar la 
+página. Por ejemplo: [SYSTEM COMMAND]: Inicia la conversación 
+saludando al inversor y haciendo tu primera pregunta 
+estratégica. 
+El Mapeo en Zustand: Cuando la API te devuelva el JSON, tu código en Next.js hará algo 
+tan simple como esto: 
+JavaScript 
+// Pseudocódigo 
+const respuesta = await llamarGeminiAPI(historialMensajes); 
+const data = JSON.parse(respuesta); 
+ 
+// 1. Mostrar texto en el chat 
+agregarMensajeAlChat(data.dialogo_ui); 
+ 
+// 2. Mover el Radar en tiempo real (El Aha Moment) 
+if (data.isv_data.horizonte_score !== null) { 
+    actualizarRadarUI('horizonte', data.isv_data.horizonte_score); 
+} 
+ 
+// 3. Transición a Capa 1 
+if (data.isv_data.perfil_completado === true) { 
+    iniciarAnimacionTheOracle(); 
+    cargarMarketplace(data.isv_data); 
+2. } 
+ 
+----------------Page (1) Break----------------
+
