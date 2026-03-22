@@ -169,16 +169,18 @@ export function AiChatProfiler() {
 
                 if (perfilCompletado && data.extraccion_datos?.confirmacion_busqueda === true) {
                     const store = useGeolandStore.getState();
-                    const payload = {
-                        filtrosDuros: store.filtrosDuros,
-                        filtrosBlandosIsv: store.filtrosBlandosIsv,
-                        preferenciasAgro: (store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' || store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK') ? store.preferenciasAgro : null
-                    };
 
                     setIsRefining(true);
                     try {
                         // Dynamic import to avoid breaking components loading rules across react
-                        const { fetchMatch } = await import('@/lib/api/geolandService');
+                        const { fetchMatch, buildMatchPayload } = await import('@/lib/api/geolandService');
+                        const payload = buildMatchPayload(
+                            store.filtrosDuros,
+                            store.filtrosBlandosIsv,
+                            {
+                                preferenciasAgro: (store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' || store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK') ? store.preferenciasAgro : null
+                            }
+                        );
                         const nuevosAssets = await fetchMatch(payload);
                         setAssets(nuevosAssets);
                     } catch (error) {

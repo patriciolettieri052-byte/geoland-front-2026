@@ -36,7 +36,18 @@ export function useAssets() {
                 );
                 setAssets(assetsWithRationale);
             })
-            .catch(err => setError(err.message))
+            .catch(err => {
+                // NOTE: This hook is currently unused. The real fix for infinite loading 
+                // is applied directly in page.tsx where fetching actually occurs.
+                console.error('[useAssets] fetchMatch falló:', err);
+                if (err.message === 'NO_ASSETS_MATCH') {
+                    setAssets([]);
+                    setError(null);
+                } else {
+                    setError('No se pudieron cargar los resultados. Intentá de nuevo.');
+                }
+                setLoading(false);
+            })
             .finally(() => setLoading(false));
     }, [perfilCompletado, filtrosDuros, filtrosBlandosIsv]);
 

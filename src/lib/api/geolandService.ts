@@ -59,6 +59,25 @@ export interface RecalculateResponse {
 }
 
 // ── POST /api/v1/core/match ───────────────────────────────────────
+function sanitizeFiltrosDuros(f: FiltrosDuros): FiltrosDuros {
+    return {
+        ubicacion:         f?.ubicacion         ?? "todos",
+        tipoActivo:        f?.tipoActivo        ?? "todos",
+        presupuestoMaximo: f?.presupuestoMaximo ?? 0,
+        moneda:            f?.moneda            ?? "USD",
+    };
+}
+
+function sanitizeFiltrosBlandos(b: FiltrosBlandosIsv): FiltrosBlandosIsv {
+    return {
+        estrategiaObjetivo: b?.estrategiaObjetivo ?? "todas",
+        horizonteAnos:      b?.horizonteAnos      ?? "todos",
+        involucramiento:    b?.involucramiento     ?? "todos",
+        riesgoTolerancia:   b?.riesgoTolerancia    ?? "todos",
+        financiacion:       b?.financiacion        ?? "todos",
+        mercadoPreferencia: b?.mercadoPreferencia  ?? "todos",
+    };
+}
 export function buildMatchPayload(
     filtrosDuros: FiltrosDuros,
     filtrosBlandosIsv: FiltrosBlandosIsv,
@@ -70,7 +89,9 @@ export function buildMatchPayload(
         experience_level?: string | null;
     }
 ): MatchPayload {
-    const payload: MatchPayload = { filtrosDuros, filtrosBlandosIsv };
+    const safeDuros   = sanitizeFiltrosDuros(filtrosDuros);
+    const safeBlandos = sanitizeFiltrosBlandos(filtrosBlandosIsv);
+    const payload: MatchPayload = { filtrosDuros: safeDuros, filtrosBlandosIsv: safeBlandos };
     if (extras?.preferenciasAgro) payload.preferenciasAgro = extras.preferenciasAgro;
     // Campos ISV expandido — solo incluir si tienen valor en el store
     if (extras?.investor_type)         payload.investor_type    = extras.investor_type;

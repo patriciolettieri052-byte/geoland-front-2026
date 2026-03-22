@@ -32,6 +32,7 @@ export default function GeolandOS() {
   } = useGeolandStore();
 
   const [currentTheme, setCurrentTheme] = useState<Theme>('geoland');
+  const [error, setError] = useState<string | null>(null);
 
   const themes: { id: Theme; icon: any; label: string; bg: string }[] = [
     { id: 'geoland', icon: Zap, label: 'Geoland OS', bg: '/monolith2.jpeg' },
@@ -61,12 +62,29 @@ export default function GeolandOS() {
 
     // We fetch the assets upon initial loader completion for the first rendering.
     if (assets.length === 0) {
+      setError(null);
+      const timeoutId = setTimeout(() => {
+        setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
+      }, 15000);
+
       try {
-        const { fetchMatch } = await import('@/lib/api/geolandService');
-        const data = await fetchMatch({ filtrosDuros, filtrosBlandosIsv });
+        const { fetchMatch, buildMatchPayload } = await import('@/lib/api/geolandService');
+        const store = useGeolandStore.getState();
+        const payload = buildMatchPayload(store.filtrosDuros, store.filtrosBlandosIsv, {
+            preferenciasAgro: (store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' || store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK') ? store.preferenciasAgro : null
+        });
+        const data = await fetchMatch(payload);
+        clearTimeout(timeoutId);
         setAssets(data);
-      } catch (error) {
-        console.error(error);
+      } catch (err: any) {
+        clearTimeout(timeoutId);
+        console.error(err);
+        if (err.message === 'NO_ASSETS_MATCH') {
+            setAssets([]);
+            setError(null);
+        } else {
+            setError('No se pudieron cargar los resultados. Intentá de nuevo.');
+        }
       }
     }
   };
@@ -202,15 +220,29 @@ export default function GeolandOS() {
                       </div>
 
                       <div className="flex-1">
-                        <Layer1GlassGrid assets={filteredAssets} onAssetClick={setActiveAsset} />
+                        {error ? (
+                            <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-8">
+                                <p className="text-white/60 text-lg mb-4">{error}</p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                                >
+                                    Reintentar
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <Layer1GlassGrid assets={filteredAssets} onAssetClick={setActiveAsset} />
 
-                        {filteredAssets.length === 0 && (
-                          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center opacity-70">
-                            <Typography variant="h4" className="text-white/80">Sin coincidencias estrictas</Typography>
-                            <Typography variant="p" className="max-w-xs mt-4 leading-relaxed text-sm text-white/50">
-                              Tus filtros duros (Ubicación, Tipo) son restrictivos para el mock actual.
-                            </Typography>
-                          </motion.div>
+                                {filteredAssets.length === 0 && (
+                                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center opacity-70">
+                                    <Typography variant="h4" className="text-white/80">Sin coincidencias estrictas</Typography>
+                                    <Typography variant="p" className="max-w-xs mt-4 leading-relaxed text-sm text-white/50">
+                                      Tus filtros duros (Ubicación, Tipo) son restrictivos para el mock actual.
+                                    </Typography>
+                                  </motion.div>
+                                )}
+                            </>
                         )}
                       </div>
                     </motion.div>
