@@ -51,42 +51,64 @@ export default function GeolandOS() {
 
   // Handle flow transitions based on Zustand state
   useEffect(() => {
-    if (perfilCompletado && assets.length === 0 && !isRefining) {
-      // initial fetch
-      setIsRefining(true);
-    }
-  }, [perfilCompletado, assets.length, isRefining, setIsRefining]);
+    if (!perfilCompletado || assets.length > 0) return;
 
-  const handleLoaderComplete = async () => {
-    setIsRefining(false);
+    let cancelled = false;
 
-    // We fetch the assets upon initial loader completion for the first rendering.
-    if (assets.length === 0) {
-      setError(null);
-      const timeoutId = setTimeout(() => {
-        setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
-      }, 15000);
-
-      try {
-        const { fetchMatch, buildMatchPayload } = await import('@/lib/api/geolandService');
-        const store = useGeolandStore.getState();
-        const payload = buildMatchPayload(store.filtrosDuros, store.filtrosBlandosIsv, {
-            preferenciasAgro: (store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' || store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK') ? store.preferenciasAgro : null
-        });
-        const data = await fetchMatch(payload);
-        clearTimeout(timeoutId);
-        setAssets(data);
-      } catch (err: any) {
-        clearTimeout(timeoutId);
-        console.error(err);
-        if (err.message === 'NO_ASSETS_MATCH') {
-            setAssets([]);
-            setError(null);
-        } else {
-            setError('No se pudieron cargar los resultados. Intentá de nuevo.');
+    const timeoutId = setTimeout(() => {
+        if (!cancelled) {
+            setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
+            setIsRefining(false);
         }
-      }
+    }, 15000);
+
+    setIsRefining(true);
+
+    (async () => {
+        try {
+            const { fetchMatch, buildMatchPayload } = await import('@/lib/api/geolandService');
+            const store = useGeolandStore.getState();
+            const payload = buildMatchPayload(store.filtrosDuros, store.filtrosBlandosIsv, {
+                preferenciasAgro: (
+                    store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' ||
+                    store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK'
+                ) ? store.preferenciasAgro : null
+            });
+            const data = await fetchMatch(payload);
+            if (!cancelled) {
+                clearTimeout(timeoutId);
+                setAssets(data);
+            }
+        } catch (err: any) {
+            if (!cancelled) {
+                clearTimeout(timeoutId);
+                console.error('[page.tsx] fetchMatch falló:', err);
+                if (err.message === 'NO_ASSETS_MATCH') {
+                    setAssets([]);
+                    setError(null);
+                } else {
+                    setError('No se pudieron cargar los resultados. Intentá de nuevo.');
+                }
+            }
+        } finally {
+            if (!cancelled) setIsRefining(false);
+        }
+    })();
+
+    return () => {
+        cancelled = true;
+        clearTimeout(timeoutId);
+    };
+  }, [perfilCompletado]);
+
+  const handleLoaderComplete = () => {
+    // El fetch ya corrió en el useEffect de arriba.
+    // Esta función solo cierra el loader visualmente cuando los assets ya llegaron.
+    if (assets.length > 0 || error) {
+        setIsRefining(false);
     }
+    // Si assets todavía está vacío y no hay error, el fetch sigue corriendo —
+    // el loader se mantiene hasta que el useEffect llame setIsRefining(false).
   };
 
   // 🧠 THE MATCHMAKER ENGINE - Only client side sorting rendering now, backend filters the arrays.

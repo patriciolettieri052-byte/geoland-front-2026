@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Typography } from '../ui/Typography';
 
@@ -8,6 +9,14 @@ interface TheOracleLoaderProps {
 }
 
 export function TheOracleLoader({ onComplete }: TheOracleLoaderProps) {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onComplete();
+        }, 4000); // 4 segundos fijos — independiente de Framer Motion
+
+        return () => clearTimeout(timer); // cleanup si se desmonta antes
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -33,14 +42,6 @@ export function TheOracleLoader({ onComplete }: TheOracleLoaderProps) {
                     analizando los activos recomendados para ti
                 </Typography>
             </motion.div>
-
-            {/* Auto-transition trigger */}
-            <motion.div
-                onAnimationComplete={() => setTimeout(onComplete, 2000)}
-                animate={{ opacity: 1 }}
-                initial={{ opacity: 0 }}
-                transition={{ duration: 3.5 }}
-            />
         </motion.div>
     );
 }
