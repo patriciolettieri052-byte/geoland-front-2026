@@ -60,7 +60,7 @@ export default function GeolandOS() {
             setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
             setIsRefining(false);
         }
-    }, 15000);
+    }, 30000);
 
     setIsRefining(true);
 
