@@ -5,31 +5,48 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import { motion } from 'framer-motion';
 import { Typography } from '../ui/Typography';
 
-const INVESTOR_TYPE_LABELS: Record<string, string> = {
-    retail_exploratorio: '👤 Retail',
-    retail_activo: '👤 Retail Activo',
-    profesional_independiente: '💼 Profesional',
-    advisor_wealth_manager: '🤝 Advisor',
-    family_office: '🏛️ Family Office',
-    fondo_institucional: '🏦 Institucional',
-};
-
 export function DynamicIsvRadar() {
-    const { filtrosBlandosIsv, isvExpandido } = useGeolandStore();
+    const { isvV4 } = useGeolandStore();
 
-    const mapStr = (val: string | null, def: number, map: Record<string, number>) => val && map[val] ? map[val] : def;
+    const mapValue = (val: string | null, map: Record<string, number>) => (val && map[val] ? map[val] : 10);
 
     const data = [
-        { subject: 'Strategy', A: mapStr(filtrosBlandosIsv.estrategiaObjetivo, 10, { "Renta": 30, "Buy & Hold": 50, "Fix & Flip": 90, "Farmland": 20 }), fullMark: 100 },
-        { subject: 'Horizon', A: mapStr(filtrosBlandosIsv.horizonteAnos, 10, { "1-2": 20, "3-5": 50, ">5": 90, "Flexible": 50 }), fullMark: 100 },
-        { subject: 'Involve', A: mapStr(filtrosBlandosIsv.involucramiento, 10, { "Activo": 90, "Medio": 50, "Pasivo": 10 }), fullMark: 100 },
-        { subject: 'Risk', A: mapStr(filtrosBlandosIsv.riesgoTolerancia, 10, { "Bajo": 20, "Medio": 50, "Alto": 90 }), fullMark: 100 },
-        { subject: 'Finance', A: mapStr(filtrosBlandosIsv.financiacion, 10, { "100% Propio": 10, "Con Deuda": 90, "Depende": 50 }), fullMark: 100 },
-        { subject: 'Market', A: mapStr(filtrosBlandosIsv.mercadoPreferencia, 10, { "Consolidados": 20, "Emergentes": 80, "Ambos": 50 }), fullMark: 100 },
+        { 
+            subject: 'Strategy', 
+            A: isvV4.strategy_cluster.length > 0 ? 80 : (isvV4.strategy_intent ? 40 : 10), 
+            fullMark: 100 
+        },
+        { 
+            subject: 'Effort', 
+            A: mapValue(isvV4.effort_level, { "low": 20, "medium": 60, "high": 100 }), 
+            fullMark: 100 
+        },
+        { 
+            subject: 'Budget', 
+            A: mapValue(isvV4.budget_range, { "low": 20, "medium": 60, "high": 100 }), 
+            fullMark: 100 
+        },
+        { 
+            subject: 'Tradeoff', 
+            A: mapValue(isvV4.decision_tradeoff, { "yield": 20, "balanced": 60, "appreciation": 100 }), 
+            fullMark: 100 
+        },
+        { 
+            subject: 'Horizon', 
+            A: mapValue(isvV4.time_horizon, { "short": 20, "medium": 60, "long": 100 }), 
+            fullMark: 100 
+        },
     ];
 
-    const cs = isvExpandido.confidenceScore;
-    const isConfident = cs >= 60;
+    // Cálculo de confianza agregada (ISV-V4-05)
+    const confMap: Record<string, number> = { 'high': 100, 'medium': 60, 'low': 20 };
+    const confFields = Object.values(isvV4.confidence_by_field);
+    const definedConf = confFields.filter(v => v !== null) as string[];
+    const cs = definedConf.length > 0 
+        ? definedConf.reduce((acc, val) => acc + (confMap[val] || 0), 0) / definedConf.length
+        : 0;
+
+    const isConfident = isvV4.isv_sufficient;
 
     return (
         <div className="relative w-full h-full min-h-[500px] flex flex-col items-center justify-center">
@@ -68,14 +85,14 @@ export function DynamicIsvRadar() {
                 </ResponsiveContainer>
             </motion.div>
 
-            <div className="absolute bottom-8 text-center bg-black/40 backdrop-blur-md border border-white/5 py-3 px-8 rounded-full">
-                <Typography variant="label" className="text-white">Investor Strategy Vector</Typography>
+            <div className="absolute bottom-16 text-center bg-black/40 backdrop-blur-md border border-white/5 py-3 px-8 rounded-full">
+                <Typography variant="label" className="text-white">Investor Strategy Vector v4</Typography>
             </div>
 
-            {/* ── CONFIDENCE BAR (FRONT-ISV-EXP-05) ─────────────────── */}
+            {/* ── CONFIDENCE BAR ─────────────────── */}
             <div className="w-full px-6 mt-4">
                 <div className="flex justify-between text-xs text-white/50 mb-1">
-                    <span>Confianza del perfil</span>
+                    <span>Confianza del vector</span>
                     <span>{cs.toFixed(0)}%</span>
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-1.5">
@@ -88,33 +105,33 @@ export function DynamicIsvRadar() {
                 </div>
             </div>
 
-            {/* ── ISV EXPANDED TAGS (FRONT-ISV-EXP-05) ──────────────── */}
+            {/* ── ISV V4 TAGS ──────────────── */}
             <div className="flex flex-wrap gap-1.5 px-6 mt-3 justify-center">
-                {isvExpandido.investorType && (
-                    <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
-                        {INVESTOR_TYPE_LABELS[isvExpandido.investorType] ?? isvExpandido.investorType}
+                {isvV4.final_strategy && (
+                    <span className="text-xs bg-emerald-900/40 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        🎯 {isvV4.final_strategy}
                     </span>
                 )}
-                {isvExpandido.experienceLevel && (
+                {isvV4.effort_level && (
                     <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
-                        {isvExpandido.experienceLevel}
+                        Esfuerzo: {isvV4.effort_level}
                     </span>
                 )}
-                {isvExpandido.liquidityNeed && (
+                {isvV4.budget_range && (
                     <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
-                        Liquidez {isvExpandido.liquidityNeed}
+                        Presupuesto: {isvV4.budget_range}
                     </span>
                 )}
-                {isvExpandido.avoidedGeographies?.map(g => (
-                    <span key={g} className="text-xs bg-red-900/40 text-red-300 px-2 py-0.5 rounded-full border border-red-500/20">
-                        Evita: {g}
+                {isvV4.time_horizon && (
+                    <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
+                        Plazo: {isvV4.time_horizon}
                     </span>
-                ))}
-                {isvExpandido.subStrategies?.map(s => (
-                    <span key={s} className="text-xs bg-emerald-900/30 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                        {s}
+                )}
+                {isvV4.isv_sufficient && (
+                    <span className="text-xs bg-blue-900/40 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/20">
+                        ✅ Perfil Completo
                     </span>
-                ))}
+                )}
             </div>
         </div>
     );

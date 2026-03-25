@@ -38,6 +38,41 @@ export interface IsvExpandido {
     presupuestoMinimo: number | null;
 }
 
+// ── ISV V4 — schema nuevo (ISV-V4-01) ─────────────────────────────
+export type StrategyIntent =
+  | 'income' | 'resale' | 'passive' | 'development'
+  | 'land' | 'commercial' | 'appreciation' | 'mixed' | null;
+
+export type FinalStrategy =
+  | 'buy_hold' | 'rental' | 'fix_and_flip' | 'fix_and_rent'
+  | 'appreciation' | 'development' | 'commercial' | 'land' | 'opportunistic' | null;
+
+export type EffortLevel = 'passive' | 'semi_active' | 'active' | null;
+export type BudgetRange = 'under_100k' | '100k_300k' | '300k_1m' | 'over_1m' | null;
+export type DecisionTradeoff = 'simple_predictable' | 'higher_upside' | 'balanced' | null;
+export type TimeHorizon = 'short' | 'mid' | 'long' | null;
+export type ConfidenceLevel = 'high' | 'medium' | 'low' | null;
+
+export interface IsvV4 {
+  strategy_intent: StrategyIntent;
+  strategy_cluster: FinalStrategy[];
+  final_strategy: FinalStrategy;
+  effort_level: EffortLevel;
+  budget_range: BudgetRange;
+  decision_tradeoff: DecisionTradeoff;
+  time_horizon: TimeHorizon;
+  confidence_by_field: {
+    strategy_intent: ConfidenceLevel;
+    strategy_cluster: ConfidenceLevel;
+    final_strategy: ConfidenceLevel;
+    effort_level: ConfidenceLevel;
+    budget_range: ConfidenceLevel;
+    decision_tradeoff: ConfidenceLevel;
+    time_horizon: ConfidenceLevel;
+  };
+  isv_sufficient: boolean;
+}
+
 export interface Message {
     role: 'user' | 'assistant';
     content: string;
@@ -89,6 +124,10 @@ export interface GeolandState {
     setCurrentState: (s: ConversationState) => void;
     isvExpandido: IsvExpandido;
     updateIsvExpandido: (partial: Partial<IsvExpandido>) => void;
+    // ISV V4
+    isvV4: IsvV4;
+    updateIsvV4: (partial: Partial<IsvV4>) => void;
+    resetIsvV4: () => void;
     contradictionDetected: boolean;
     setContradictionDetected: (v: boolean) => void;
 }
@@ -112,6 +151,26 @@ const initialFiltrosBlandos: FiltrosBlandosIsv = {
 const initialPreferenciasAgro: PreferenciasAgro = {
     zonaAgroecologica: null,
     accesoAgua: null,
+};
+
+const initialIsvV4: IsvV4 = {
+  strategy_intent: null,
+  strategy_cluster: [],
+  final_strategy: null,
+  effort_level: null,
+  budget_range: null,
+  decision_tradeoff: null,
+  time_horizon: null,
+  confidence_by_field: {
+    strategy_intent: null,
+    strategy_cluster: null,
+    final_strategy: null,
+    effort_level: null,
+    budget_range: null,
+    decision_tradeoff: null,
+    time_horizon: null,
+  },
+  isv_sufficient: false,
 };
 
 const initialSensitivity = {
@@ -149,7 +208,8 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         iterandoResultados: false,
         activeAssetId: null,
         assets: [],
-        isRefining: false
+        isRefining: false,
+        isvV4: initialIsvV4,
     }),
 
     assets: [],
@@ -191,6 +251,11 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     updateIsvExpandido: (partial) => set((state) => ({
         isvExpandido: { ...state.isvExpandido, ...partial }
     })),
+    isvV4: initialIsvV4,
+    updateIsvV4: (partial) => set((state) => ({
+      isvV4: { ...state.isvV4, ...partial }
+    })),
+    resetIsvV4: () => set({ isvV4: initialIsvV4 }),
     contradictionDetected: false,
     setContradictionDetected: (contradictionDetected) => set({ contradictionDetected }),
 }));

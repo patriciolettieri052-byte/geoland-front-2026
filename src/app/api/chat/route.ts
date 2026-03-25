@@ -73,6 +73,56 @@ function applyConfidenceGuard(jsonOutput: any): any {
     return jsonOutput;
 }
 
+// ── ISV V4: mapeo del response de Gemini al store (ISV-V4-03) ──────
+function mapGeminiToIsvV4(isvV4Raw: any): any {
+    if (!isvV4Raw) return null;
+    return {
+        strategy_intent: isvV4Raw.strategy_intent ?? null,
+        strategy_cluster: Array.isArray(isvV4Raw.strategy_cluster) ? isvV4Raw.strategy_cluster : [],
+        final_strategy: isvV4Raw.final_strategy ?? null,
+        effort_level: isvV4Raw.effort_level ?? null,
+        budget_range: isvV4Raw.budget_range ?? null,
+        decision_tradeoff: isvV4Raw.decision_tradeoff ?? null,
+        time_horizon: isvV4Raw.time_horizon ?? null,
+        confidence_by_field: {
+            strategy_intent: isvV4Raw.confidence_by_field?.strategy_intent ?? null,
+            strategy_cluster: isvV4Raw.confidence_by_field?.strategy_cluster ?? null,
+            final_strategy: isvV4Raw.confidence_by_field?.final_strategy ?? null,
+            effort_level: isvV4Raw.confidence_by_field?.effort_level ?? null,
+            budget_range: isvV4Raw.confidence_by_field?.budget_range ?? null,
+            decision_tradeoff: isvV4Raw.confidence_by_field?.decision_tradeoff ?? null,
+            time_horizon: isvV4Raw.confidence_by_field?.time_horizon ?? null,
+        },
+        isv_sufficient: isvV4Raw.isv_sufficient === true,
+    };
+}
+
+// ── ISV V4: guardrail de suficiencia (ISV-V4-03) ────────────────────
+// Bloquea isv_sufficient si faltan campos críticos con confianza media/alta
+function applyIsvV4SufficiencyGuard(jsonOutput: any): any {
+    const v4 = jsonOutput?.isv_v4;
+    if (!v4 || v4.isv_sufficient !== true) return jsonOutput;
+
+    const cf = v4.confidence_by_field ?? {};
+    const acceptable = (level: string | null) => level === 'high' || level === 'medium';
+
+    const clusterOk = acceptable(cf.strategy_cluster);
+    const effortOk  = acceptable(cf.effort_level);
+    const budgetOk  = acceptable(cf.budget_range);
+    const hasOneOf  = acceptable(cf.decision_tradeoff) || acceptable(cf.time_horizon);
+
+    if (!clusterOk || !effortOk || !budgetOk || !hasOneOf) {
+        console.warn('[ISV-V4] isv_sufficient bloqueado — faltan campos críticos con confianza suficiente', {
+            clusterOk, effortOk, budgetOk, hasOneOf
+        });
+        return {
+            ...jsonOutput,
+            isv_v4: { ...v4, isv_sufficient: false }
+        };
+    }
+    return jsonOutput;
+}
+
 // Fire-and-forget analytics helper — never throws (FRONT-ISV-EXP-03)
 async function trackEvent(event: string, props: Record<string, any> = {}) {
     try {
@@ -136,14 +186,26 @@ You must respond ONLY with the valid JSON object described in the instructions.
             throw new Error('Invalid JSON format in AI response');
         }
 
-        // Apply confidence guard before processing
-        jsonOutput = applyConfidenceGuard(jsonOutput);
+        // Apply legacy confidence guard for v3 (Refinamiento flow)
+        if (!perfilCompletado) {
+            // Apply ISV v4 guard and mapping
+            jsonOutput = applyIsvV4SufficiencyGuard(jsonOutput);
+        } else {
+            // Legacy v3 path
+            jsonOutput = applyConfidenceGuard(jsonOutput);
+        }
+
+        const isvV4Mapeado = mapGeminiToIsvV4(jsonOutput.isv_v4);
+        const isvSufficient = jsonOutput.isv_v4?.isv_sufficient ?? false;
 
         const mapped = jsonOutput.extraccion_datos
             ? mapGeminiToStore(jsonOutput.extraccion_datos)
             : null;
 
         // Analytics events (fire-and-forget)
+        if (isvSufficient) trackEvent('isv_v4_sufficient');
+        if (jsonOutput.isv_v4?.strategy_cluster?.length > 0) trackEvent('isv_v4_cluster_defined');
+
         const newState = jsonOutput.extraccion_datos?.current_state;
         const extDatos = jsonOutput.extraccion_datos;
         if (newState === 'CONFIRMATION') trackEvent('isv_profile_confirmed');
@@ -152,10 +214,12 @@ You must respond ONLY with the valid JSON object described in the instructions.
 
         return NextResponse.json({
             dialogo_ui: jsonOutput.dialogo_ui,
+            isvV4_mapeado: isvV4Mapeado,
+            perfil_completado: perfilCompletado ? (extDatos?.perfil_completado ?? false) : isvSufficient,
+            // legacy fields — mantener para REFINAMIENTO_SYSTEM_PROMPT que aún usa v3
             current_state: newState ?? currentState ?? 'INIT',
             contradiccion_detectada: extDatos?.contradiccion_detectada ?? false,
             extraccion_mapeada: mapped,
-            perfil_completado: extDatos?.perfil_completado ?? false,
             iterando_resultados: extDatos?.iterando_resultados ?? false,
         });
 

@@ -23,6 +23,7 @@ export function AiChatProfiler() {
         contradictionDetected,
         currentState,
         isvExpandido,
+        updateIsvV4,
     } = useGeolandStore();
 
     const [input, setInput] = useState('');
@@ -123,11 +124,27 @@ export function AiChatProfiler() {
                 setMessages((prev) => [...prev, { role: 'assistant', content: data.dialogo_ui }]);
             }
 
-            // Update Zustand local state based on LLM inference
+            // ISV V4 — actualizar store con el nuevo schema (ISV-V4-04)
+            if (data.isvV4_mapeado) {
+                updateIsvV4(data.isvV4_mapeado);
+            }
+
+            // Transición a Capa 1 cuando el ISV es suficiente
+            if (data.perfil_completado && !perfilCompletado) {
+                setTimeout(() => {
+                    setPerfilCompletado(true);
+                }, 3000);
+            }
+
+            // Refinamiento (REFINAMIENTO_SYSTEM_PROMPT — legacy, se mantiene)
+            if (data.iterando_resultados !== undefined) {
+                setIterandoResultados(data.iterando_resultados);
+            }
+
+            // Legacy v3 mapping (only if present, for backward compatibility during refinement)
             if (data.extraccion_mapeada) {
                 const { filtrosDuros, filtrosBlandosIsv, preferenciasAgro, isvExpandido: isvExp } = data.extraccion_mapeada;
-                const { perfil_completado: completadoPayload, iterando_resultados } = data;
-
+                
                 updateFiltros(
                     {
                         ubicacion: filtrosDuros?.ubicacion || null,
@@ -146,53 +163,37 @@ export function AiChatProfiler() {
                     preferenciasAgro
                 );
 
-                // Update ISV Expandido in store (FRONT-ISV-EXP-04)
                 if (isvExp) updateIsvExpandido(isvExp);
+            }
 
-                // Update state machine position
-                if (data.current_state) setCurrentState(data.current_state);
+            if (data.current_state) setCurrentState(data.current_state);
+            setContradictionDetected(data.contradiccion_detectada ?? false);
 
-                // Update contradiction flag
-                setContradictionDetected(data.contradiccion_detectada ?? false);
+            if (perfilCompletado && data.extraccion_datos?.confirmacion_busqueda === true) {
+                const store = useGeolandStore.getState();
 
-                if (iterando_resultados) {
-                    setIterandoResultados(true);
-                }
-
-                // FRONT-ISV-EXP-04: only mark complete if confidence_score >= 60
-                const cs = isvExp?.confidenceScore ?? 0;
-                if (completadoPayload && cs >= 60 && !perfilCompletado) {
-                    setTimeout(() => {
-                        setPerfilCompletado(true);
-                    }, 3000);
-                }
-
-                if (perfilCompletado && data.extraccion_datos?.confirmacion_busqueda === true) {
-                    const store = useGeolandStore.getState();
-
-                    setIsRefining(true);
-                    try {
-                        // Dynamic import to avoid breaking components loading rules across react
-                        const { fetchMatch, buildMatchPayload } = await import('@/lib/api/geolandService');
-                        const payload = buildMatchPayload(
-                            store.filtrosDuros,
-                            store.filtrosBlandosIsv,
-                            {
-                                preferenciasAgro: (store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' || store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK') ? store.preferenciasAgro : null
-                            }
-                        );
-                        const nuevosAssets = await fetchMatch(payload);
-                        setAssets(nuevosAssets);
-                    } catch (error) {
-                        // Si no hay resultados, el agente ya informó — no romper la grilla
-                        console.error("No matches for the iteration.", error);
-                        setMessages(prev => [...prev, {
-                            role: 'assistant',
-                            content: 'Mi analizador indexó un error al mapear esos parámetros exactos. ¿Ajustamos algo más para ser un poco más flexibles?'
-                        }]);
-                    } finally {
-                        setIsRefining(false);
-                    }
+                setIsRefining(true);
+                try {
+                    // Dynamic import to avoid breaking components loading rules across react
+                    const { fetchMatch, buildMatchPayload } = await import('@/lib/api/geolandService');
+                    const payload = buildMatchPayload(
+                        store.filtrosDuros,
+                        store.filtrosBlandosIsv,
+                        {
+                            preferenciasAgro: (store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' || store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK') ? store.preferenciasAgro : null
+                        }
+                    );
+                    const nuevosAssets = await fetchMatch(payload);
+                    setAssets(nuevosAssets);
+                } catch (error) {
+                    // Si no hay resultados, el agente ya informó — no romper la grilla
+                    console.error("No matches for the iteration.", error);
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: 'Mi analizador indexó un error al mapear esos parámetros exactos. ¿Ajustamos algo más para ser un poco más flexibles?'
+                    }]);
+                } finally {
+                    setIsRefining(false);
                 }
             }
 
