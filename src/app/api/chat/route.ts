@@ -172,7 +172,7 @@ You must respond ONLY with the valid JSON object described in the instructions.
 `;
 
         const response = await genAI.models.generateContent({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-2.5-flash',
             contents: fullPrompt,
         });
 
