@@ -101,6 +101,73 @@ export function buildMatchPayload(
     return payload;
 }
 
+// ── TRADUCCIÓN ISV V6 → MatchPayload (ISV-V6-04) ──────────────────
+const STRATEGY_MAP: Record<string, string> = {
+  'buy_hold_income':      'RENTA',
+  'rental_long_term':     'RENTA',
+  'short_term_rental':    'SHORT_TERM_RENTAL',
+  'rental_short_term':    'SHORT_TERM_RENTAL',
+  'fix_and_flip':         'FIX_FLIP',
+  'development':          'GREENFIELD',
+  'farmland_agriculture': 'FARMLAND',
+  'agriculture':          'FARMLAND',
+  'farmland_livestock':   'LIVESTOCK',
+  'livestock':            'LIVESTOCK',
+  'farmland_mixed':       'FARMLAND',
+  'nnn_commercial':       'NNN_COMERCIAL',
+  'commercial':           'NNN_COMERCIAL',
+  'opportunistic':        'DISTRESS',
+};
+
+const EFFORT_MAP: Record<string, string> = {
+  low: 'Pasivo', medium: 'Medio', high: 'Activo'
+};
+const HORIZON_MAP: Record<string, string> = {
+  short: 'Corto', medium: 'Medio', long: 'Largo'
+};
+const TRADEOFF_MAP: Record<string, string> = {
+  conservative: 'Bajo', balanced: 'Medio', growth_tolerant: 'Alto'
+};
+
+export function buildMatchPayloadFromV6(
+    isvV6: import('@/store/useGeolandStore').IsvV6
+): MatchPayload {
+    const strategyKey = isvV6.main_strategy ?? isvV6.strategy_primary ?? '';
+    const estrategia  = STRATEGY_MAP[strategyKey] ?? 'todas';
+    const mercado     = isvV6.preferred_markets?.[0] ?? 'todos';
+    const tipoActivo  = isvV6.asset_class === 'farmland'
+        ? 'farmland'
+        : (isvV6.sub_asset_class ?? 'todos');
+
+    const filtrosDuros: FiltrosDuros = {
+        ubicacion:         mercado,
+        tipoActivo:        tipoActivo,
+        presupuestoMaximo: isvV6.budget?.amount_max ?? 0,
+        moneda:            isvV6.budget?.currency   ?? 'USD',
+    };
+
+    const filtrosBlandosIsv: FiltrosBlandosIsv = {
+        estrategiaObjetivo: estrategia,
+        horizonteAnos:      HORIZON_MAP[isvV6.time_horizon ?? '']    ?? 'todos',
+        involucramiento:    EFFORT_MAP[isvV6.effort_level ?? '']     ?? 'todos',
+        riesgoTolerancia:   TRADEOFF_MAP[isvV6.decision_tradeoff ?? ''] ?? 'todos',
+        financiacion:       'todos',
+        mercadoPreferencia: mercado,
+    };
+
+    const payload: MatchPayload = { filtrosDuros, filtrosBlandosIsv };
+
+    // Farmland extras
+    if (isvV6.asset_class === 'farmland' && isvV6.strategy_cluster?.length) {
+        payload.sub_strategies = isvV6.strategy_cluster as any;
+    }
+    if (isvV6.confidence_score) {
+        payload.experience_level = isvV6.confidence_score.toString();
+    }
+
+    return payload;
+}
+
 export async function fetchMatch(payload: MatchPayload): Promise<Asset[]> {
     const res = await fetch(`${API_URL}/api/v1/core/match`, {
         method: 'POST',

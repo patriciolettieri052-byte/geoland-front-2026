@@ -16,14 +16,15 @@ export function AiChatProfiler() {
         setChatHistory: setMessages,
         setAssets,
         setIsRefining,
-        // ISV Expandido — FRONT-ISV-EXP-04
-        updateIsvExpandido,
+        // ISV V6 — ISV-V6-04
+        updateIsvV6,
+        isvV6,
+        updateIsvV4,
+        isvV4,
         setCurrentState,
         setContradictionDetected,
         contradictionDetected,
         currentState,
-        isvExpandido,
-        updateIsvV4,
     } = useGeolandStore();
 
     const [input, setInput] = useState('');
@@ -124,23 +125,19 @@ export function AiChatProfiler() {
                 setMessages((prev) => [...prev, { role: 'assistant', content: data.dialogo_ui }]);
             }
 
-            // ISV V4 — actualizar store con el nuevo schema (ISV-V4-04)
-            if (data.isvV4_mapeado) {
-                updateIsvV4(data.isvV4_mapeado);
-            }
+            // ISV V6 — actualizar store (ISV-V6-04)
+            if (data.isvV6_mapeado) {
+                updateIsvV6(data.isvV6_mapeado);
 
-            // Actualizar filtrosDuros con moneda y ubicacion inferidos por el agente v4 (ISV-V4-07)
-            if (data.filtrosDuros_delta) {
-                const { moneda, ubicacion } = data.filtrosDuros_delta;
-                if (moneda || ubicacion) {
-                    updateFiltros(
-                        {
-                            ...(ubicacion ? { ubicacion } : {}),
-                            ...(moneda    ? { moneda }    : {}),
-                        },
-                        {},
-                        undefined
-                    );
+                // Sincronizar filtrosDuros con campos críticos del v6
+                const v6 = data.isvV6_mapeado;
+                const durosUpdate: any = {};
+                if (v6.preferred_markets?.[0]) durosUpdate.ubicacion = v6.preferred_markets[0];
+                if (v6.budget?.currency)       durosUpdate.moneda    = v6.budget.currency;
+                if (v6.budget?.amount_max)     durosUpdate.presupuestoMaximo = v6.budget.amount_max;
+                
+                if (Object.keys(durosUpdate).length > 0) {
+                    updateFiltros(durosUpdate, {}, undefined);
                 }
             }
 
@@ -178,7 +175,7 @@ export function AiChatProfiler() {
                     preferenciasAgro
                 );
 
-                if (isvExp) updateIsvExpandido(isvExp);
+                // updateFiltros already handled the mapping. isvExpandido is no longer used separately.
             }
 
             if (data.current_state) setCurrentState(data.current_state);

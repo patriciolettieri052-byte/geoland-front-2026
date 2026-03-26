@@ -73,6 +73,48 @@ export interface IsvV4 {
   isv_sufficient: boolean;
 }
 
+// ── ISV V6 — schema completo (ISV-V6-01) ──────────────────────────
+export type InvestmentMode = 'performance_driven' | 'intent_defined' | 'intent_guided' | null;
+export type AssetClass = 'real_estate' | 'farmland' | null;
+export type SubAssetClass = 'residential' | 'commercial' | 'agriculture' | 'livestock' | 'mixed_farmland' | 'mixed_real_estate' | null;
+export type StrategyPrimary =
+  | 'rental_long_term' | 'rental_short_term' | 'buy_hold' | 'fix_and_flip'
+  | 'development' | 'agriculture' | 'livestock' | 'mixed_farmland'
+  | 'commercial' | 'opportunistic' | null;
+export type EffortLevelV6 = 'low' | 'medium' | 'high' | null;
+export type DecisionTradeoffV6 = 'conservative' | 'balanced' | 'growth_tolerant' | null;
+export type TimeHorizonV6 = 'short' | 'medium' | 'long' | null;
+export type MarketMode = 'fixed' | 'multi_market' | 'open_exploration' | null;
+export type CurrencyV6 = 'USD' | 'EUR' | 'AED' | 'ARS' | null;
+
+export interface BudgetV6 {
+  amount_raw: string | null;
+  amount_min: number | null;
+  amount_max: number | null;
+  currency: CurrencyV6;
+}
+
+export interface IsvV6 {
+  investment_mode: InvestmentMode;
+  asset_class: AssetClass;
+  sub_asset_class: SubAssetClass;
+  strategy_primary: StrategyPrimary;
+  strategy_secondary: StrategyPrimary;
+  strategy_cluster: string[];
+  main_strategy: string | null;
+  effort_level: EffortLevelV6;
+  budget: BudgetV6;
+  decision_tradeoff: DecisionTradeoffV6;
+  time_horizon: TimeHorizonV6;
+  preferred_markets: string[];
+  market_mode: MarketMode;
+  user_name: string | null;
+  confidence_score: number;
+  stability_score: number;
+  isv_sufficient: boolean;
+  confirmed_by_user: boolean;
+}
+
 export interface Message {
     role: 'user' | 'assistant';
     content: string;
@@ -128,6 +170,10 @@ export interface GeolandState {
     isvV4: IsvV4;
     updateIsvV4: (partial: Partial<IsvV4>) => void;
     resetIsvV4: () => void;
+    // ISV V6
+    isvV6: IsvV6;
+    updateIsvV6: (partial: Partial<IsvV6>) => void;
+    resetIsvV6: () => void;
     contradictionDetected: boolean;
     setContradictionDetected: (v: boolean) => void;
 }
@@ -173,6 +219,27 @@ const initialIsvV4: IsvV4 = {
   isv_sufficient: false,
 };
 
+const initialIsvV6: IsvV6 = {
+  investment_mode: null,
+  asset_class: null,
+  sub_asset_class: null,
+  strategy_primary: null,
+  strategy_secondary: null,
+  strategy_cluster: [],
+  main_strategy: null,
+  effort_level: null,
+  budget: { amount_raw: null, amount_min: null, amount_max: null, currency: null },
+  decision_tradeoff: null,
+  time_horizon: null,
+  preferred_markets: [],
+  market_mode: null,
+  user_name: null,
+  confidence_score: 0,
+  stability_score: 0,
+  isv_sufficient: false,
+  confirmed_by_user: false,
+};
+
 const initialSensitivity = {
     exitCapRate: 5.5,
     capexOverrun: 0,
@@ -210,6 +277,7 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         assets: [],
         isRefining: false,
         isvV4: initialIsvV4,
+        isvV6: initialIsvV6,
     }),
 
     assets: [],
@@ -256,6 +324,11 @@ export const useGeolandStore = create<GeolandState>((set) => ({
       isvV4: { ...state.isvV4, ...partial }
     })),
     resetIsvV4: () => set({ isvV4: initialIsvV4 }),
+    isvV6: initialIsvV6,
+    updateIsvV6: (partial) => set((state) => ({
+      isvV6: { ...state.isvV6, ...partial }
+    })),
+    resetIsvV6: () => set({ isvV6: initialIsvV6 }),
     contradictionDetected: false,
     setContradictionDetected: (contradictionDetected) => set({ contradictionDetected }),
 }));

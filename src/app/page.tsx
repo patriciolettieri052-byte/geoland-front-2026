@@ -44,14 +44,9 @@ export default function GeolandOS() {
 
     (async () => {
         try {
-            const { fetchMatch, buildMatchPayload } = await import('@/lib/api/geolandService');
+            const { fetchMatch, buildMatchPayloadFromV6 } = await import('@/lib/api/geolandService');
             const store = useGeolandStore.getState();
-            const payload = buildMatchPayload(store.filtrosDuros, store.filtrosBlandosIsv, {
-                preferenciasAgro: (
-                    store.filtrosBlandosIsv.estrategiaObjetivo === 'FARMLAND' ||
-                    store.filtrosBlandosIsv.estrategiaObjetivo === 'LIVESTOCK'
-                ) ? store.preferenciasAgro : null
-            });
+            const payload = buildMatchPayloadFromV6(store.isvV6);
             const data = await fetchMatch(payload);
             if (!cancelled) {
                 clearTimeout(timeoutId);
