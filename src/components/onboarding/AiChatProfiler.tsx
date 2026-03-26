@@ -217,7 +217,7 @@ export function AiChatProfiler() {
                 </div>
             )}
 
-            <div className="flex-1 overflow-y-auto space-y-6 scrollbar-hide py-8" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex-1 overflow-y-auto space-y-6 scrollbar-hide pt-16 pb-8" style={{ scrollbarWidth: 'none' }}>
                 <AnimatePresence initial={false}>
                     {messages.map((msg, i) => (
                         <motion.div
@@ -226,11 +226,11 @@ export function AiChatProfiler() {
                             animate={{ opacity: 1, y: 0 }}
                             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            <div className="max-w-[85%] p-4 flex gap-4 bg-white/60 border border-white/20 shadow-sm backdrop-blur-md rounded-2xl">
+                            <div className="max-w-[85%] p-4 flex gap-4 bg-white/5 border border-white/10 shadow-sm backdrop-blur-md rounded-2xl">
                                 <div className="mt-1 flex-shrink-0">
-                                    {msg.role === 'user' ? <User size={18} className="text-black/60" /> : <div className="w-[18px] h-[18px] flex items-center justify-center bg-black text-white font-bold text-[10px] rounded-sm">G</div>}
+                                    {msg.role === 'user' ? <User size={18} className="text-white/60" /> : <div className="w-[18px] h-[18px] flex items-center justify-center bg-white/20 text-white font-bold text-[10px] rounded-sm">G</div>}
                                 </div>
-                                <p className="text-sm md:text-base font-medium leading-relaxed text-black">
+                                <p className="text-sm md:text-base font-medium leading-relaxed text-white/90">
                                     {msg.content}
                                 </p>
                             </div>
@@ -264,15 +264,7 @@ export function AiChatProfiler() {
                     </motion.div>
                 )}
 
-                {/* ── CONFIDENCE INDICATOR — only in SUMMARY/CONFIRMATION ── */}
-                {['SUMMARY', 'CONFIRMATION'].includes(currentState) && (
-                    <div className="text-xs text-white/40 text-right mb-1">
-                        Confianza del perfil: {isvExpandido.confidenceScore.toFixed(0)}%
-                        {isvExpandido.confidenceScore < 60 && (
-                            <span className="text-orange-400 ml-1">— necesito más información</span>
-                        )}
-                    </div>
-                )}
+                {/* ── CONFIDENCE INDICATOR removed ── */}
 
                 <form onSubmit={sendMessage} className="relative flex items-center">
                     <input
@@ -281,7 +273,8 @@ export function AiChatProfiler() {
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Introduce your investment criteria..."
                         disabled={isLoading}
-                        className="w-full bg-white/5 border border-white/20 rounded-full py-4 pl-6 pr-14 text-white placeholder-white/40 focus:outline-none focus:border-white/50 transition-colors shadow-lg backdrop-blur-xl"
+                        autoFocus
+                        className="w-full bg-white/5 border-0 rounded-full py-4 pl-6 pr-14 text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors shadow-lg backdrop-blur-xl"
                     />
                     <button
                         type="submit"

@@ -85,9 +85,7 @@ export function DynamicIsvRadar() {
                 </ResponsiveContainer>
             </motion.div>
 
-            <div className="absolute bottom-16 text-center bg-black/40 backdrop-blur-md border border-white/5 py-3 px-8 rounded-full">
-                <Typography variant="label" className="text-white">Investor Strategy Vector v4</Typography>
-            </div>
+            {/* ISV label removed */}
 
             {/* ── CONFIDENCE BAR ─────────────────── */}
             <div className="w-full px-6 mt-4">

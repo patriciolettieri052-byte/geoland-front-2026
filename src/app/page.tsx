@@ -11,8 +11,6 @@ import { Asset } from '@/lib/mockEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '@/components/ui/Typography';
 
-import { Snowflake, Palmtree, Moon, Zap } from 'lucide-react';
-
 type Theme = 'geoland' | 'snow' | 'beach' | 'ny';
 
 export default function GeolandOS() {
@@ -154,39 +152,18 @@ export default function GeolandOS() {
             {/* Dark overlay to ensure text contrast */}
             <div className="absolute inset-0 bg-black/25" />
 
-            {/* THEME SELECTOR - CIRCULAR BUTTONS */}
-            <motion.div
-              className="mb-8 flex items-center gap-4 px-6 py-3 bg-white/5 border border-white/10 rounded-full backdrop-blur-xl relative z-20 shadow-2xl"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
-            >
-              <div className="flex items-center gap-4">
-                {themes.map((theme) => (
-                  <button
-                    key={theme.id}
-                    onClick={() => setCurrentTheme(theme.id)}
-                    className={`relative flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 group ${currentTheme === theme.id
-                      ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]'
-                      : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80'
-                      }`}
-                    title={theme.label}
-                  >
-                    <theme.icon size={16} />
-                    {currentTheme === theme.id && (
-                      <motion.div
-                        layoutId="active-theme-ring"
-                        className="absolute -inset-1 border border-white/30 rounded-full"
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                      />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
+            {/* GEOLAND OS — top left */}
+            <div className="absolute top-6 left-8 z-30">
+              <span className="text-white/70 text-sm font-light tracking-[0.25em] uppercase">GEOLAND OS</span>
+            </div>
+
+            {/* V 1.0 — top right */}
+            <div className="absolute top-6 right-8 z-30">
+              <span className="text-white/40 text-xs font-light tracking-widest">V 1.0</span>
+            </div>
 
             {/* Floating Glass Container (60/40 Split) */}
-            <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10 transition-all duration-700">
+            <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10 transition-all duration-700">
 
               {/* 60% Left Side - Persistent Chat */}
               <div className="w-full md:w-[60%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
@@ -206,10 +183,6 @@ export default function GeolandOS() {
                       transition={{ duration: 0.5 }}
                       className="absolute inset-0 flex flex-col items-center justify-center"
                     >
-                      <div className="absolute top-12 text-center w-full z-10">
-                        <Typography variant="h3" className="font-light tracking-widest text-white/50">GEOLAND</Typography>
-                        <div className="w-12 h-px bg-white/20 mx-auto mt-4" />
-                      </div>
                       <DynamicIsvRadar />
                     </motion.div>
                   ) : isRefining ? (
@@ -274,18 +247,6 @@ export default function GeolandOS() {
 
             </div>
 
-            {/* DEMO BUTTON - BELOW THE PANEL */}
-            {!perfilCompletado && (
-              <motion.button
-                onClick={handleDemoMode}
-                className="mt-8 px-8 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full backdrop-blur-md text-white/60 hover:text-white font-medium text-xs tracking-widest uppercase transition-all z-20 group"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-              >
-                <span className="opacity-50 group-hover:opacity-100 mr-2">⚡</span> Quick Demo (Bypass Onboarding)
-              </motion.button>
-            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -2,25 +2,25 @@
 
 import { Asset } from '@/lib/mockEngine';
 import { motion } from 'framer-motion';
-import { Typography } from '../ui/Typography';
-import { ShieldAlert } from 'lucide-react';
+import { Bell, Heart } from 'lucide-react';
+
+const STRATEGY_LABELS: Record<string, string> = {
+    'FIX_FLIP': 'Fix and Flip',
+    'RENTA': 'Renta',
+    'FARMLAND': 'Farmland',
+    'LIVESTOCK': 'Ganadería',
+    'GREENFIELD': 'Greenfield',
+    'DISTRESS': 'Distress',
+    'NNN_COMERCIAL': 'NNN Comercial',
+    'LAND_BANKING': 'Land Banking',
+    'VALUE_ADD': 'Value Add',
+};
 
 const ZONA_LABELS: Record<string, string> = {
     'pampa_humeda': '🌾 Pampa Húmeda',
     'nea': '🌿 NEA',
     'noa': '⛰️ NOA',
     '_default': '📍 Zona Argentina',
-};
-
-const CONEAT_LABELS: Record<number, string> = {
-    1: 'Suelo Premium (Clase 1)',
-    2: 'Suelo Muy Bueno (Clase 2)',
-    3: 'Suelo Bueno (Clase 3)',
-    4: 'Suelo Regular (Clase 4)',
-    5: 'Suelo Moderado (Clase 5)',
-    6: 'Suelo Pobre (Clase 6)',
-    7: 'Suelo Marginal (Clase 7)',
-    8: 'Suelo Muy Marginal (Clase 8)',
 };
 
 const AGUA_LABELS: Record<string, string> = {
@@ -32,70 +32,130 @@ const AGUA_LABELS: Record<string, string> = {
 interface Layer1AssetCardProps {
     asset: Asset;
     onClick: (id: string) => void;
+    rank?: number;
 }
 
-export function Layer1AssetCard({ asset, onClick }: Layer1AssetCardProps) {
-    const { expectedIrr, riskLevel } = asset.layer1;
+export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) {
+    const { expectedIrr, riskLevel, gScore, backgroundImageUrl } = asset.layer1;
+    const precio = asset.layer2.metrics.baseCapex;
+    const strategyLabel = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
+
     const getRiskColor = (level: string) => {
-        const lower = level.toLowerCase();
-        if (lower.includes('alto') || lower.includes('max')) return '!text-red-600';
-        if (lower.includes('medio')) return '!text-amber-500';
-        if (lower.includes('bajo') || lower.includes('min')) return '!text-emerald-600';
-        return '!text-black/80';
+        const l = level.toLowerCase();
+        if (l.includes('alto') || l.includes('max')) return 'text-red-500';
+        if (l.includes('medio')) return 'text-amber-400';
+        return 'text-emerald-400';
     };
+
+    const formatPrecio = (n: number) => {
+        if (!n || n === 0) return '—';
+        return `${n.toLocaleString('es-ES')} USD`;
+    };
+
+    const isTop = rank === 1;
 
     return (
         <motion.div
-            className="flex flex-row items-stretch h-[110px] bg-white/90 backdrop-blur-xl rounded-2xl border border-black/10 shadow-sm overflow-hidden group transition-all duration-300 hover:shadow-md cursor-pointer hover:bg-white"
+            className={`flex flex-row items-stretch h-[110px] bg-white rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg ${isTop ? 'ring-2 ring-amber-400/60' : 'ring-1 ring-black/8'}`}
             onClick={() => onClick(asset.id)}
-            whileHover={{ scale: 1.02, y: -5 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            whileHover={{ scale: 1.015, y: -2 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
         >
-            {/* Foto Izquierda - 30% */}
+            {/* FOTO — 28% */}
             <div
-                className="w-[30%] h-full shrink-0 bg-cover bg-center border-r border-black/5 opacity-90 group-hover:opacity-100 transition-opacity"
-                style={{ backgroundImage: `url(${asset.layer1.backgroundImageUrl})` }}
-            />
+                className="relative w-[28%] shrink-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+            >
+                {/* TOP badge */}
+                {isTop && (
+                    <div className="absolute top-2 left-2 bg-amber-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded tracking-widest uppercase">
+                        TOP 1
+                    </div>
+                )}
 
-            {/* Contenido Central - 45% */}
-            <div className="flex flex-col justify-center px-4 md:px-6 w-[45%] shrink-0 bg-white">
-                <Typography variant="h4" className="!text-black font-semibold truncate text-[14px] md:text-[16px] leading-tight mb-1">
-                    {asset.strategy}
-                </Typography>
-                <div className="flex items-center gap-1.5 !text-[#999999] truncate">
-                    <Typography variant="label" className="!text-[#999999] text-[9px] md:text-[10px] uppercase tracking-[0.15em] font-medium truncate">
-                        {asset.location}
-                    </Typography>
+                {/* Action icons */}
+                <div className="absolute top-2 right-2 flex gap-1">
+                    <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-6 h-6 flex items-center justify-center bg-white/80 backdrop-blur rounded-full hover:bg-white transition-colors"
+                    >
+                        <Bell size={10} className="text-black/60" />
+                    </button>
+                    <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-6 h-6 flex items-center justify-center bg-white/80 backdrop-blur rounded-full hover:bg-white transition-colors"
+                    >
+                        <Heart size={10} className="text-black/60" />
+                    </button>
                 </div>
+
+                {/* Risk badge sobre foto */}
+                <div className="absolute bottom-2 left-2">
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/50 backdrop-blur-sm ${getRiskColor(riskLevel)}`}>
+                        ⊙ {riskLevel}
+                    </span>
+                </div>
+            </div>
+
+            {/* CONTENIDO CENTRAL — 47% */}
+            <div className="flex flex-col justify-center px-4 w-[47%] shrink-0 border-r border-black/6">
+                {/* Ciudad + país */}
+                <p className="text-[9px] text-gray-400 uppercase tracking-[0.15em] font-medium mb-0.5">
+                    📍 {asset.location}
+                </p>
+
+                {/* Nombre / título */}
+                <p className="text-[13px] font-bold text-gray-900 leading-tight mb-2 truncate">
+                    {asset.etiqueta_operacion ?? asset.location}
+                </p>
+
+                {/* Precio + Estrategia */}
+                <div className="flex gap-4">
+                    <div>
+                        <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">Precio</p>
+                        <p className="text-[12px] font-bold text-gray-800">{formatPrecio(precio)}</p>
+                    </div>
+                    <div>
+                        <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">Estrategia</p>
+                        <p className="text-[12px] font-semibold text-gray-700">{strategyLabel}</p>
+                    </div>
+                </div>
+
+                {/* Tags agro (si aplica) */}
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
-                    <div className="flex flex-wrap gap-1 mt-2">
+                    <div className="flex gap-1 mt-1.5 flex-wrap">
                         {asset.zona_agroecologica && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] md:text-[9px] font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">{ZONA_LABELS[asset.zona_agroecologica]}</span>
-                        )}
-                        {asset.clase_coneat && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] md:text-[9px] font-medium bg-amber-100 text-amber-800 border border-amber-200">{CONEAT_LABELS[asset.clase_coneat]}</span>
+                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                {ZONA_LABELS[asset.zona_agroecologica]}
+                            </span>
                         )}
                         {asset.acceso_agua && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] md:text-[9px] font-medium bg-blue-100 text-blue-800 border border-blue-200">{AGUA_LABELS[asset.acceso_agua]}</span>
+                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200">
+                                {AGUA_LABELS[asset.acceso_agua]}
+                            </span>
                         )}
                     </div>
                 )}
             </div>
 
-            {/* Indicadores Derecha - 25% */}
-            <div className="flex flex-col items-center justify-center w-[25%] shrink-0 border-l border-black/5 bg-[#EEEEEE] group-hover:bg-[#E5E5E5] transition-colors py-2">
-                <Typography variant="label" className="text-[8px] md:text-[9px] !text-[#777777] uppercase font-bold tracking-[0.1em] mb-0.5 text-center leading-tight">
-                    ROI<br />ESPERADO
-                </Typography>
-                <Typography variant="h3" className="!text-black font-extrabold text-[16px] md:text-xl leading-none mb-1.5 md:mb-2">
-                    {(expectedIrr * 100).toFixed(1)}%
-                </Typography>
+            {/* DERECHA — 25%: estrategia tag + G-Score + ROI */}
+            <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-2">
+                {/* Strategy tag + G-Score en la misma línea como referencia */}
+                <div className="flex items-center gap-2 w-full justify-end">
+                    <span className="text-[8px] font-semibold text-gray-400 uppercase tracking-widest">
+                        {strategyLabel.toUpperCase()}
+                    </span>
+                    <span className="bg-black text-white text-[11px] font-black px-2 py-0.5 rounded">
+                        G {gScore}
+                    </span>
+                </div>
 
-                <div className="flex items-center gap-1.5 bg-transparent px-2 py-0.5 md:px-3 md:py-1 rounded border border-[#CCCCCC]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`hidden md:block ${getRiskColor(riskLevel)}`}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                    <Typography variant="label" className={`text-[7px] md:text-[8px] font-extrabold uppercase tracking-widest ${getRiskColor(riskLevel)}`}>
-                        {riskLevel}
-                    </Typography>
+                {/* ROI */}
+                <div className="text-right">
+                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">ROI Est.</p>
+                    <p className="text-[15px] font-black text-emerald-500 leading-tight">
+                        ↗ {(expectedIrr * 100).toFixed(1)}%
+                    </p>
                 </div>
             </div>
         </motion.div>

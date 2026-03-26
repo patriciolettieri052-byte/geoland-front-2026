@@ -13,18 +13,16 @@ const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
-        transition: {
-            staggerChildren: 0.15,
-        },
+        transition: { staggerChildren: 0.12 },
     },
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 24 },
     visible: {
         opacity: 1,
         y: 0,
-        transition: { type: 'spring' as const, stiffness: 300, damping: 24 }
+        transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
     },
 };
 
@@ -36,9 +34,9 @@ export function Layer1GlassGrid({ assets, onAssetClick }: Layer1GlassGridProps) 
             initial="hidden"
             animate="visible"
         >
-            {assets.map((asset) => (
+            {assets.map((asset, index) => (
                 <motion.div key={asset.id} variants={itemVariants} className="w-full">
-                    <Layer1AssetCard asset={asset} onClick={onAssetClick} />
+                    <Layer1AssetCard asset={asset} onClick={onAssetClick} rank={index + 1} />
                 </motion.div>
             ))}
         </motion.div>
