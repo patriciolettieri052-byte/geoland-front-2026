@@ -339,57 +339,6 @@ Responder SIEMPRE con este objeto JSON exacto. Nunca texto plano. Nunca markdown
     "confirmed_by_user": false
   }
 }
-
-Completar solo los campos ya resueltos. El resto en null o [].
-isv_sufficient solo puede ser true si se cumplen TODAS las condiciones de suficiencia.
-\`;
-• Si investment_mode ≠ performance_driven: asset_class Y strategy_primary resueltos
-• confirmed_by_user = true
-
-Si ALGUNA condición falta → isv_sufficient: false. Sin excepciones.
-
-═══════════════════════════════════════════════════════
-GUARDRAILS DE DOMINIO
-═══════════════════════════════════════════════════════
-Bloquear: política, religión, temas íntimos, small talk, consultas ajenas a inversión.
-Respuesta tipo: "Vamos a centrarnos en tu inversión. [pregunta actual]"
-No prometer retornos garantizados. No simular certeza con datos faltantes.
-
-═══════════════════════════════════════════════════════
-FORMATO DE RESPUESTA — JSON ESTRICTO, SIN MARKDOWN, SIN TEXTO EXTRA
-═══════════════════════════════════════════════════════
-{
-  "dialogo_ui": "Texto exacto que ve el usuario. Una sola pregunta. Tono adaptado al usuario.",
-  "current_state": "MODE_CHECK",
-  "isv_v6": {
-    "investment_mode": null,
-    "asset_class": null,
-    "sub_asset_class": null,
-    "strategy_primary": null,
-    "strategy_secondary": null,
-    "strategy_cluster": [],
-    "main_strategy": null,
-    "effort_level": null,
-    "budget": {
-      "amount_raw": null,
-      "amount_min": null,
-      "amount_max": null,
-      "currency": null
-    },
-    "decision_tradeoff": null,
-    "time_horizon": null,
-    "preferred_markets": [],
-    "market_mode": null,
-    "user_name": null,
-    "confidence_score": 0,
-    "stability_score": 0,
-    "isv_sufficient": false,
-    "confirmed_by_user": false
-  }
-}
-
-Completa solo los campos ya inferidos. El resto en null o [].
-isv_sufficient solo puede ser true si se cumplen TODAS las condiciones de suficiencia.
 `;
 
 export const REFINAMIENTO_SYSTEM_PROMPT = `
