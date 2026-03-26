@@ -11,8 +11,6 @@ import { Asset } from '@/lib/mockEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '@/components/ui/Typography';
 
-type Theme = 'geoland' | 'snow' | 'beach' | 'ny';
-
 export default function GeolandOS() {
   const {
     perfilCompletado,
@@ -21,31 +19,13 @@ export default function GeolandOS() {
     setActiveAsset,
     filtrosDuros,
     filtrosBlandosIsv,
-    updateFiltros,
-    setPerfilCompletado,
     assets,
     setAssets,
     isRefining,
     setIsRefining
   } = useGeolandStore();
 
-  const [currentTheme, setCurrentTheme] = useState<Theme>('geoland');
   const [error, setError] = useState<string | null>(null);
-
-  const themes: { id: Theme; icon: any; label: string; bg: string }[] = [
-    { id: 'geoland', icon: Zap, label: 'Geoland OS', bg: '/monolith2.jpeg' },
-    { id: 'snow', icon: Snowflake, label: 'Cozy Snow', bg: '/snow.png' },
-    { id: 'beach', icon: Palmtree, label: 'Beautiful Beach', bg: '/beach.png' },
-    { id: 'ny', icon: Moon, label: 'Manhattan Night', bg: '/ny-night.png' },
-  ];
-
-  const handleDemoMode = () => {
-    updateFiltros(
-      { ubicacion: 'Madrid', tipoActivo: 'Fix & Flip' },
-      { estrategiaObjetivo: 'Active', riesgoTolerancia: 'Medio', involucramiento: 'Directo' }
-    );
-    setPerfilCompletado(true);
-  };
 
   // Handle flow transitions based on Zustand state
   useEffect(() => {
@@ -140,7 +120,7 @@ export default function GeolandOS() {
             key="main-container"
             className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
             style={{
-              backgroundImage: `url(${themes.find(t => t.id === currentTheme)?.bg})`,
+              backgroundImage: `url('/monolith2.jpeg')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
