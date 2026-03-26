@@ -1,124 +1,142 @@
 'use client';
 
-import React, { useMemo } from 'react';
 import { useGeolandStore } from '@/store/useGeolandStore';
-import {
-    Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-    ResponsiveContainer, Tooltip
-} from 'recharts';
-
-/**
- * DynamicIsvRadar (V6)
- * Visualiza el Investor Strategy Vector v6 en 6 ejes estratégicos:
- * 1. Compromiso (Effort Level)
- * 2. Horizonte (Time Horizon)
- * 3. Tolerancia (Decision Tradeoff)
- * 4. Escala (Budget)
- * 5. Especialización (Asset Class / Strategy)
- * 6. Estabilidad (AI Confidence/Stability)
- */
-
-const EFFORT_VALS: Record<string, number> = { low: 30, medium: 65, high: 95 };
-const HORIZON_VALS: Record<string, number> = { short: 30, medium: 65, long: 95 };
-const TRADEOFF_VALS: Record<string, number> = { conservative: 30, balanced: 65, growth_tolerant: 95 };
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+import { motion } from 'framer-motion';
+import { Typography } from '../ui/Typography';
 
 export function DynamicIsvRadar() {
-    const isv = useGeolandStore((state) => state.isvV6);
+    const { isvV6 } = useGeolandStore();
 
-    const data = useMemo(() => {
-        // Normalización de valores para el radar (0-100)
-        const budgetVal = isv.budget?.amount_max 
-            ? Math.min(100, (isv.budget.amount_max / 1000000) * 100) 
-            : 0;
-            
-        return [
-            { subject: 'Compromiso', A: EFFORT_VALS[isv.effort_level ?? ''] ?? 10, fullMark: 100 },
-            { subject: 'Horizonte',  A: HORIZON_VALS[isv.time_horizon ?? ''] ?? 10, fullMark: 100 },
-            { subject: 'Tolerancia', A: TRADEOFF_VALS[isv.decision_tradeoff ?? ''] ?? 10, fullMark: 100 },
-            { subject: 'Escala',     A: budgetVal || 10, fullMark: 100 },
-            { subject: 'Estrategia', A: isv.main_strategy ? 90 : (isv.strategy_primary ? 60 : 10), fullMark: 100 },
-            { subject: 'Estabilidad',A: isv.stability_score || 10, fullMark: 100 },
-        ];
-    }, [isv]);
+    // Strategy score desde cluster length
+    const strategyScore = (() => {
+        const n = isvV6.strategy_cluster?.length ?? 0;
+        if (n === 0) return 10;
+        if (n === 1) return 40;
+        if (n === 2) return 65;
+        return 90;
+    })();
 
-    const tags = useMemo(() => {
-        const t = [];
-        if (isv.investment_mode === 'performance_driven') t.push('Alta Rentabilidad');
-        if (isv.asset_class === 'real_estate') t.push('Inmobiliario');
-        if (isv.asset_class === 'farmland') t.push('Agro/Ganadería');
-        if (isv.market_mode === 'open_exploration') t.push('Exploración Abierta');
-        if (isv.budget?.currency) t.push(isv.budget.currency);
-        return t;
-    }, [isv]);
+    // Budget score desde amount_max
+    const budgetScore = (() => {
+        const max = isvV6.budget?.amount_max;
+        if (!max) return 10;
+        if (max <= 100000)  return 20;
+        if (max <= 300000)  return 45;
+        if (max <= 1000000) return 70;
+        return 95;
+    })();
+
+    const HORIZON_MAP:  Record<string, number> = { short: 20, medium: 55, long: 90 };
+    const EFFORT_MAP:   Record<string, number> = { low: 10, medium: 50, high: 90 };
+    const TRADEOFF_MAP: Record<string, number> = { conservative: 20, balanced: 50, growth_tolerant: 90 };
+
+    const mapVal = (val: string | null, map: Record<string, number>): number =>
+        val && map[val] !== undefined ? map[val] : 10;
+
+    const data = [
+        { subject: 'Strategy', A: strategyScore,                                  fullMark: 100 },
+        { subject: 'Horizon',  A: mapVal(isvV6.time_horizon, HORIZON_MAP),        fullMark: 100 },
+        { subject: 'Involve',  A: mapVal(isvV6.effort_level, EFFORT_MAP),         fullMark: 100 },
+        { subject: 'Risk',     A: mapVal(isvV6.decision_tradeoff, TRADEOFF_MAP),  fullMark: 100 },
+        { subject: 'Budget',   A: budgetScore,                                    fullMark: 100 },
+    ];
+
+    const cs = isvV6.confidence_score ?? 0;
+    const isConfident = cs >= 60;
 
     return (
-        <div className="w-full flex flex-col items-center bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-2xl overflow-hidden min-h-[400px]">
-            <div className="text-center mb-4">
-                <h3 className="text-white font-bold text-lg tracking-tight uppercase">
-                    Estrategia Vectorizada <span className="text-blue-400">v6</span>
-                </h3>
-                {isv.user_name && (
-                    <p className="text-gray-400 text-sm mt-1">Inversor: <span className="text-white font-medium">{isv.user_name}</span></p>
-                )}
-            </div>
+        <div className="relative w-full h-full min-h-[500px] flex flex-col items-center justify-center">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0%,transparent_70%)] pointer-events-none" />
 
-            <div className="w-full h-64 relative">
+            {isvV6.user_name && (
+                <div className="absolute top-4 text-center w-full z-10">
+                    <Typography variant="label" className="text-white/50 text-xs tracking-widest uppercase">
+                        Perfil de {isvV6.user_name}
+                    </Typography>
+                </div>
+            )}
+
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="w-full h-full max-h-[600px] z-10"
+            >
                 <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-                        <PolarGrid stroke="#334155" />
-                        <PolarAngleAxis 
-                            dataKey="subject" 
-                            tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }} 
+                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
+                        <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                        <PolarAngleAxis
+                            dataKey="subject"
+                            tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 300, letterSpacing: '0.1em' }}
                         />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                        <PolarRadiusAxis
+                            angle={30}
+                            domain={[0, 100]}
+                            tick={false}
+                            axisLine={false}
+                        />
                         <Radar
-                            name="ISV v6"
+                            name="ISV"
                             dataKey="A"
-                            stroke="#3b82f6"
-                            strokeWidth={3}
-                            fill="#3b82f6"
-                            fillOpacity={0.4}
-                        />
-                        <Tooltip
-                            contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
-                            itemStyle={{ color: '#60a5fa' }}
+                            stroke="#ffffff"
+                            strokeWidth={2}
+                            fill="#ffffff"
+                            fillOpacity={0.2}
+                            animationDuration={800}
+                            animationEasing="ease-in-out"
                         />
                     </RadarChart>
                 </ResponsiveContainer>
+            </motion.div>
+
+            <div className="absolute bottom-8 text-center bg-black/40 backdrop-blur-md border border-white/5 py-3 px-8 rounded-full">
+                <Typography variant="label" className="text-white">Investor Strategy Vector</Typography>
             </div>
 
-            {/* Tags dinámicos — Bottom Bar */}
-            <div className="flex flex-wrap justify-center gap-2 mt-4">
-                {tags.map((tag) => (
-                    <span 
-                        key={tag} 
-                        className="px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-300 text-[10px] font-bold uppercase rounded-full tracking-wider"
-                    >
-                        {tag}
-                    </span>
-                ))}
-                {!isv.isv_sufficient && (
-                    <span className="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase rounded-full tracking-wider animate-pulse">
-                        Perfilando...
-                    </span>
-                )}
-                {isv.isv_sufficient && (
-                    <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold uppercase rounded-full tracking-wider shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-                        Vector Listo
-                    </span>
-                )}
+            {/* Confidence bar */}
+            <div className="w-full px-6 mt-4">
+                <div className="flex justify-between text-xs text-white/50 mb-1">
+                    <span>Confianza del perfil</span>
+                    <span>{cs.toFixed(0)}%</span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-1.5">
+                    <motion.div
+                        className={`h-1.5 rounded-full transition-colors duration-300 ${isConfident ? 'bg-emerald-400' : 'bg-orange-400'}`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${cs}%` }}
+                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                    />
+                </div>
             </div>
 
-            {/* Confidence Bar */}
-            <div className="w-full mt-6 bg-white/5 rounded-full h-1.5 overflow-hidden">
-                <div 
-                    className="h-full bg-gradient-to-r from-blue-600 to-indigo-400 transition-all duration-1000 ease-out"
-                    style={{ width: `${isv.confidence_score * 100}%` }}
-                />
-            </div>
-            <div className="flex justify-between w-full mt-1 px-1">
-                <span className="text-gray-500 text-[9px] uppercase font-bold tracking-tighter">Confianza de la IA</span>
-                <span className="text-white text-[9px] font-bold tracking-tighter">{Math.round(isv.confidence_score * 100)}%</span>
+            {/* Tags */}
+            <div className="flex flex-wrap gap-1.5 px-6 mt-3 justify-center">
+                {isvV6.main_strategy && (
+                    <span className="text-xs bg-emerald-900/30 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        {isvV6.main_strategy.replace(/_/g, ' ')}
+                    </span>
+                )}
+                {isvV6.effort_level && (
+                    <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
+                        {isvV6.effort_level === 'low' ? 'Pasivo' : isvV6.effort_level === 'medium' ? 'Semi-activo' : 'Activo'}
+                    </span>
+                )}
+                {isvV6.budget?.currency && isvV6.budget?.amount_max && (
+                    <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
+                        {isvV6.budget.currency} {isvV6.budget.amount_max.toLocaleString()}
+                    </span>
+                )}
+                {isvV6.time_horizon && (
+                    <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
+                        {isvV6.time_horizon === 'short' ? 'Corto plazo' : isvV6.time_horizon === 'medium' ? 'Medio plazo' : 'Largo plazo'}
+                    </span>
+                )}
+                {isvV6.confirmed_by_user && (
+                    <span className="text-xs bg-emerald-900/50 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-400/30">
+                        ✓ Perfil confirmado
+                    </span>
+                )}
             </div>
         </div>
     );
