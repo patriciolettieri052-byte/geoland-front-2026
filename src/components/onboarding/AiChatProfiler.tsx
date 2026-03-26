@@ -129,6 +129,21 @@ export function AiChatProfiler() {
                 updateIsvV4(data.isvV4_mapeado);
             }
 
+            // Actualizar filtrosDuros con moneda y ubicacion inferidos por el agente v4 (ISV-V4-07)
+            if (data.filtrosDuros_delta) {
+                const { moneda, ubicacion } = data.filtrosDuros_delta;
+                if (moneda || ubicacion) {
+                    updateFiltros(
+                        {
+                            ...(ubicacion ? { ubicacion } : {}),
+                            ...(moneda    ? { moneda }    : {}),
+                        },
+                        {},
+                        undefined
+                    );
+                }
+            }
+
             // Transición a Capa 1 cuando el ISV es suficiente
             if (data.perfil_completado && !perfilCompletado) {
                 setTimeout(() => {

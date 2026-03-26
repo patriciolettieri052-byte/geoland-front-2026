@@ -93,6 +93,8 @@ function mapGeminiToIsvV4(isvV4Raw: any): any {
             decision_tradeoff: isvV4Raw.confidence_by_field?.decision_tradeoff ?? null,
             time_horizon: isvV4Raw.confidence_by_field?.time_horizon ?? null,
         },
+        moneda: isvV4Raw.moneda ?? null,
+        ubicacion: isvV4Raw.ubicacion ?? null,
         isv_sufficient: isvV4Raw.isv_sufficient === true,
     };
 }
@@ -216,6 +218,10 @@ You must respond ONLY with the valid JSON object described in the instructions.
             dialogo_ui: jsonOutput.dialogo_ui,
             isvV4_mapeado: isvV4Mapeado,
             perfil_completado: perfilCompletado ? (extDatos?.perfil_completado ?? false) : isvSufficient,
+            filtrosDuros_delta: {
+                moneda: jsonOutput.isv_v4?.moneda ?? null,
+                ubicacion: jsonOutput.isv_v4?.ubicacion ?? null,
+            },
             // legacy fields — mantener para REFINAMIENTO_SYSTEM_PROMPT que aún usa v3
             current_state: newState ?? currentState ?? 'INIT',
             contradiccion_detectada: extDatos?.contradiccion_detectada ?? false,
