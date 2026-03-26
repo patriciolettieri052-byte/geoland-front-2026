@@ -134,7 +134,7 @@ export default function GeolandOS() {
 
             {/* Logo — alineado con borde izquierdo del contenedor */}
             <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-center justify-between relative z-30">
-              <img src="/logo.png" alt="GEOLAND" className="h-8 w-auto opacity-90" />
+              <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
               <span className="text-white/40 text-[11px] font-light tracking-wide italic">
                 The Decision Infrastructure for Global Real Estate
               </span>
