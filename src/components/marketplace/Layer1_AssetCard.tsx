@@ -20,13 +20,31 @@ const ZONA_LABELS: Record<string, string> = {
     'pampa_humeda': '🌾 Pampa Húmeda',
     'nea': '🌿 NEA',
     'noa': '⛰️ NOA',
-    '_default': '📍 Zona Argentina',
+    '_default': 'Zona Argentina',
 };
 
 const AGUA_LABELS: Record<string, string> = {
-    'secano': '☁️ Secano',
-    'riego_complementario': '💧 Riego Complementario',
-    'riego_pleno': '🌊 Riego Pleno',
+    'secano': 'Secano',
+    'riego_complementario': 'Riego Complementario',
+    'riego_pleno': 'Riego Pleno',
+};
+
+const RANK_BADGES: Record<number, { label: string; className: string; ring: string }> = {
+    1: {
+        label: 'Gold',
+        className: 'bg-gradient-to-r from-yellow-500 to-amber-400 text-black',
+        ring: 'ring-2 ring-amber-400/70',
+    },
+    2: {
+        label: 'Silver',
+        className: 'bg-gradient-to-r from-slate-300 to-gray-400 text-black',
+        ring: 'ring-2 ring-slate-300/60',
+    },
+    3: {
+        label: 'Bronze',
+        className: 'bg-gradient-to-r from-orange-700 to-amber-700 text-white',
+        ring: 'ring-2 ring-orange-600/50',
+    },
 };
 
 interface Layer1AssetCardProps {
@@ -36,27 +54,21 @@ interface Layer1AssetCardProps {
 }
 
 export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) {
-    const { expectedIrr, riskLevel, gScore, backgroundImageUrl } = asset.layer1;
+    const { expectedIrr, gScore, backgroundImageUrl } = asset.layer1;
     const precio = asset.layer2.metrics.baseCapex;
     const strategyLabel = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
-
-    const getRiskColor = (level: string) => {
-        const l = level.toLowerCase();
-        if (l.includes('alto') || l.includes('max')) return 'text-red-500';
-        if (l.includes('medio')) return 'text-amber-400';
-        return 'text-emerald-400';
-    };
 
     const formatPrecio = (n: number) => {
         if (!n || n === 0) return '—';
         return `${n.toLocaleString('es-ES')} USD`;
     };
 
-    const isTop = rank === 1;
+    const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
+    const ringClass = badge ? badge.ring : 'ring-1 ring-black/8';
 
     return (
         <motion.div
-            className={`flex flex-row items-stretch h-[110px] bg-white rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg ${isTop ? 'ring-2 ring-amber-400/60' : 'ring-1 ring-black/8'}`}
+            className={`flex flex-row items-stretch h-[110px] bg-white/85 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg hover:bg-white/95 ${ringClass}`}
             onClick={() => onClick(asset.id)}
             whileHover={{ scale: 1.015, y: -2 }}
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
@@ -66,14 +78,12 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 className="relative w-[28%] shrink-0 bg-cover bg-center"
                 style={{ backgroundImage: `url(${backgroundImageUrl})` }}
             >
-                {/* TOP badge */}
-                {isTop && (
-                    <div className="absolute top-2 left-2 bg-amber-400 text-black text-[9px] font-black px-1.5 py-0.5 rounded tracking-widest uppercase">
-                        TOP 1
+                {badge && (
+                    <div className={`absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded tracking-widest uppercase shadow-md ${badge.className}`}>
+                        {badge.label}
                     </div>
                 )}
 
-                {/* Action icons */}
                 <div className="absolute top-2 right-2 flex gap-1">
                     <button
                         onClick={(e) => e.stopPropagation()}
@@ -89,39 +99,29 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     </button>
                 </div>
 
-                {/* Risk badge sobre foto */}
+                {/* Strategy badge sobre foto */}
                 <div className="absolute bottom-2 left-2">
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/50 backdrop-blur-sm ${getRiskColor(riskLevel)}`}>
-                        ⊙ {riskLevel}
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/55 backdrop-blur-sm text-white/90">
+                        {strategyLabel}
                     </span>
                 </div>
             </div>
 
             {/* CONTENIDO CENTRAL — 47% */}
             <div className="flex flex-col justify-center px-4 w-[47%] shrink-0 border-r border-black/6">
-                {/* Ciudad + país */}
                 <p className="text-[9px] text-gray-400 uppercase tracking-[0.15em] font-medium mb-0.5">
-                    📍 {asset.location}
+                    {asset.location}
                 </p>
 
-                {/* Nombre / título */}
                 <p className="text-[13px] font-bold text-gray-900 leading-tight mb-2 truncate">
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
 
-                {/* Precio + Estrategia */}
-                <div className="flex gap-4">
-                    <div>
-                        <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">Precio</p>
-                        <p className="text-[12px] font-bold text-gray-800">{formatPrecio(precio)}</p>
-                    </div>
-                    <div>
-                        <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">Estrategia</p>
-                        <p className="text-[12px] font-semibold text-gray-700">{strategyLabel}</p>
-                    </div>
+                <div>
+                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">Precio</p>
+                    <p className="text-[12px] font-bold text-gray-800">{formatPrecio(precio)}</p>
                 </div>
 
-                {/* Tags agro (si aplica) */}
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
                     <div className="flex gap-1 mt-1.5 flex-wrap">
                         {asset.zona_agroecologica && (
@@ -138,23 +138,16 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
             </div>
 
-            {/* DERECHA — 25%: estrategia tag + G-Score + ROI */}
+            {/* DERECHA — 25%: G-Score + ROI */}
             <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-2">
-                {/* Strategy tag + G-Score en la misma línea como referencia */}
-                <div className="flex items-center gap-2 w-full justify-end">
-                    <span className="text-[8px] font-semibold text-gray-400 uppercase tracking-widest">
-                        {strategyLabel.toUpperCase()}
-                    </span>
-                    <span className="bg-black text-white text-[11px] font-black px-2 py-0.5 rounded">
-                        G {gScore}
-                    </span>
-                </div>
+                <span className="bg-black text-white text-[10px] font-black px-2 py-0.5 rounded tracking-wide">
+                    G-Score {gScore}
+                </span>
 
-                {/* ROI */}
                 <div className="text-right">
                     <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">ROI Est.</p>
                     <p className="text-[15px] font-black text-emerald-500 leading-tight">
-                        ↗ {(expectedIrr * 100).toFixed(1)}%
+                        {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>
             </div>
