@@ -132,14 +132,12 @@ export default function GeolandOS() {
             {/* Dark overlay to ensure text contrast */}
             <div className="absolute inset-0 bg-black/25" />
 
-            {/* GEOLAND OS — top left */}
-            <div className="absolute top-6 left-8 z-30">
-              <span className="text-white/70 text-sm font-light tracking-[0.25em] uppercase">GEOLAND OS</span>
-            </div>
-
-            {/* V 1.0 — top right */}
-            <div className="absolute top-6 right-8 z-30">
-              <span className="text-white/40 text-xs font-light tracking-widest">V 1.0</span>
+            {/* Logo — alineado con borde izquierdo del contenedor */}
+            <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-center justify-between relative z-30">
+              <img src="/logo.png" alt="GEOLAND" className="h-8 w-auto opacity-90" />
+              <span className="text-white/40 text-[11px] font-light tracking-wide italic">
+                The Decision Infrastructure for Global Real Estate
+              </span>
             </div>
 
             {/* Floating Glass Container (60/40 Split) */}
