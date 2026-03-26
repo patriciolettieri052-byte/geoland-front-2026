@@ -52,7 +52,7 @@ export function AiChatProfiler() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         history: [],
-                        message: '[SYSTEM COMMAND]: Inicia la conversación saludando al inversor y haciendo tu primera pregunta estratégica.'
+                        message: '[SYSTEM COMMAND]: Inicia la conversación con exactamente este mensaje, sin agregar nada más: "Hola.\n\nVoy a ayudarte a encontrar oportunidades de inversión.\n\nPara empezar, puedes contarme en una frase qué estás buscando o qué te gustaría hacer con tu inversión."'
                     }),
                 });
 
