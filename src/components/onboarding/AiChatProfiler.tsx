@@ -41,39 +41,14 @@ export function AiChatProfiler() {
         scrollToBottom();
     }, [messages, isLoading]);
 
-    // Initial invisible prompt
+    // Initial invisible prompt - simplified to direct set
     useEffect(() => {
-        let isMounted = true;
-        const initChat = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        history: [],
-                        message: '[SYSTEM COMMAND]: Inicia la conversación con exactamente este mensaje, sin agregar nada más: "Hola.\n\nVoy a ayudarte a encontrar oportunidades de inversión.\n\nPara empezar, puedes contarme en una frase qué estás buscando o qué te gustaría hacer con tu inversión."'
-                    }),
-                });
-
-                const data = await response.json();
-
-                if (isMounted && data.dialogo_ui) {
-                    setMessages(() => [{ role: 'assistant', content: data.dialogo_ui }]);
-                }
-            } catch (error) {
-                console.error('Init chat failed', error);
-            } finally {
-                if (isMounted) setIsLoading(false);
-            }
-        };
-
-        // Only run if empty
         if (messages.length === 0) {
-            initChat();
+            setMessages(() => [{
+                role: 'assistant',
+                content: 'Hola.\n\nVoy a ayudarte a encontrar oportunidades de inversión.\n\nPara empezar, puedes contarme en una frase qué estás buscando o qué te gustaría hacer con tu inversión.'
+            }]);
         }
-
-        return () => { isMounted = false; };
     }, [messages.length, setMessages]);
 
     // 🕵️ THE FEEDBACK LOOP TRIGGER
