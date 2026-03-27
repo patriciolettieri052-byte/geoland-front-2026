@@ -152,13 +152,7 @@ function getFirstMissingField(isv: Record<string, any>): string | null {
     const mode = isv?.investment_mode;
     const isPerformance = mode === 'performance_driven';
 
-    // Si asset_class y strategy_primary ya están resueltos,
-    // investment_mode se infiere como intent_defined — no preguntar al usuario
-    const hasAsset = !!isv?.asset_class;
-    const hasStrategy = !!isv?.strategy_primary;
-
-    if (!mode && !hasAsset && !hasStrategy) return 'investment_mode';
-    // Si tiene activo y estrategia pero no investment_mode → el LLM lo mapeará como intent_defined
+    if (!mode) return 'investment_mode';
 
     if (!isPerformance) {
         if (!isv?.asset_class) return 'asset_class';
@@ -180,7 +174,7 @@ function getFirstMissingField(isv: Record<string, any>): string | null {
 
     if (!isv?.confirmed_by_user) return 'confirmation';
 
-    return null;
+    return null; // todo resuelto
 }
 
 
