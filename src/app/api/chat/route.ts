@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { ONBOARDING_SYSTEM_PROMPT, REFINAMIENTO_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 
-// Force v1 endpoint (not v1beta) which is required for newer accounts
-const genAI = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY || 'dummy_key',
-    httpOptions: { apiVersion: 'v1' }
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
 });
 
 function cleanJsonMarkdown(text: string): string {
@@ -147,8 +145,8 @@ export async function POST(req: NextRequest) {
             trackEvent('isv_started');
         }
 
-        if (!process.env.GEMINI_API_KEY) {
-            console.error('CRITICAL: GEMINI_API_KEY environment variable is missing.');
+        if (!process.env.OPENAI_API_KEY) {
+            console.error('CRITICAL: OPENAI_API_KEY environment variable is missing.');
             return NextResponse.json(
                 { error: 'System architecture error: Missing intelligence layer connection.' },
                 { status: 500 }
@@ -171,15 +169,22 @@ USER MESSAGE: ${message}
 You must respond ONLY with the valid JSON object described in the instructions.
 `;
 
-        const response = await genAI.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: fullPrompt,
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [
+                {
+                    role: 'user',
+                    content: fullPrompt,
+                }
+            ],
+            temperature: 0.3,  // bajo para respuestas consistentes y estructuradas
+            max_tokens: 1500,
         });
 
-        const rawText = response.text;
+        const rawText = response.choices[0]?.message?.content;
 
         if (!rawText) {
-            throw new Error('Empty response from Gemini');
+            throw new Error('Empty response from OpenAI');
         }
 
         const cleanText = cleanJsonMarkdown(rawText);
