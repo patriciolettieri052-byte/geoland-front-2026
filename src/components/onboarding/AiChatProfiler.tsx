@@ -115,7 +115,7 @@ export function AiChatProfiler() {
                     history: currentHistoryForApi,
                     message: userMessage,
                     perfilCompletado,
-                    currentState,
+                    currentState: isvV6,  // ← mandar el objeto ISV completo
                 }),
             });
 
