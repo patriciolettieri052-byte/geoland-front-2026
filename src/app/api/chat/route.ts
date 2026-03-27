@@ -4,6 +4,7 @@ import { ONBOARDING_SYSTEM_PROMPT, REFINAMIENTO_SYSTEM_PROMPT } from '@/lib/ai/p
 import { normalizeInput } from '@/lib/ai/normalizer';
 import { runInference } from '@/lib/ai/inferenceRules';
 import { callLLM } from '@/lib/ai/llmClient';
+import { getNextQuestion } from '@/lib/ai/flowController';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
@@ -170,102 +171,130 @@ export async function POST(req: NextRequest) {
             ? REFINAMIENTO_SYSTEM_PROMPT
             : ONBOARDING_SYSTEM_PROMPT;
 
-        const conversationHistory = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
-
-        // ── PIPELINE NORMALIZER + INFERENCE (solo ISV v6) ────────
-        let inferenceContext = '';
-        let normalizedMessage = message;
-
         if (!perfilCompletado) {
+            // ── PIPELINE ──────────────────────────────────────────
+            // 1. Normalizar input
+            let normalizedMessage = message;
+            let inferenceContext = '';
             try {
-                // 1. Normalizar el input crudo del usuario
                 const normOutput = normalizeInput({
                     rawText: message,
                     conversationHistory: history.map((h: any) => h.content),
                 });
                 normalizedMessage = normOutput.normalizedText;
 
-                // 2. Correr inferencia sobre el texto normalizado
                 const infOutput = runInference({
                     normalizedOutput: normOutput,
                     currentIsvState: currentState ?? {},
                     conversationTurn: history.length,
                 });
-
-                // 3. Inyectar contexto de inferencia al prompt
                 inferenceContext = infOutput.contextForLLM;
-
-                console.log('[ISV-Pipeline] normalizer:', normOutput.meta);
-                console.log('[ISV-Pipeline] inference nextAction:', infOutput.nextAction);
                 console.log('[ISV-Pipeline] resolvedFields:', infOutput.resolvedFields);
-            } catch (pipelineError) {
-                // Si el pipeline falla, continuar con el mensaje original — no interrumpir
-                console.warn('[ISV-Pipeline] Pipeline error (non-fatal):', pipelineError);
+            } catch (e) {
+                console.warn('[ISV-Pipeline] pipeline error (non-fatal):', e);
             }
-        }
-        // ── FIN PIPELINE ──────────────────────────────────────────
 
-        // Usar callLLM si está en ISV v6, llamada directa si es refinamiento legacy
-        let rawText: string;
+            // 2. Obtener estado ISV actual del store (enviado por el frontend)
+            const currentIsv = currentState ?? {};
 
-        if (!perfilCompletado) {
+            // 3. FlowController decide qué pregunta viene
+            const flowResult = getNextQuestion(currentIsv);
+            console.log('[ISV-Flow] nextQuestion:', flowResult.nextQuestion);
+            console.log('[ISV-Flow] resolved:', flowResult.resolvedFields);
+            console.log('[ISV-Flow] missing:', flowResult.missingFields);
+
+            // 4. Construir el userMessage para el LLM
+            const conversationHistory = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
+
+            // Detectar si el usuario fue ambiguo: mismos campos pendientes que el turno anterior
+            const prevMissing: string[] = currentIsv?._prevMissingFields ?? [];
+            const isRetry = flowResult.missingFields.some(f => prevMissing.includes(f));
+
+            const flowInstruction = flowResult.nextQuestion === 'P10_SUMMARY'
+                ? `INSTRUCCIÓN: Genera un resumen del perfil con estos datos y pide confirmación al usuario:\n${JSON.stringify(currentIsv, null, 2)}`
+                : flowResult.nextQuestion === 'DONE'
+                ? `INSTRUCCIÓN: El perfil ya está confirmado. Muestra un mensaje de cierre breve y amigable.`
+                : isRetry
+                ? `INSTRUCCIÓN: El usuario no respondió claramente la pregunta anterior. NO la repitas literal.
+Usa esta reformulación más corta (puedes adaptar el tono):
+${flowResult.retryText}
+
+Campos ya resueltos (NO preguntar): ${flowResult.resolvedFields.join(', ') || 'ninguno aún'}`
+                : `INSTRUCCIÓN: La próxima pregunta a hacer es "${flowResult.nextQuestion}".
+Texto exacto a usar (puedes adaptar el tono pero no cambiar el significado ni las opciones):
+${flowResult.questionText}
+
+Campos ya resueltos (NO preguntar por ninguno de estos): ${flowResult.resolvedFields.join(', ') || 'ninguno aún'}`;
+
+            const userContent = `HISTORIAL:
+${conversationHistory}
+
+MENSAJE DEL USUARIO: ${normalizedMessage}
+${inferenceContext}
+${flowInstruction}
+
+Responde SOLO con el JSON indicado. Mapea la respuesta del usuario a los campos del ISV si corresponde.`;
+
+            // 5. Llamar al LLM
             const llmResponse = await callLLM({
-                systemPrompt: systemPrompt + inferenceContext,
-                userMessage: `CONVERSATION HISTORY:\n${conversationHistory}\n\nUSER MESSAGE: ${normalizedMessage}\n\nYou must respond ONLY with the valid JSON object described in the instructions.`,
+                systemPrompt: ONBOARDING_SYSTEM_PROMPT,
+                userMessage: userContent,
             });
-            rawText = llmResponse.text;
-            console.log('[ISV-Pipeline] LLM model:', llmResponse.model, '| tokens:', llmResponse.tokensUsed);
-        } else {
-            // Refinamiento legacy — llamada directa sin pipeline
-            const response = await openai.chat.completions.create({
-                model: 'gpt-5.2',
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: `CONVERSATION HISTORY:\n${conversationHistory}\n\nUSER MESSAGE: ${message}\n\nYou must respond ONLY with the valid JSON object described in the instructions.` }
-                ],
-                temperature: 0.3,
-                max_completion_tokens: 1500,
-                response_format: { type: 'json_object' }
-            });
-            rawText = response.choices[0]?.message?.content ?? '';
-        }
 
-        if (!rawText) {
-            throw new Error('Empty response from OpenAI');
-        }
+            const cleanText = cleanJsonMarkdown(llmResponse.text);
+            let jsonOutput: any;
+            try {
+                jsonOutput = JSON.parse(cleanText);
+            } catch {
+                console.error('[ISV] JSON parse error. Raw:', llmResponse.text);
+                throw new Error('Invalid JSON from LLM');
+            }
 
-        const cleanText = cleanJsonMarkdown(rawText);
-        let jsonOutput;
-        try {
-            jsonOutput = JSON.parse(cleanText);
-        } catch (parseError) {
-            console.error('JSON Parse Error. Raw text was:', rawText);
-            throw new Error('Invalid JSON format in AI response');
-        }
-
-        if (!perfilCompletado) {
-            // ISV v6 flow
             jsonOutput = applyIsvV6SufficiencyGuard(jsonOutput);
             const isvV6Mapeado = mapGeminiToIsvV6(jsonOutput.isv_v6);
             const isvSufficient = isvV6Mapeado?.isv_sufficient && isvV6Mapeado?.confirmed_by_user ? true : false;
 
-            // Analytics
             if (isvSufficient) trackEvent('isv_v6_complete');
-            if (isvV6Mapeado?.investment_mode === 'performance_driven') trackEvent('isv_v6_performance_driven');
-            if (isvV6Mapeado?.user_name) trackEvent('isv_v6_name_captured');
+
+            // Inyectar _prevMissingFields en el ISV para detectar reintentos en el próximo turno
+            if (isvV6Mapeado) {
+                (isvV6Mapeado as any)._prevMissingFields = flowResult.missingFields;
+            }
 
             return NextResponse.json({
                 dialogo_ui: jsonOutput.dialogo_ui,
-                current_state: jsonOutput.current_state ?? currentState ?? 'INIT',
+                current_state: flowResult.nextQuestion,
                 isvV6_mapeado: isvV6Mapeado,
                 perfil_completado: isvSufficient,
-                // legacy
                 contradiccion_detectada: false,
                 extraccion_mapeada: null,
                 iterando_resultados: false,
             });
         } else {
             // Refinamiento flow (legacy v3 path)
+            const response = await openai.chat.completions.create({
+                model: 'gpt-5.2',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `CONVERSATION HISTORY:\n${history.map((h: any) => `${h.role}: ${h.content}`).join('\n')}\n\nUSER MESSAGE: ${message}\n\nYou must respond ONLY with the valid JSON object described in the instructions.` }
+                ],
+                temperature: 0.3,
+                max_completion_tokens: 1500,
+                response_format: { type: 'json_object' }
+            });
+            const rawText = response.choices[0]?.message?.content ?? '';
+            
+            if (!rawText) throw new Error('Empty response from OpenAI');
+
+            const cleanText = cleanJsonMarkdown(rawText);
+            let jsonOutput: any;
+            try {
+                jsonOutput = JSON.parse(cleanText);
+            } catch (parseError) {
+                console.error('JSON Parse Error. Raw text was:', rawText);
+                throw new Error('Invalid JSON format in AI response');
+            }
+
             jsonOutput = applyConfidenceGuard(jsonOutput);
             const mapped = jsonOutput.extraccion_datos
                 ? mapGeminiToStore(jsonOutput.extraccion_datos)
