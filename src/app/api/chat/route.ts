@@ -254,16 +254,22 @@ Responde SOLO con el JSON indicado. Mapea la respuesta del usuario a los campos 
             const isvV6Mapeado = mapGeminiToIsvV6(jsonOutput.isv_v6);
             const isvSufficient = isvV6Mapeado?.isv_sufficient && isvV6Mapeado?.confirmed_by_user ? true : false;
 
+            // Fix: recalcular nextQuestion con el ISV YA actualizado por el LLM
+            // El flowController inicial leyó el estado del turno anterior — corregir aquí
+            const updatedIsv = { ...currentIsv, ...(isvV6Mapeado ?? {}) };
+            const updatedFlow = getNextQuestion(updatedIsv);
+            console.log('[ISV-Flow] nextQuestion UPDATED:', updatedFlow.nextQuestion);
+
             if (isvSufficient) trackEvent('isv_v6_complete');
 
             // Inyectar _prevMissingFields en el ISV para detectar reintentos en el próximo turno
             if (isvV6Mapeado) {
-                (isvV6Mapeado as any)._prevMissingFields = flowResult.missingFields;
+                (isvV6Mapeado as any)._prevMissingFields = updatedFlow.missingFields;
             }
 
             return NextResponse.json({
                 dialogo_ui: jsonOutput.dialogo_ui,
-                current_state: flowResult.nextQuestion,
+                current_state: updatedFlow.nextQuestion,
                 isvV6_mapeado: isvV6Mapeado,
                 perfil_completado: isvSufficient,
                 contradiccion_detectada: false,
