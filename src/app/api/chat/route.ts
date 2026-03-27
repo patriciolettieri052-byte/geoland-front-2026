@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { ONBOARDING_SYSTEM_PROMPT, REFINAMIENTO_SYSTEM_PROMPT } from '@/lib/ai/prompts';
-import { normalizeInput } from '@/lib/ai/normalizer';
-import { runInference } from '@/lib/ai/inferenceRules';
-import { callLLM } from '@/lib/ai/llmClient';
-import { getNextQuestion } from '@/lib/ai/flowController';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
@@ -150,6 +146,38 @@ async function trackEvent(event: string, props: Record<string, any> = {}) {
 }
 
 
+// ── ISV FLOW: detecta qué campo falta resolver ────────────────────
+// Función pura. Sin clases. Sin módulos. Lee el ISV y devuelve el primer campo pendiente.
+function getFirstMissingField(isv: Record<string, any>): string | null {
+    const mode = isv?.investment_mode;
+    const isPerformance = mode === 'performance_driven';
+
+    if (!mode) return 'investment_mode';
+
+    if (!isPerformance) {
+        if (!isv?.asset_class) return 'asset_class';
+        if (isv.asset_class === 'real_estate' && !isv?.sub_asset_class) return 'sub_asset_class';
+        if (!isv?.strategy_primary) return 'strategy_primary';
+    }
+
+    if (!isv?.effort_level) return 'effort_level';
+
+    const hasAmount = isv?.budget?.amount_max || isv?.budget?.amount_raw;
+    if (!hasAmount) return 'budget_amount';
+    if (!isv?.budget?.currency) return 'budget_currency';
+
+    if (!isv?.decision_tradeoff) return 'decision_tradeoff';
+    if (!isv?.time_horizon) return 'time_horizon';
+
+    const hasMarket = isv?.market_mode || (Array.isArray(isv?.preferred_markets) && isv.preferred_markets.length > 0);
+    if (!hasMarket) return 'market';
+
+    if (!isv?.confirmed_by_user) return 'confirmation';
+
+    return null; // todo resuelto
+}
+
+
 export async function POST(req: NextRequest) {
     try {
         const { history, message, perfilCompletado, currentState } = await req.json();
@@ -171,82 +199,41 @@ export async function POST(req: NextRequest) {
             ? REFINAMIENTO_SYSTEM_PROMPT
             : ONBOARDING_SYSTEM_PROMPT;
 
+        const conversationHistory = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
+
         if (!perfilCompletado) {
-            // ── PIPELINE ──────────────────────────────────────────
-            // 1. Normalizar input
-            let normalizedMessage = message;
-            let inferenceContext = '';
-            try {
-                const normOutput = normalizeInput({
-                    rawText: message,
-                    conversationHistory: history.map((h: any) => h.content),
-                });
-                normalizedMessage = normOutput.normalizedText;
-
-                const infOutput = runInference({
-                    normalizedOutput: normOutput,
-                    currentIsvState: currentState ?? {},
-                    conversationTurn: history.length,
-                });
-                inferenceContext = infOutput.contextForLLM;
-                console.log('[ISV-Pipeline] resolvedFields:', infOutput.resolvedFields);
-            } catch (e) {
-                console.warn('[ISV-Pipeline] pipeline error (non-fatal):', e);
-            }
-
-            // 2. Obtener estado ISV actual del store (enviado por el frontend)
+            // Campo pendiente — el prompt sabe qué preguntar
             const currentIsv = currentState ?? {};
+            const missingField = getFirstMissingField(currentIsv);
+            const fieldInstruction = missingField
+                ? `\n\nCAMPO PENDIENTE: "${missingField}". Este campo aún está vacío. Tu próxima pregunta debe resolverlo.`
+                : `\n\nTodos los campos están resueltos. Genera el resumen del perfil y pide confirmación.`;
 
-            // 3. FlowController decide qué pregunta viene
-            const flowResult = getNextQuestion(currentIsv);
-            console.log('[ISV-Flow] nextQuestion:', flowResult.nextQuestion);
-            console.log('[ISV-Flow] resolved:', flowResult.resolvedFields);
-            console.log('[ISV-Flow] missing:', flowResult.missingFields);
+            console.log('[ISV] missingField:', missingField);
 
-            // 4. Construir el userMessage para el LLM
-            const conversationHistory = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
-
-            // Detectar si el usuario fue ambiguo: mismos campos pendientes que el turno anterior
-            const prevMissing: string[] = currentIsv?._prevMissingFields ?? [];
-            const isRetry = flowResult.missingFields.some(f => prevMissing.includes(f));
-
-            const flowInstruction = flowResult.nextQuestion === 'P10_SUMMARY'
-                ? `INSTRUCCIÓN: Genera un resumen del perfil con estos datos y pide confirmación al usuario:\n${JSON.stringify(currentIsv, null, 2)}`
-                : flowResult.nextQuestion === 'DONE'
-                ? `INSTRUCCIÓN: El perfil ya está confirmado. Muestra un mensaje de cierre breve y amigable.`
-                : isRetry
-                ? `INSTRUCCIÓN: El usuario no respondió claramente la pregunta anterior. NO la repitas literal.
-Usa esta reformulación más corta (puedes adaptar el tono):
-${flowResult.retryText}
-
-Campos ya resueltos (NO preguntar): ${flowResult.resolvedFields.join(', ') || 'ninguno aún'}`
-                : `INSTRUCCIÓN: La próxima pregunta a hacer es "${flowResult.nextQuestion}".
-Texto exacto a usar (puedes adaptar el tono pero no cambiar el significado ni las opciones):
-${flowResult.questionText}
-
-Campos ya resueltos (NO preguntar por ninguno de estos): ${flowResult.resolvedFields.join(', ') || 'ninguno aún'}`;
-
-            const userContent = `HISTORIAL:
-${conversationHistory}
-
-MENSAJE DEL USUARIO: ${normalizedMessage}
-${inferenceContext}
-${flowInstruction}
-
-Responde SOLO con el JSON indicado. Mapea la respuesta del usuario a los campos del ISV si corresponde.`;
-
-            // 5. Llamar al LLM
-            const llmResponse = await callLLM({
-                systemPrompt: ONBOARDING_SYSTEM_PROMPT,
-                userMessage: userContent,
+            const response = await openai.chat.completions.create({
+                model: 'gpt-4o-mini',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    {
+                        role: 'user',
+                        content: `HISTORIAL:\n${conversationHistory}\n\nMENSAJE DEL USUARIO: ${message}${fieldInstruction}\n\nResponde SOLO con el JSON indicado.`
+                    }
+                ],
+                temperature: 0.3,
+                max_tokens: 1500,
+                response_format: { type: 'json_object' },
             });
 
-            const cleanText = cleanJsonMarkdown(llmResponse.text);
+            const rawText = response.choices[0]?.message?.content;
+            if (!rawText) throw new Error('Empty response from OpenAI');
+
+            const cleanText = cleanJsonMarkdown(rawText);
             let jsonOutput: any;
             try {
                 jsonOutput = JSON.parse(cleanText);
             } catch {
-                console.error('[ISV] JSON parse error. Raw:', llmResponse.text);
+                console.error('[ISV] JSON parse error. Raw:', rawText);
                 throw new Error('Invalid JSON from LLM');
             }
 
@@ -254,22 +241,11 @@ Responde SOLO con el JSON indicado. Mapea la respuesta del usuario a los campos 
             const isvV6Mapeado = mapGeminiToIsvV6(jsonOutput.isv_v6);
             const isvSufficient = isvV6Mapeado?.isv_sufficient && isvV6Mapeado?.confirmed_by_user ? true : false;
 
-            // Fix: recalcular nextQuestion con el ISV YA actualizado por el LLM
-            // El flowController inicial leyó el estado del turno anterior — corregir aquí
-            const updatedIsv = { ...currentIsv, ...(isvV6Mapeado ?? {}) };
-            const updatedFlow = getNextQuestion(updatedIsv);
-            console.log('[ISV-Flow] nextQuestion UPDATED:', updatedFlow.nextQuestion);
-
             if (isvSufficient) trackEvent('isv_v6_complete');
-
-            // Inyectar _prevMissingFields en el ISV para detectar reintentos en el próximo turno
-            if (isvV6Mapeado) {
-                (isvV6Mapeado as any)._prevMissingFields = updatedFlow.missingFields;
-            }
 
             return NextResponse.json({
                 dialogo_ui: jsonOutput.dialogo_ui,
-                current_state: updatedFlow.nextQuestion,
+                current_state: jsonOutput.current_state ?? currentState ?? 'INIT',
                 isvV6_mapeado: isvV6Mapeado,
                 perfil_completado: isvSufficient,
                 contradiccion_detectada: false,
