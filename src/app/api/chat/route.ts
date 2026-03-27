@@ -8,6 +8,16 @@ const openai = new OpenAI({
 
 function cleanJsonMarkdown(text: string): string {
     let cleaned = text.trim();
+    
+    // Find first { and last }
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        return cleaned.substring(firstBrace, lastBrace + 1);
+    }
+
+    // Fallback to old method if no braces found (unlikely for JSON)
     if (cleaned.startsWith('```json')) {
         cleaned = cleaned.replace(/^```json/, '');
     } else if (cleaned.startsWith('```')) {
@@ -158,27 +168,22 @@ export async function POST(req: NextRequest) {
             : ONBOARDING_SYSTEM_PROMPT;
 
         const conversationHistory = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
-        const fullPrompt = `
-${systemPrompt}
-
-CONVERSATION HISTORY:
-${conversationHistory}
-
-USER MESSAGE: ${message}
-
-You must respond ONLY with the valid JSON object described in the instructions.
-`;
-
+        
         const response = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
                 {
+                    role: 'system',
+                    content: systemPrompt
+                },
+                {
                     role: 'user',
-                    content: fullPrompt,
+                    content: `CONVERSATION HISTORY:\n${conversationHistory}\n\nUSER MESSAGE: ${message}\n\nYou must respond ONLY with the valid JSON object described in the instructions.`
                 }
             ],
             temperature: 0.3,  // bajo para respuestas consistentes y estructuradas
             max_tokens: 1500,
+            response_format: { type: 'json_object' } // Asegura salida JSON válida
         });
 
         const rawText = response.choices[0]?.message?.content;
