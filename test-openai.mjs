@@ -15,7 +15,7 @@ async function test() {
                 }
             ],
             temperature: 0.3,
-            max_tokens: 1500,
+            max_completion_tokens: 1500,
         });
 
         console.log('RAW RESPONSE:', response.choices[0]?.message?.content);

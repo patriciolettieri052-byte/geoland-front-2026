@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { ONBOARDING_SYSTEM_PROMPT, REFINAMIENTO_SYSTEM_PROMPT } from '@/lib/ai/prompts';
+import { normalizeInput } from '@/lib/ai/normalizer';
+import { runInference } from '@/lib/ai/inferenceRules';
+import { callLLM } from '@/lib/ai/llmClient';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
@@ -168,25 +171,64 @@ export async function POST(req: NextRequest) {
             : ONBOARDING_SYSTEM_PROMPT;
 
         const conversationHistory = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
-        
-        const response = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
-            messages: [
-                {
-                    role: 'system',
-                    content: systemPrompt
-                },
-                {
-                    role: 'user',
-                    content: `CONVERSATION HISTORY:\n${conversationHistory}\n\nUSER MESSAGE: ${message}\n\nYou must respond ONLY with the valid JSON object described in the instructions.`
-                }
-            ],
-            temperature: 0.3,  // bajo para respuestas consistentes y estructuradas
-            max_tokens: 1500,
-            response_format: { type: 'json_object' } // Asegura salida JSON válida
-        });
 
-        const rawText = response.choices[0]?.message?.content;
+        // ── PIPELINE NORMALIZER + INFERENCE (solo ISV v6) ────────
+        let inferenceContext = '';
+        let normalizedMessage = message;
+
+        if (!perfilCompletado) {
+            try {
+                // 1. Normalizar el input crudo del usuario
+                const normOutput = normalizeInput({
+                    rawText: message,
+                    conversationHistory: history.map((h: any) => h.content),
+                });
+                normalizedMessage = normOutput.normalizedText;
+
+                // 2. Correr inferencia sobre el texto normalizado
+                const infOutput = runInference({
+                    normalizedOutput: normOutput,
+                    currentIsvState: currentState ?? {},
+                    conversationTurn: history.length,
+                });
+
+                // 3. Inyectar contexto de inferencia al prompt
+                inferenceContext = infOutput.contextForLLM;
+
+                console.log('[ISV-Pipeline] normalizer:', normOutput.meta);
+                console.log('[ISV-Pipeline] inference nextAction:', infOutput.nextAction);
+                console.log('[ISV-Pipeline] resolvedFields:', infOutput.resolvedFields);
+            } catch (pipelineError) {
+                // Si el pipeline falla, continuar con el mensaje original — no interrumpir
+                console.warn('[ISV-Pipeline] Pipeline error (non-fatal):', pipelineError);
+            }
+        }
+        // ── FIN PIPELINE ──────────────────────────────────────────
+
+        // Usar callLLM si está en ISV v6, llamada directa si es refinamiento legacy
+        let rawText: string;
+
+        if (!perfilCompletado) {
+            const llmResponse = await callLLM({
+                systemPrompt: systemPrompt + inferenceContext,
+                userMessage: `CONVERSATION HISTORY:\n${conversationHistory}\n\nUSER MESSAGE: ${normalizedMessage}\n\nYou must respond ONLY with the valid JSON object described in the instructions.`,
+            });
+            rawText = llmResponse.text;
+            console.log('[ISV-Pipeline] LLM model:', llmResponse.model, '| tokens:', llmResponse.tokensUsed);
+        } else {
+            // Refinamiento legacy — llamada directa sin pipeline
+            const response = await openai.chat.completions.create({
+                model: 'gpt-5.2',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `CONVERSATION HISTORY:\n${conversationHistory}\n\nUSER MESSAGE: ${message}\n\nYou must respond ONLY with the valid JSON object described in the instructions.` }
+                ],
+                temperature: 0.3,
+                max_completion_tokens: 1500,
+                response_format: { type: 'json_object' }
+            });
+            rawText = response.choices[0]?.message?.content ?? '';
+        }
 
         if (!rawText) {
             throw new Error('Empty response from OpenAI');

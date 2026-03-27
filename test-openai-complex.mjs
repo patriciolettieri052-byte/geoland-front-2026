@@ -33,7 +33,7 @@ You must respond ONLY with the valid JSON object described in the instructions.
             model: 'gpt-4o-mini',
             messages: [{ role: 'user', content: fullPrompt }],
             temperature: 0.3,
-            max_tokens: 1500,
+            max_completion_tokens: 1500,
         });
 
         const rawText = response.choices[0]?.message?.content;
