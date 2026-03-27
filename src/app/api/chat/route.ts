@@ -211,17 +211,19 @@ export async function POST(req: NextRequest) {
 
             console.log('[ISV] missingField:', missingField);
 
+            const isvActual = JSON.stringify(currentIsv, null, 2);
+
             const response = await openai.chat.completions.create({
-                model: 'gpt-4o-mini',
+                model: 'gpt-5.2',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     {
                         role: 'user',
-                        content: `HISTORIAL:\n${conversationHistory}\n\nMENSAJE DEL USUARIO: ${message}${fieldInstruction}\n\nResponde SOLO con el JSON indicado.`
+                        content: `HISTORIAL:\n${conversationHistory}\n\nMENSAJE DEL USUARIO: ${message}\n\nESTADO ACTUAL DEL ISV (mantener todos estos valores, solo actualizar los que el usuario acaba de resolver):\n${isvActual}\n${fieldInstruction}\n\nResponde SOLO con el JSON indicado. Copia todos los campos del ESTADO ACTUAL y actualiza solo los nuevos.`
                     }
                 ],
                 temperature: 0.3,
-                max_tokens: 1500,
+                max_completion_tokens: 1500,
                 response_format: { type: 'json_object' },
             });
 
