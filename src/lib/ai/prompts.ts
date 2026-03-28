@@ -39,30 +39,95 @@ MAPEO DE SEÑALES — APLICAR SIEMPRE
 ═══════════════════════════════════════════════════════
 Cuando el usuario mencione cualquiera de estas señales, mapear el campo correspondiente SIN volver a preguntarlo:
 
-• piso / departamento / casa / chalet / local / oficina → asset_class = "real_estate"
-• construir / demoler / reformar / desarrollar / obra nueva → asset_class = "real_estate", strategy_primary = "development" (si es construir) o señal de fix_and_flip (si es reformar y vender)
-• campo / tierra / finca / estancia / chacra → asset_class = "farmland"
-• para alquilar / renta / buy and hold / ingreso pasivo → strategy_primary = "rental_long_term"
-• airbnb / turístico / alquiler vacacional → strategy_primary = "rental_short_term"
-• reformar y vender / flipear / mejorar y vender / comprar barato y vender → strategy_primary = "fix_and_flip"
-• construir / levantar / obra nueva → strategy_primary = "development"
-• ganadería / vacas / ganado / bovino → strategy_primary = "livestock", asset_class = "farmland"
-• agricultura / cultivo / soja / maíz / trigo → strategy_primary = "agriculture", asset_class = "farmland"
-• solo rendimiento / me da igual el tipo / lo que más rinda → investment_mode = "performance_driven"
-• [mención de activo o estrategia concreta] → investment_mode = "intent_defined"
-• nada / solo invertir / manos fuera / pasivo → effort_level = "low"
-• algo / seguirla de cerca → effort_level = "medium"
-• mucho / gestionar yo / muy activo → effort_level = "high"
-• simple / predecible / sin riesgo → decision_tradeoff = "conservative"
-• acepto complejidad / más rentabilidad → decision_tradeoff = "growth_tolerant"
-• depende / equilibrio → decision_tradeoff = "balanced"
-• corto plazo / 1-2 años → time_horizon = "short"
-• medio plazo / 3-5 años → time_horizon = "medium"
-• largo plazo / generacional / para siempre → time_horizon = "long"
-• Madrid / Miami / Buenos Aires / Dubai → preferred_markets = [ciudad], market_mode = "fixed"
-• abierto / lo que mejor rinda / no sé → market_mode = "open_exploration"
-• monto numérico (200k, 300.000, etc.) → budget.amount_raw, budget.amount_max
-• dólares / USD / euros / EUR / dirhams / AED → budget.currency
+── ASSET CLASS ──
+• propiedad / inmueble / unidad / vivienda / departamento / depto / dpto / apartamento / apto / flat / casa / chalet / villa / duplex / triplex / ph / monoambiente / loft / estudio → asset_class = "real_estate"
+• local / local comercial / oficina / nave / retail / galpón / depósito / bodega / strip center → asset_class = "real_estate", sub_asset_class = "commercial"
+• centro logístico / parque industrial / logística → asset_class = "real_estate", sub_asset_class = "logistics"
+• campo / campos / tierra / finca / estancia / chacra / hacienda / predio rural / lote rural / fracción / hectáreas / has → asset_class = "farmland"
+
+── SUB ASSET CLASS ──
+• residencial / vivienda / familia / hogar / para vivir / uso habitacional → sub_asset_class = "residential"
+• comercial / local comercial / oficina / nave / retail / triple net / NNN → sub_asset_class = "commercial"
+• logística / centro logístico / parque industrial → sub_asset_class = "logistics"
+
+── ESTRATEGIAS ──
+• alquilar / renta / ingreso pasivo / flujo / cashflow / buy and hold / alquiler tradicional → strategy_primary = "rental_long_term"
+• airbnb / temporal / turístico / vacacional / alquiler corto / por días / por semanas / corta estancia → strategy_primary = "rental_short_term"
+• reformar / remodelar / reciclar / comprar y vender / entrada y salida / flip / flipear / mejorar y vender → strategy_primary = "fix_and_flip"
+• construir / desarrollar / obra / obra nueva / pozo / preventa / promoción / edificar / levantar / solar → strategy_primary = "development"
+• comprar tierra / guardar tierra / esperar valorización / land banking → strategy_primary = "land_banking"
+• subdividir / lotear / loteo → strategy_primary = "subdivision"
+• ganadería / ganado / vacas / bovino / ovino / feedlot / tambo → strategy_primary = "livestock", asset_class = "farmland"
+• agricultura / cultivo / sembrar / cosecha / soja / maíz / trigo / girasol → strategy_primary = "agriculture", asset_class = "farmland"
+• mixto / agrícola y ganadero → strategy_primary = "mixed_farmland", asset_class = "farmland"
+• alquilar y vender → strategy_cluster = ["rental_long_term","fix_and_flip"], main_strategy = "rental_long_term"
+
+── INVESTMENT MODE ──
+• máximo retorno / lo que más rinda / rentabilidad máxima / solo rendimiento / me da igual el tipo / performance → investment_mode = "performance_driven"
+• no sé / estoy viendo / explorando / evaluando / no tengo claro → investment_mode = "exploratory"
+• [cualquier mención de activo o estrategia concreta] → investment_mode = "intent_defined"
+
+── INVOLUCRAMIENTO ──
+• pasivo / no hacer nada / llave en mano / que lo manejen / automático / manos fuera / no tengo tiempo → effort_level = "low"
+• seguirlo / mirarlo / reportes / estar al tanto / seguirla de cerca → effort_level = "medium"
+• yo me encargo / lo hago yo / hands on / soy desarrollador / tengo equipo / muy activo / gestionar yo → effort_level = "high"
+
+── RIESGO / TRADEOFF ──
+• seguro / conservador / tranquilo / simple / predecible / sin riesgo / sin complicaciones → decision_tradeoff = "conservative"
+• equilibrio / moderado / balance / depende → decision_tradeoff = "balanced"
+• agresivo / alto retorno / maximizar / apalancado / acepto complejidad / más rentabilidad / growth → decision_tradeoff = "growth_tolerant"
+
+── HORIZONTE ──
+• ya / rápido / meses / este año / corto plazo / 1-2 años / quiero liquidez / exit rápido → time_horizon = "short"
+• 2 / 3 / 4 / 5 años / medio plazo / algunos años → time_horizon = "medium"
+• largo plazo / jubilación / para mis hijos / generacional / para siempre / más de 5 años → time_horizon = "long"
+
+── PRESUPUESTO (parsing) ──
+• 200k → 200000 | 1.5m → 1500000 | 200 mil → 200000 | 2 millones → 2000000
+• medio palo → 500000 | un palo → 1000000
+• "entre 100k y 200k" → amount_min = 100000, amount_max = 200000
+• "menos de 300k" → amount_max = 300000
+• monto detectado → budget.amount_raw (string original) + budget.amount_max (número)
+
+── MONEDA ──
+• usd / dólares / dolar / u$s / u$d / dolar billete / usd cash → budget.currency = "USD"
+• eur / euros / euro → budget.currency = "EUR"
+• aed / dirhams → budget.currency = "AED"
+• ars / pesos / pesos argentinos → budget.currency = "ARS"
+• uyu / pesos uruguayos → budget.currency = "UYU"
+• clp / pesos chilenos → budget.currency = "CLP"
+• mxn / pesos mexicanos → budget.currency = "MXN"
+• brl / reales → budget.currency = "BRL"
+
+── MERCADOS ──
+Ciudades soportadas: Madrid, Miami, Buenos Aires, Dubai
+
+Mapeo directo:
+• Madrid / España → preferred_markets = ["Madrid"], market_mode = "fixed"
+• Miami / Florida / USA / EEUU → preferred_markets = ["Miami"], market_mode = "fixed"
+• Buenos Aires / Argentina / CABA / Capital Federal / baires → preferred_markets = ["Buenos Aires"], market_mode = "fixed"
+• Dubai / Dubái / UAE / Emiratos / Medio Oriente → preferred_markets = ["Dubai"], market_mode = "fixed"
+
+Mapeo indirecto (mercado proxy — mencionar que operamos en ciudades cercanas):
+• Uruguay / Montevideo / Punta del Este → preferred_markets = ["Buenos Aires"], market_proxy = "Uruguay"
+• Chile → preferred_markets = ["Miami","Madrid"], market_proxy = "Chile"
+• México → preferred_markets = ["Miami"], market_proxy = "Mexico"
+• Latam / América Latina → preferred_markets = ["Buenos Aires","Miami"]
+• Europa → preferred_markets = ["Madrid"]
+• Global / donde sea / cualquier ciudad → preferred_markets = ["Madrid","Miami","Buenos Aires","Dubai"], market_mode = "open_exploration"
+
+Barrios → ciudad:
+• Palermo / Recoleta / Belgrano / Puerto Madero / San Telmo / Tigre / San Isidro / Olivos / Nuñez → preferred_markets = ["Buenos Aires"]
+• Salamanca / Chamberí / Retiro / Malasaña / Chueca / Pozuelo / La Moraleja / Alcobendas → preferred_markets = ["Madrid"]
+• Brickell / Wynwood / South Beach / Coconut Grove / Coral Gables / Aventura / Sunny Isles / Doral → preferred_markets = ["Miami"]
+• Downtown Dubai / Dubai Marina / Palm Jumeirah / DIFC / Business Bay / JVC / JBR / Al Barsha → preferred_markets = ["Dubai"]
+
+── INTENCIÓN CULTURAL ──
+• dolarizar / sacar del banco / proteger el capital / preservar valor → tag: capital_preservation (mencionarlo en dialogo_ui)
+• para jubilarme / para mis hijos / generacional → time_horizon = "long"
+
+── AMBIGÜEDAD ──
+• Si confidence_score < 70: no cerrar el campo — pedir aclaración con opciones concretas
 
 ═══════════════════════════════════════════════════════
 SUFICIENCIA — cuándo cerrar el perfil
