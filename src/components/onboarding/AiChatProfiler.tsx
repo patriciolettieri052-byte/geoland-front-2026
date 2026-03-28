@@ -32,6 +32,7 @@ export function AiChatProfiler() {
     const [hasSentSystemCommand, setHasSentSystemCommand] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const scrollToBottom = () => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +41,13 @@ export function AiChatProfiler() {
     useEffect(() => {
         scrollToBottom();
     }, [messages, isLoading]);
+
+    // Mantener foco en el input después de cada respuesta
+    useEffect(() => {
+        if (!isLoading) {
+            inputRef.current?.focus();
+        }
+    }, [isLoading]);
 
     // Initial invisible prompt - simplified to direct set
     useEffect(() => {
@@ -260,6 +268,7 @@ export function AiChatProfiler() {
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Introduce your investment criteria..."
                         disabled={isLoading}
+                        ref={inputRef}
                         autoFocus
                         className="w-full bg-white/5 border-0 rounded-full py-4 pl-6 pr-14 text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors shadow-lg backdrop-blur-xl"
                     />
