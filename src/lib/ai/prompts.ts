@@ -369,9 +369,12 @@ mapear el campo INMEDIATAMENTE sin hacer la pregunta de ese campo.
 ── ESTRATEGIA ──
 • para alquilar / renta / alquiler / buy and hold / buy & hold / ingreso pasivo / flujo / cashflow / alquiler y mantener / alquilar y mantener en el tiempo → strategy_primary = "rental_long_term", asset_class = "real_estate"
 • airbnb / turístico / vacacional / temporario / alquiler corto / por días / por semanas → strategy_primary = "rental_short_term", asset_class = "real_estate"
-• reformar y vender / flipear / flip / mejorar y vender / comprar y vender / reciclar / remodelar / entrada y salida → strategy_primary = "fix_and_flip", asset_class = "real_estate"
-• construir / desarrollar / obra / obra nueva / edificio / pozo / preventa / promoción / edificar / levantar / solar → strategy_primary = "development", asset_class = "real_estate"
-• comprar tierra / guardar tierra / esperar valorización / land banking / landbanking → strategy_primary = "land_banking", asset_class = "real_estate"
+• reformar y vender / flipear / flip / mejorar y vender / comprar y vender / reciclar / remodelar / entrada y salida / comprar barato y vender → strategy_primary = "fix_and_flip", asset_class = "real_estate"
+  Ejemplo: "quiero flipear algo en miami" → strategy_primary="fix_and_flip", asset_class="real_estate", preferred_markets=["Miami"]
+• construir / desarrollar / obra / obra nueva / edificio / pozo / preventa / promoción / edificar / levantar / solar / quiero construir un edificio / quiero desarrollar → strategy_primary = "development", asset_class = "real_estate"
+  Ejemplo: "quiero construir un edificio de oficinas en Dubai" → strategy_primary="development", asset_class="real_estate", sub_asset_class="commercial", preferred_markets=["Dubai"]
+• comprar tierra / guardar tierra / esperar valorización / land banking / landbanking / comprar y esperar / hold tierra → strategy_primary = "land_banking", asset_class = "real_estate"
+  Ejemplo: "quiero comprar tierra y esperar la valorización en Buenos Aires" → strategy_primary="land_banking", asset_class="real_estate", preferred_markets=["Buenos Aires"]
 • subdividir / lotear / loteo / fraccionamiento → strategy_primary = "subdivision", asset_class = "farmland"
 • ganadería / ganado / vacas / bovino / ovino / feedlot / tambo → strategy_primary = "livestock", asset_class = "farmland"
 • agricultura / cultivo / sembrar / cosecha / soja / maíz / trigo / girasol → strategy_primary = "agriculture", asset_class = "farmland"
@@ -419,6 +422,35 @@ Buenos Aires: Palermo / Recoleta / Belgrano / Puerto Madero / San Telmo / Tigre 
 Madrid: Salamanca / Chamberí / Retiro / Malasaña / Chueca / Lavapiés / Arganzuela / Carabanchel / Vallecas / Hortaleza / Sanchinarro / Las Tablas / Pozuelo / Majadahonda / Las Rozas / Alcobendas / La Moraleja / Getafe → "Madrid"
 Miami: Brickell / Wynwood / Edgewater / Midtown / South Beach / Miami Beach / Coconut Grove / Coral Gables / Aventura / Sunny Isles / Doral / Little Havana / Kendall / Key Biscayne / Bal Harbour / Design District → "Miami"
 Dubai: Downtown Dubai / Dubai Marina / JBR / Palm Jumeirah / Business Bay / DIFC / Jumeirah / Al Barsha / Dubai Hills / Arabian Ranches / JVC / Deira / Mirdif / Dubai South / Silicon Oasis → "Dubai"
+
+⚠️ EJEMPLO OBLIGATORIO DE BARRIO → CIUDAD EN JSON:
+Usuario dice: "busco algo en brickell"
+JSON correcto:
+  "preferred_markets": ["Miami"],
+  "preferred_submarkets": ["Brickell"],
+  "market_mode": "fixed"
+
+Usuario dice: "me interesa palermo"
+JSON correcto:
+  "preferred_markets": ["Buenos Aires"],
+  "preferred_submarkets": ["Palermo"],
+  "market_mode": "fixed"
+
+Usuario dice: "quiero invertir en el DIFC"
+JSON correcto:
+  "preferred_markets": ["Dubai"],
+  "preferred_submarkets": ["DIFC"],
+  "market_mode": "fixed"
+
+Usuario dice: "algo en latam"
+JSON correcto:
+  "preferred_markets": ["Buenos Aires", "Miami"],
+  "market_mode": "multi_market"
+
+Usuario dice: "donde sea / global / lo que mejor rinda"
+JSON correcto:
+  "preferred_markets": [],
+  "market_mode": "open_exploration"
 
 ── PRESUPUESTO — PARSING OBLIGATORIO ──
 ⚠️ Si amount_raw tiene valor, SIEMPRE calcular amount_max con el número convertido.
@@ -504,8 +536,9 @@ FORMATO JSON — responder SIEMPRE con este JSON exacto, sin texto fuera
       "amount_max": null,
       "currency": null
     },
-    // IMPORTANTE: currency acepta: USD | EUR | AED | ARS | UYU | CLP | MXN | BRL | COP
-    // IMPORTANTE: amount_max DEBE ser el número calculado, NUNCA null si amount_raw tiene valor
+    // CRÍTICO: currency acepta SOLO estos valores: "USD" | "EUR" | "AED" | "ARS" | "UYU" | "CLP" | "MXN" | "BRL" | "COP"
+    // CRÍTICO: si amount_raw tiene valor numérico, amount_max DEBE tener el número calculado
+    // Ejemplo: amount_raw="2 millones" → amount_max=2000000 | amount_raw="un palo" → amount_max=1000000
     "decision_tradeoff": null,
     "time_horizon": null,
     "preferred_markets": [],
