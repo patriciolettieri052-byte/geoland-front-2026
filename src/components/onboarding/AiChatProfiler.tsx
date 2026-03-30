@@ -98,7 +98,7 @@ export function AiChatProfiler() {
                     history: currentHistoryForApi,
                     message: userMessage,
                     perfilCompletado,
-                    currentState: isvV6,  // ← mandar el objeto ISV completo
+                    currentState: useGeolandStore.getState().isvV6,  // leer estado más reciente del store
                 }),
             });
 
