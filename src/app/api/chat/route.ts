@@ -121,10 +121,8 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
     const isPerformance = v6.investment_mode === 'performance_driven';
 
     const hasMarket = !!(v6.market_mode || v6.preferred_markets?.length > 0);
-    const hasSubmarket = !!(
-        v6.preferred_submarkets?.length > 0 ||
-        v6.market_mode === 'open_exploration'
-    );
+    // preferred_submarkets es deseable pero no bloqueante — el agente puede no haberla preguntado
+    // si el usuario no mencionó zona y el agente cerró el ISV, se acepta como open_within_city
 
     const checks = [
         !!v6.investment_mode,
@@ -133,7 +131,6 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
         !!v6.decision_tradeoff,
         !!v6.time_horizon,
         hasMarket,
-        hasSubmarket,
         isPerformance || (!!v6.asset_class && !!v6.strategy_primary),
         v6.confirmed_by_user === true,
     ];
@@ -141,7 +138,7 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
     if (!checks.every(Boolean)) {
         const missing = [
             'investment_mode','effort_level','budget+currency','decision_tradeoff',
-            'time_horizon','market','submarket','asset_class+strategy','confirmed_by_user'
+            'time_horizon','market','asset_class+strategy','confirmed_by_user'
         ].filter((_,i) => !checks[i]);
         console.warn('[ISV-V6] isv_sufficient bloqueado — faltan:', missing);
         return { ...jsonOutput, isv_v6: { ...v6, isv_sufficient: false } };
