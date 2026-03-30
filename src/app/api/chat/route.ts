@@ -83,29 +83,32 @@ function applyConfidenceGuard(jsonOutput: any): any {
 function mapGeminiToIsvV6(raw: any): import('@/store/useGeolandStore').IsvV6 | null {
     if (!raw) return null;
     return {
-        investment_mode:   raw.investment_mode   ?? null,
-        asset_class:       raw.asset_class       ?? null,
-        sub_asset_class:   raw.sub_asset_class   ?? null,
-        strategy_primary:  raw.strategy_primary  ?? null,
+        investment_mode:    raw.investment_mode    ?? null,
+        asset_class:        raw.asset_class        ?? null,
+        sub_asset_class:    raw.sub_asset_class    ?? null,
+        strategy_primary:   raw.strategy_primary   ?? null,
         strategy_secondary: raw.strategy_secondary ?? null,
-        strategy_cluster:  Array.isArray(raw.strategy_cluster) ? raw.strategy_cluster : [],
-        main_strategy:     raw.main_strategy     ?? null,
-        effort_level:      raw.effort_level      ?? null,
+        strategy_cluster:   Array.isArray(raw.strategy_cluster) ? raw.strategy_cluster : [],
+        main_strategy:      raw.main_strategy      ?? null,
+        target_return:      raw.target_return      ?? null,
+        effort_level:       raw.effort_level       ?? null,
         budget: {
             amount_raw: raw.budget?.amount_raw ?? null,
             amount_min: raw.budget?.amount_min ?? null,
             amount_max: raw.budget?.amount_max ?? null,
             currency:   raw.budget?.currency   ?? null,
         },
-        decision_tradeoff: raw.decision_tradeoff ?? null,
-        time_horizon:      raw.time_horizon      ?? null,
-        preferred_markets: Array.isArray(raw.preferred_markets) ? raw.preferred_markets : [],
-        market_mode:       raw.market_mode       ?? null,
-        user_name:         raw.user_name         ?? null,
-        confidence_score:  raw.confidence_score  ?? 0,
-        stability_score:   raw.stability_score   ?? 0,
-        isv_sufficient:    raw.isv_sufficient === true,
-        confirmed_by_user: raw.confirmed_by_user === true,
+        decision_tradeoff:    raw.decision_tradeoff    ?? null,
+        time_horizon:         raw.time_horizon         ?? null,
+        preferred_markets:    Array.isArray(raw.preferred_markets) ? raw.preferred_markets : [],
+        preferred_submarkets: Array.isArray(raw.preferred_submarkets) ? raw.preferred_submarkets : [],
+        market_mode:          raw.market_mode          ?? null,
+        market_proxy:         raw.market_proxy         ?? null,
+        user_name:            raw.user_name            ?? null,
+        confidence_score:     raw.confidence_score     ?? 0,
+        stability_score:      raw.stability_score      ?? 0,
+        isv_sufficient:       raw.isv_sufficient === true,
+        confirmed_by_user:    raw.confirmed_by_user === true,
     };
 }
 
@@ -117,19 +120,29 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
     const b = v6.budget ?? {};
     const isPerformance = v6.investment_mode === 'performance_driven';
 
+    const hasMarket = !!(v6.market_mode || v6.preferred_markets?.length > 0);
+    const hasSubmarket = !!(
+        v6.preferred_submarkets?.length > 0 ||
+        v6.market_mode === 'open_exploration'
+    );
+
     const checks = [
         !!v6.investment_mode,
         !!v6.effort_level,
         !!(b.amount_max && b.currency),
         !!v6.decision_tradeoff,
         !!v6.time_horizon,
-        !!(v6.market_mode || v6.preferred_markets?.length > 0),
+        hasMarket,
+        hasSubmarket,
         isPerformance || (!!v6.asset_class && !!v6.strategy_primary),
         v6.confirmed_by_user === true,
     ];
 
     if (!checks.every(Boolean)) {
-        const missing = ['investment_mode','effort_level','budget+currency','decision_tradeoff','time_horizon','market_mode','asset_class+strategy','confirmed_by_user'].filter((_,i) => !checks[i]);
+        const missing = [
+            'investment_mode','effort_level','budget+currency','decision_tradeoff',
+            'time_horizon','market','submarket','asset_class+strategy','confirmed_by_user'
+        ].filter((_,i) => !checks[i]);
         console.warn('[ISV-V6] isv_sufficient bloqueado — faltan:', missing);
         return { ...jsonOutput, isv_v6: { ...v6, isv_sufficient: false } };
     }
