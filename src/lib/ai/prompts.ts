@@ -368,9 +368,11 @@ mapear el campo INMEDIATAMENTE sin hacer la pregunta de ese campo.
 • campo / campos / tierra / finca / estancia / chacra / hacienda / predio rural / hectáreas / has → asset_class = "farmland"
 
 ── ESTRATEGIA ──
-• para alquilar / renta / alquiler / buy and hold / buy & hold / "I want to buy and hold" / ingreso pasivo / flujo / cashflow / alquiler y mantener / alquilar y mantener en el tiempo → strategy_primary = "rental_long_term", asset_class = "real_estate"
+• para alquilar / renta / alquiler / buy and hold / buy & hold / "I want to buy and hold" / ingreso pasivo / flujo / cashflow / cashflow positivo / alquiler y mantener / alquilar y mantener en el tiempo / quiero alquilar → strategy_primary = "rental_long_term", asset_class = "real_estate"
   ⚠️ "buy and hold" siempre es rental_long_term, NUNCA buy_and_hold_appreciation
-• airbnb / turístico / vacacional / temporario / alquiler corto / por días / por semanas → strategy_primary = "rental_short_term", asset_class = "real_estate"
+  Ejemplo: "quiero algo con cashflow positivo en miami" → strategy_primary="rental_long_term", preferred_markets=["Miami"]
+• airbnb / turístico / vacacional / temporario / alquiler corto / por días / por semanas / alquiler vacacional / mercado de alquiler vacacional → strategy_primary = "rental_short_term", asset_class = "real_estate"
+  Ejemplo: "me interesa el mercado de alquiler vacacional en españa" → strategy_primary="rental_short_term", preferred_markets=["Madrid"]
 • reformar y vender / flipear / flip / mejorar y vender / comprar y vender / reciclar / remodelar / entrada y salida / comprar barato y vender → strategy_primary = "fix_and_flip", asset_class = "real_estate"
   Ejemplo: "quiero flipear algo en miami" → strategy_primary="fix_and_flip", asset_class="real_estate", preferred_markets=["Miami"]
 • construir / desarrollar / obra / obra nueva / edificio / pozo / preventa / promoción / edificar / levantar / solar / quiero construir un edificio / quiero desarrollar → strategy_primary = "development", asset_class = "real_estate"
@@ -394,7 +396,8 @@ mapear el campo INMEDIATAMENTE sin hacer la pregunta de ese campo.
 • [cualquier mención de activo o estrategia concreta] → investment_mode = "intent_defined"
 
 ── INVOLUCRAMIENTO ──
-• nada / solo invertir / manos fuera / llave en mano / pasivo / que lo manejen / automático / "algo pasivo" / "no quiero gestionar nada" / "no requiera mucho tiempo" / "trabajo full time" / "algo tranquilo" → effort_level = "low"
+• nada / solo invertir / manos fuera / llave en mano / pasivo / que lo manejen / automático / "algo pasivo" / "quiero algo pasivo" / "no quiero gestionar nada" / "no requiera mucho tiempo" / "trabajo full time" / "algo tranquilo" / "sin gestionarlo" → effort_level = "low"
+  Ejemplo: "quiero algo pasivo en buenos aires" → effort_level="low", preferred_markets=["Buenos Aires"]
 • seguirla de cerca / estar al tanto / reportes / mirarlo → effort_level = "medium"
 • tengo una constructora / soy constructor / lo gestiono yo / yo me encargo / tengo equipo / hands on / muy activo / soy desarrollador / soy promotor → effort_level = "high"
 
@@ -408,7 +411,9 @@ Ciudades soportadas: "Madrid", "Miami", "Buenos Aires", "Dubai"
 Mapeo DIRECTO ciudad/país → ciudad soportada:
 • Madrid / España / Spain → "Madrid"
 • Miami / Florida / USA / EEUU / Estados Unidos → "Miami"
-• Buenos Aires / Argentina / CABA / Capital Federal / baires / Bs As → "Buenos Aires"
+• Buenos Aires / Argentina / CABA / Capital Federal / baires / Bs As / ARG / corrientes / entre ríos / "en argentina" → "Buenos Aires"
+  Ejemplo: "quiero meterle guita a algo tranquilo en baires" → preferred_markets=["Buenos Aires"]
+  Ejemplo: "quiero invertir en un campo en corrientes" → preferred_markets=["Buenos Aires"]
 • Dubai / Dubái / UAE / Emiratos / Medio Oriente → "Dubai"
 
 Mapeo INDIRECTO región → ciudades soportadas:
@@ -432,6 +437,11 @@ Buenos Aires: Palermo / Recoleta / Belgrano / Puerto Madero / San Telmo / Tigre 
 Madrid: Salamanca / Chamberí / Retiro / Malasaña / Chueca / Lavapiés / Arganzuela / Carabanchel / Vallecas / Hortaleza / Sanchinarro / Las Tablas / Pozuelo / Majadahonda / Las Rozas / Alcobendas / La Moraleja / Getafe → "Madrid"
 Miami: Brickell / Wynwood / Edgewater / Midtown / South Beach / Miami Beach / Coconut Grove / Coral Gables / Aventura / Sunny Isles / Doral / Little Havana / Kendall / Key Biscayne / Bal Harbour / Design District → "Miami"
 Dubai: Downtown Dubai / Dubai Marina / JBR / Palm Jumeirah / Business Bay / DIFC / Jumeirah / Al Barsha / Dubai Hills / Arabian Ranches / JVC / Deira / Mirdif / Dubai South / Silicon Oasis → "Dubai"
+
+⚠️ TEXTO LARGO CON MÚLTIPLES SEÑALES — parsear TODOS los campos detectables:
+Ejemplo: "Me interesa algo en Madrid o Miami, preferiblemente residencial, con un horizonte de 5 años, presupuesto de entre 200 y 400 mil euros, y que no requiera mucho tiempo de mi parte ya que trabajo full time."
+→ preferred_markets=["Madrid","Miami"], sub_asset_class="residential", time_horizon="medium", budget.amount_min=200000, budget.amount_max=400000, budget.currency="EUR", effort_level="low", asset_class="real_estate"
+⚠️ NUNCA ignorar señales en textos largos. Parsear campo por campo aunque sean muchos.
 
 ⚠️ EJEMPLO OBLIGATORIO DE BARRIO → CIUDAD EN JSON:
 Usuario dice: "busco algo en brickell"
@@ -493,7 +503,8 @@ Monedas — valores válidos: USD | EUR | AED | ARS | UYU | CLP | MXN | BRL | CO
 • 2 / 3 / 4 / 5 años / medio plazo / mediano plazo → "medium"
 • entre corto y medio → "short_medium"
 • entre medio y largo → "medium_long"
-• largo plazo / para mis hijos / jubilación / generacional / para siempre / más de 5 años → "long"
+• largo plazo / para mis hijos / jubilación / "para jubilarme" / generacional / para siempre / más de 5 años / retiro / pensión → "long"
+  Ejemplo: "busco algo para jubilarme en madrid" → time_horizon="long", preferred_markets=["Madrid"]
 
 ── TRADEOFF ──
 • simple / predecible / sin riesgo / conservador / tranquilo / sin complicaciones → "conservative"
