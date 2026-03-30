@@ -172,7 +172,8 @@ C. SI farmland — BIFURCACIÓN OBLIGATORIA (si strategy_primary es null)
 • combinación → strategy_primary = "mixed_farmland"
 
 ⚠️ NOTA: land_banking y subdivision son estrategias de real_estate, NO de farmland.
-• "comprar tierra y esperar valorización" / "land banking" → strategy_primary = "land_banking", asset_class = "real_estate"
+• "comprar tierra y esperar valorización" / "land banking" / "comprar y esperar" → strategy_primary = "land_banking", asset_class = "real_estate"
+  ⚠️ land_banking es SIEMPRE asset_class="real_estate", NUNCA farmland
 • "subdividir / lotear / fraccionamiento" → strategy_primary = "subdivision"
 
 ═══════════════════════════════════════════════════════
@@ -367,7 +368,8 @@ mapear el campo INMEDIATAMENTE sin hacer la pregunta de ese campo.
 • campo / campos / tierra / finca / estancia / chacra / hacienda / predio rural / hectáreas / has → asset_class = "farmland"
 
 ── ESTRATEGIA ──
-• para alquilar / renta / alquiler / buy and hold / buy & hold / ingreso pasivo / flujo / cashflow / alquiler y mantener / alquilar y mantener en el tiempo → strategy_primary = "rental_long_term", asset_class = "real_estate"
+• para alquilar / renta / alquiler / buy and hold / buy & hold / "I want to buy and hold" / ingreso pasivo / flujo / cashflow / alquiler y mantener / alquilar y mantener en el tiempo → strategy_primary = "rental_long_term", asset_class = "real_estate"
+  ⚠️ "buy and hold" siempre es rental_long_term, NUNCA buy_and_hold_appreciation
 • airbnb / turístico / vacacional / temporario / alquiler corto / por días / por semanas → strategy_primary = "rental_short_term", asset_class = "real_estate"
 • reformar y vender / flipear / flip / mejorar y vender / comprar y vender / reciclar / remodelar / entrada y salida / comprar barato y vender → strategy_primary = "fix_and_flip", asset_class = "real_estate"
   Ejemplo: "quiero flipear algo en miami" → strategy_primary="fix_and_flip", asset_class="real_estate", preferred_markets=["Miami"]
@@ -381,7 +383,8 @@ mapear el campo INMEDIATAMENTE sin hacer la pregunta de ese campo.
 • campo mixto / agrícola y ganadero → strategy_primary = "mixed_farmland", asset_class = "farmland"
 
 ── SUB ASSET CLASS ──
-• residencial / vivienda / para vivir / familias / hogar / uso habitacional → sub_asset_class = "residential"
+• residencial / vivienda / para vivir / familias / hogar / uso habitacional / "preferiblemente residencial" / "propiedades residenciales" → sub_asset_class = "residential"
+  Ejemplo: "preferiblemente residencial" → sub_asset_class="residential"
 • comercial / local / local comercial / oficina / nave / retail / galpon → sub_asset_class = "commercial"
 • logística / parque industrial / centro logístico → sub_asset_class = "logistics"
 
@@ -391,7 +394,7 @@ mapear el campo INMEDIATAMENTE sin hacer la pregunta de ese campo.
 • [cualquier mención de activo o estrategia concreta] → investment_mode = "intent_defined"
 
 ── INVOLUCRAMIENTO ──
-• nada / solo invertir / manos fuera / llave en mano / pasivo / que lo manejen / automático → effort_level = "low"
+• nada / solo invertir / manos fuera / llave en mano / pasivo / que lo manejen / automático / "algo pasivo" / "no quiero gestionar nada" / "no requiera mucho tiempo" / "trabajo full time" / "algo tranquilo" → effort_level = "low"
 • seguirla de cerca / estar al tanto / reportes / mirarlo → effort_level = "medium"
 • tengo una constructora / soy constructor / lo gestiono yo / yo me encargo / tengo equipo / hands on / muy activo / soy desarrollador / soy promotor → effort_level = "high"
 
@@ -409,13 +412,20 @@ Mapeo DIRECTO ciudad/país → ciudad soportada:
 • Dubai / Dubái / UAE / Emiratos / Medio Oriente → "Dubai"
 
 Mapeo INDIRECTO región → ciudades soportadas:
-• Latam / América Latina / Latinoamérica → ["Buenos Aires", "Miami"]
-• Europa / Europe → ["Madrid"]
-• Medio Oriente → ["Dubai"]
-• Global / donde sea / cualquier ciudad / abierto → market_mode = "open_exploration", preferred_markets = []
-• Uruguay / Montevideo / Punta del Este → ["Buenos Aires"] + market_proxy = "Uruguay"
-• Chile → ["Miami", "Madrid"] + market_proxy = "Chile"
-• México → ["Miami"] + market_proxy = "Mexico"
+• Latam / América Latina / Latinoamérica → preferred_markets=["Buenos Aires", "Miami"], market_mode="multi_market"
+• Europa / Europe → preferred_markets=["Madrid"], market_mode="fixed"
+• Medio Oriente → preferred_markets=["Dubai"], market_mode="fixed"
+• Global / donde sea / cualquier ciudad / abierto → preferred_markets=[], market_mode="open_exploration"
+• Uruguay / Montevideo / Punta del Este → preferred_markets=["Buenos Aires"], market_proxy="Uruguay", market_mode="fixed"
+• Chile → preferred_markets=["Miami","Madrid"], market_proxy="Chile", market_mode="multi_market"
+• México → preferred_markets=["Miami"], market_proxy="Mexico", market_mode="fixed"
+
+⚠️ EJEMPLOS JSON OBLIGATORIOS:
+"me interesa invertir en montevideo" → preferred_markets=["Buenos Aires"], market_proxy="Uruguay"
+"quiero algo en europa" → preferred_markets=["Madrid"]
+"busco algo en latam" → preferred_markets=["Buenos Aires","Miami"]
+"quiero algo en argentina" → preferred_markets=["Buenos Aires"]
+"me interesa españa" → preferred_markets=["Madrid"]
 
 Mapeo BARRIOS → ciudad soportada:
 Buenos Aires: Palermo / Recoleta / Belgrano / Puerto Madero / San Telmo / Tigre / San Isidro / Olivos / Nuñez / Colegiales / Villa Crespo / Almagro / Caballito / Flores / Villa Urquiza / Devoto / Boedo / Barracas / Avellaneda / Lomas de Zamora / Microcentro → "Buenos Aires"
