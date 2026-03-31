@@ -5,15 +5,33 @@ import { motion } from 'framer-motion';
 import { Bell, Heart } from 'lucide-react';
 
 const STRATEGY_LABELS: Record<string, string> = {
-    'FIX_FLIP': 'Fix and Flip',
-    'RENTA': 'Renta',
-    'FARMLAND': 'Farmland',
-    'LIVESTOCK': 'Ganadería',
-    'GREENFIELD': 'Greenfield',
-    'DISTRESS': 'Distress',
-    'NNN_COMERCIAL': 'NNN Comercial',
-    'LAND_BANKING': 'Land Banking',
-    'VALUE_ADD': 'Value Add',
+    // Backend values (mayúsculas)
+    'FIX_FLIP':         'Fix & Flip',
+    'RENTA':            'Renta',
+    'SHORT_TERM_RENTAL':'Renta Corta',
+    'FARMLAND':         'Farmland',
+    'LIVESTOCK':        'Ganadería',
+    'GREENFIELD':       'Development',
+    'DISTRESS':         'Distressed',
+    'NNN_COMERCIAL':    'NNN Comercial',
+    'LAND_BANKING':     'Land Banking',
+    'VALUE_ADD':        'Value Add',
+    'FORESTRY':         'Forestal',
+    // ISV V6 values (minúsculas — por si llegan directamente)
+    'fix_and_flip':              'Fix & Flip',
+    'rental_long_term':          'Renta',
+    'rental_short_term':         'Renta Corta',
+    'buy_and_hold_appreciation': 'Buy & Hold',
+    'development':               'Development',
+    'commercial':                'Comercial',
+    'agriculture':               'Agricultura',
+    'livestock':                 'Ganadería',
+    'mixed_farmland':            'Farmland Mixto',
+    'land_banking':              'Land Banking',
+    'subdivision':               'Subdivisión',
+    'value_add':                 'Value Add',
+    'distressed':                'Distressed',
+    'forestry':                  'Forestal',
 };
 
 const ZONA_LABELS: Record<string, string> = {

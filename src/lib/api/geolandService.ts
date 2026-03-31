@@ -28,6 +28,9 @@ export interface MatchPayload {
     sub_strategies?:   string[];
     liquidity_need?:   string;
     experience_level?: string;
+    // ISV V6 extras
+    use_potential?:    string[];
+    market_proxy?:     string;
 }
 
 export interface RecalculatePayload {
@@ -103,20 +106,31 @@ export function buildMatchPayload(
 
 // ── TRADUCCIÓN ISV V6 → MatchPayload (ISV-V6-04) ──────────────────
 const STRATEGY_MAP: Record<string, string> = {
-  'buy_hold_income':      'RENTA',
-  'rental_long_term':     'RENTA',
-  'short_term_rental':    'SHORT_TERM_RENTAL',
-  'rental_short_term':    'SHORT_TERM_RENTAL',
-  'fix_and_flip':         'FIX_FLIP',
-  'development':          'GREENFIELD',
-  'farmland_agriculture': 'FARMLAND',
-  'agriculture':          'FARMLAND',
-  'farmland_livestock':   'LIVESTOCK',
-  'livestock':            'LIVESTOCK',
-  'farmland_mixed':       'FARMLAND',
-  'nnn_commercial':       'NNN_COMERCIAL',
-  'commercial':           'NNN_COMERCIAL',
-  'opportunistic':        'DISTRESS',
+  // Flujo
+  'buy_hold_income':           'RENTA',
+  'rental_long_term':          'RENTA',
+  'buy_and_hold_appreciation': 'RENTA',
+  'short_term_rental':         'SHORT_TERM_RENTAL',
+  'rental_short_term':         'SHORT_TERM_RENTAL',
+  'nnn_commercial':            'NNN_COMERCIAL',
+  'commercial':                'NNN_COMERCIAL',
+  // Transformación
+  'fix_and_flip':              'FIX_FLIP',
+  'value_add':                 'VALUE_ADD',
+  'development':               'GREENFIELD',
+  // Oportunidad
+  'land_banking':              'LAND_BANKING',
+  'subdivision':               'LAND_BANKING',   // más cercano hasta que el backend lo soporte
+  'distressed':                'DISTRESS',
+  'opportunistic':             'DISTRESS',
+  // Farmland
+  'farmland_agriculture':      'FARMLAND',
+  'agriculture':               'FARMLAND',
+  'farmland_livestock':        'LIVESTOCK',
+  'livestock':                 'LIVESTOCK',
+  'farmland_mixed':            'FARMLAND',
+  'mixed_farmland':            'FARMLAND',
+  'forestry':                  'FARMLAND',       // más cercano hasta que el backend lo soporte
 };
 
 const EFFORT_MAP: Record<string, string> = {
@@ -163,6 +177,16 @@ export function buildMatchPayloadFromV6(
     }
     if (isvV6.confidence_score) {
         payload.experience_level = isvV6.confidence_score.toString();
+    }
+
+    // use_potential — incluir si tiene valores (el backend lo soportará en v2)
+    if ((isvV6 as any).use_potential?.length) {
+        (payload as any).use_potential = (isvV6 as any).use_potential;
+    }
+
+    // market_proxy — incluir si existe
+    if ((isvV6 as any).market_proxy) {
+        (payload as any).market_proxy = (isvV6 as any).market_proxy;
     }
 
     return payload;
