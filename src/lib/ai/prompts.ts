@@ -383,6 +383,28 @@ mapear el campo INMEDIATAMENTE sin hacer la pregunta de ese campo.
 • ganadería / ganado / vacas / bovino / ovino / feedlot / tambo → strategy_primary = "livestock", asset_class = "farmland"
 • agricultura / cultivo / sembrar / cosecha / soja / maíz / trigo / girasol → strategy_primary = "agriculture", asset_class = "farmland"
 • campo mixto / agrícola y ganadero → strategy_primary = "mixed_farmland", asset_class = "farmland"
+• bosque / forestal / plantación / eucaliptus / pino / créditos de carbono / ESG forestal / masa forestal / forestación → strategy_primary = "forestry", asset_class = "farmland"
+  Ejemplo: "quiero invertir en un bosque en uruguay" → strategy_primary="forestry", asset_class="farmland"
+
+• reposicionar / value add / aumentar el NOI / mejorar el activo sin vender / reforma para renta / reposicionamiento → strategy_primary = "value_add", asset_class = "real_estate"
+  Ejemplo: "quiero comprar un edificio para reposicionarlo y aumentar la renta" → strategy_primary="value_add"
+
+• activo distressed / problema legal / remate / remate judicial / ocupación ilegal / precio muy por debajo del mercado / oportunidad de crisis / herencia judicial → strategy_primary = "distressed", asset_class = "real_estate"
+  Ejemplo: "busco activos distressed en buenos aires" → strategy_primary="distressed"
+
+── USE POTENTIAL (campo adicional — no reemplaza strategy_primary) ──
+• hotel / hospedaje / posada / lodge / alojamiento turístico / bed and breakfast → use_potential = ["hotel"]
+• hotel boutique / boutique hotel / hotel pequeño de lujo / property boutique → use_potential = ["hotel_boutique"]
+• restaurante / gastronómico / local para restaurante / potencial gastronómico / food and beverage → use_potential = ["restaurante"]
+• lujo / luxury / premium / high-end / gama alta / propiedades de lujo / ultra premium / exclusivo → use_potential = ["lujo"]
+• coworking / oficinas flex / espacio de trabajo compartido / hub de trabajo → use_potential = ["coworking"]
+• clínica / consultorio / centro médico / health center → use_potential = ["clinica"]
+• escuela / academia / instituto / centro educativo / guardería → use_potential = ["educativo"]
+
+⚠️ use_potential se combina con strategy_primary:
+Ejemplo: "busco algo con potencial para hotel boutique" → strategy_primary="development" o "value_add" + use_potential=["hotel_boutique"]
+Ejemplo: "quiero un local gastronómico en madrid" → strategy_primary="commercial" + use_potential=["restaurante"] + preferred_markets=["Madrid"]
+Ejemplo: "busco propiedades de lujo en miami" → use_potential=["lujo"] + preferred_markets=["Miami"]
 
 ── SUB ASSET CLASS ──
 • residencial / vivienda / para vivir / familias / hogar / uso habitacional / "preferiblemente residencial" / "propiedades residenciales" → sub_asset_class = "residential"
@@ -566,6 +588,7 @@ FORMATO JSON — responder SIEMPRE con este JSON exacto, sin texto fuera
     "preferred_submarkets": [],
     "market_mode": null,
     "market_proxy": null,
+    "use_potential": [],
     "user_name": null,
     "confidence_score": 0,
     "stability_score": 0,

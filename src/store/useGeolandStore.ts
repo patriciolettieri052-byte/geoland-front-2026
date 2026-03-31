@@ -74,26 +74,10 @@ export interface IsvV4 {
 }
 
 // ── ISV V6 — schema completo (ISV-V6-01) ──────────────────────────
-export type InvestmentMode =
-  | 'performance_driven'  // solo rendimiento, abierto a cualquier activo/estrategia
-  | 'intent_defined'      // activo y/o estrategia ya detectados claramente
-  | 'intent_guided'       // quiere algo concreto pero no lo especificó aún
-  | 'exploratory'         // no tiene claro qué busca, está evaluando
-  | null;
-
+export type InvestmentMode = 'performance_driven' | 'intent_defined' | 'intent_guided' | 'exploratory' | null;
 export type AssetClass = 'real_estate' | 'farmland' | null;
-
-export type SubAssetClass =
-  | 'residential'
-  | 'commercial'
-  | 'logistics'
-  | 'agriculture'
-  | 'livestock'
-  | 'mixed_farmland'
-  | 'mixed_real_estate'
-  | null;
-
-// 9 estrategias del sistema — siempre disponibles para mapeo
+export type SubAssetClass = 'residential' | 'commercial' | 'agriculture' | 'livestock' | 'mixed_farmland' | 'mixed_real_estate' | null;
+// 14 estrategias del sistema
 export type StrategyPrimary =
   | 'fix_and_flip'
   | 'rental_short_term'
@@ -106,52 +90,54 @@ export type StrategyPrimary =
   | 'mixed_farmland'
   | 'land_banking'
   | 'subdivision'
+  | 'value_add'
+  | 'distressed'
+  | 'forestry'
   | null;
 
+// Uso potencial del activo (modificador — no reemplaza strategy_primary)
+export type UsePotential =
+  | 'hotel'
+  | 'hotel_boutique'
+  | 'restaurante'
+  | 'lujo'
+  | 'coworking'
+  | 'clinica'
+  | 'educativo';
 export type EffortLevelV6 = 'low' | 'medium' | 'high' | null;
 export type DecisionTradeoffV6 = 'conservative' | 'balanced' | 'growth_tolerant' | null;
-export type TimeHorizonV6 = 'short' | 'medium' | 'medium_long' | 'long' | null;
-export type MarketMode = 'fixed' | 'multi_market' | 'open_exploration' | 'open_within_city' | null;
+export type TimeHorizonV6 = 'short' | 'medium' | 'long' | null;
+export type MarketMode = 'fixed' | 'multi_market' | 'open_exploration' | null;
 export type CurrencyV6 = 'USD' | 'EUR' | 'AED' | 'ARS' | 'UYU' | 'CLP' | 'MXN' | 'BRL' | 'COP' | null;
 
 export interface BudgetV6 {
-  amount_raw: string | null;   // string original del usuario ("200k", "medio palo")
+  amount_raw: string | null;
   amount_min: number | null;
   amount_max: number | null;
   currency: CurrencyV6;
 }
 
 export interface IsvV6 {
-  // Modo de inversión
   investment_mode: InvestmentMode;
-
-  // Activo y estrategia
   asset_class: AssetClass;
   sub_asset_class: SubAssetClass;
   strategy_primary: StrategyPrimary;
   strategy_secondary: StrategyPrimary | string | null;
-  strategy_cluster: string[];        // estrategias compatibles detectadas
-  main_strategy: string | null;      // estrategia dominante para el Orquestador
-
-  // Performance driven
-  target_return: string | null;      // ej: "≈30%", ">15% anual"
-
-  // Perfilado general
+  target_return: string | null;
+  strategy_cluster: string[];
+  main_strategy: string | null;
   effort_level: EffortLevelV6;
   budget: BudgetV6;
   decision_tradeoff: DecisionTradeoffV6;
   time_horizon: TimeHorizonV6;
-
-  // Geografía
-  preferred_markets: string[];       // ciudades soportadas
-  preferred_submarkets: string[];    // barrios, zonas, partidos
+  preferred_markets: string[];
+  preferred_submarkets: string[];
   market_mode: MarketMode;
-  market_proxy: string | null;       // mercado no soportado que derivó a uno soportado
-
-  // Metadata
+  market_proxy: string | null;
+  use_potential: UsePotential[];
   user_name: string | null;
-  confidence_score: number;          // 0-1
-  stability_score: number;           // 0-1
+  confidence_score: number;
+  stability_score: number;
   isv_sufficient: boolean;
   confirmed_by_user: boolean;
 }
@@ -277,6 +263,7 @@ const initialIsvV6: IsvV6 = {
   preferred_submarkets: [],
   market_mode: null,
   market_proxy: null,
+  use_potential: [],
   user_name: null,
   confidence_score: 0,
   stability_score: 0,
@@ -312,7 +299,6 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     setIterandoResultados: (val) => set({ iterandoResultados: val }),
 
     resetOnboarding: () => set({
-        chatHistory: [],
         filtrosDuros: initialFiltrosDuros,
         filtrosBlandosIsv: initialFiltrosBlandos,
         preferenciasAgro: null,
@@ -323,8 +309,6 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         isRefining: false,
         isvV4: initialIsvV4,
         isvV6: initialIsvV6,
-        currentState: 'INIT',
-        contradictionDetected: false,
     }),
 
     assets: [],

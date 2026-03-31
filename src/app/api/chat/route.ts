@@ -104,6 +104,7 @@ function mapGeminiToIsvV6(raw: any): import('@/store/useGeolandStore').IsvV6 | n
         preferred_submarkets: Array.isArray(raw.preferred_submarkets) ? raw.preferred_submarkets : [],
         market_mode:          raw.market_mode          ?? null,
         market_proxy:         raw.market_proxy         ?? null,
+        use_potential:        Array.isArray(raw.use_potential) ? raw.use_potential : [],
         user_name:            raw.user_name            ?? null,
         confidence_score:     raw.confidence_score     ?? 0,
         stability_score:      raw.stability_score      ?? 0,
