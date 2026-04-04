@@ -5,8 +5,8 @@
 import { FiltrosDuros, FiltrosBlandosIsv, PreferenciasAgro } from "@/store/useGeolandStore";
 import { Asset } from "@/lib/mockEngine";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-const API_KEY = process.env.NEXT_PUBLIC_GEOLAND_API_KEY || '';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://geoland-backend-final.onrender.com';
+const API_KEY = process.env.NEXT_PUBLIC_GEOLAND_API_KEY || 'geoland-dev-key-abc123';
 
 function getHeaders(): HeadersInit {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -193,23 +193,29 @@ export function buildMatchPayloadFromV6(
 }
 
 export async function fetchMatch(payload: MatchPayload): Promise<Asset[]> {
-    const res = await fetch(`${API_URL}/api/v1/core/match`, {
-        method: 'POST',
+    const mercado = payload.filtrosDuros.ubicacion ?? 'Madrid';
+    // Construimos la URL con query params para el nuevo backend
+    const url = `${API_URL}/api/v1/match/search?mercado=${encodeURIComponent(mercado)}&min_aqs=45`;
+    
+    console.log(`[GeolandService] Buscando en: ${url}`);
+    
+    const res = await fetch(url, {
+        method: 'GET',
         headers: getHeaders(),
-        body: JSON.stringify(payload),
     });
 
     if (res.status === 404) {
-        // Dataset vacío post-veto WACC
         throw new Error('NO_ASSETS_MATCH');
     }
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Backend error en /core/match');
+        throw new Error(err.message || 'Backend error en /match/search');
     }
 
-    const data: MatchResponse = await res.json();
-    return data.assets;
+    const data = await res.json();
+    // Nuestro backend devuelve { count: N, results: [...] } o [...] 
+    // Según database.py:search_assets devuelve una lista [...]
+    return data;
 }
 
 // ── POST /api/v1/core/recalculate ─────────────────────────────────
@@ -245,9 +251,10 @@ export async function fetchRecalculate(
 // ── GET /api/v1/health ────────────────────────────────────────────
 export async function checkBackendHealth(): Promise<boolean> {
     try {
-        const res = await fetch(`${API_URL}/api/v1/health`, { method: 'GET' });
+        const res = await fetch(`${API_URL}/api/v1/health`, { method: 'GET', headers: getHeaders() });
         const data = await res.json();
-        return data.status === 'ok' && data.dataset_loaded === true;
+        // Nuestro backend devuelve status: "connected"
+        return data.status === 'connected';
     } catch {
         return false;
     }
