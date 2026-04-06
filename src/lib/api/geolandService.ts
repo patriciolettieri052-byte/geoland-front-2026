@@ -107,30 +107,32 @@ export function buildMatchPayload(
 // ── TRADUCCIÓN ISV V6 → MatchPayload (ISV-V6-04) ──────────────────
 const STRATEGY_MAP: Record<string, string> = {
   // Flujo
-  'buy_hold_income':           'RENTA',
-  'rental_long_term':          'RENTA',
-  'buy_and_hold_appreciation': 'RENTA',
-  'short_term_rental':         'SHORT_TERM_RENTAL',
-  'rental_short_term':         'SHORT_TERM_RENTAL',
-  'nnn_commercial':            'NNN_COMERCIAL',
-  'commercial':                'NNN_COMERCIAL',
+  'buy_hold_income':           'RENTAL_LONG_TERM',
+  'rental_long_term':          'RENTAL_LONG_TERM',
+  'buy_and_hold_appreciation': 'RENTAL_LONG_TERM',
+  'short_term_rental':         'RENTAL_SHORT_TERM',
+  'rental_short_term':         'RENTAL_SHORT_TERM',
+  'nnn_commercial':            'COMMERCIAL',
+  'commercial':                'COMMERCIAL',
   // Transformación
-  'fix_and_flip':              'FIX_FLIP',
+  'fix_and_flip':              'FIX_AND_FLIP',
+  'fix_flip':                  'FIX_AND_FLIP',
   'value_add':                 'VALUE_ADD',
-  'development':               'GREENFIELD',
+  'development':               'DEVELOPMENT',
+  'greenfield':                'DEVELOPMENT',
   // Oportunidad
   'land_banking':              'LAND_BANKING',
-  'subdivision':               'LAND_BANKING',   // más cercano hasta que el backend lo soporte
-  'distressed':                'DISTRESS',
-  'opportunistic':             'DISTRESS',
+  'subdivision':               'SUBDIVISION',
+  'distressed':                'DISTRESSED',
+  'opportunistic':             'DISTRESSED',
   // Farmland
-  'farmland_agriculture':      'FARMLAND',
-  'agriculture':               'FARMLAND',
+  'farmland_agriculture':      'AGRICULTURE',
+  'agriculture':               'AGRICULTURE',
   'farmland_livestock':        'LIVESTOCK',
   'livestock':                 'LIVESTOCK',
-  'farmland_mixed':            'FARMLAND',
-  'mixed_farmland':            'FARMLAND',
-  'forestry':                  'FARMLAND',       // más cercano hasta que el backend lo soporte
+  'farmland_mixed':            'MIXED_FARMLAND',
+  'mixed_farmland':            'MIXED_FARMLAND',
+  'forestry':                  'FORESTRY',
 };
 
 const EFFORT_MAP: Record<string, string> = {

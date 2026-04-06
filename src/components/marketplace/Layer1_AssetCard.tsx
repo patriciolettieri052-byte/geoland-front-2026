@@ -5,18 +5,20 @@ import { motion } from 'framer-motion';
 import { Bell, Heart } from 'lucide-react';
 
 const STRATEGY_LABELS: Record<string, string> = {
-    // Backend values (mayúsculas)
-    'FIX_FLIP':         'Fix & Flip',
-    'RENTA':            'Renta',
-    'SHORT_TERM_RENTAL':'Renta Corta',
-    'FARMLAND':         'Farmland',
-    'LIVESTOCK':        'Ganadería',
-    'GREENFIELD':       'Development',
-    'DISTRESS':         'Distressed',
-    'NNN_COMERCIAL':    'NNN Comercial',
-    'LAND_BANKING':     'Land Banking',
-    'VALUE_ADD':        'Value Add',
-    'FORESTRY':         'Forestal',
+    'FIX_AND_FLIP':             'Fix & Flip',
+    'VALUE_ADD':                'Value Add',
+    'RENTAL_LONG_TERM':         'Renta',
+    'RENTAL_SHORT_TERM':        'Renta Corta',
+    'COMMERCIAL':               'Comercial',
+    'DEVELOPMENT':              'Desarrollo',
+    'DISTRESSED':               'Distressed',
+    'LAND_BANKING':             'Land Banking',
+    'AGRICULTURE':              'Agricultura',
+    'LIVESTOCK':                'Ganadería',
+    'MIXED_FARMLAND':           'Mixto',
+    'FORESTRY':                 'Forestal',
+    'BUY_AND_HOLD_APPRECIATION': 'Buy & Hold',
+    'SUBDIVISION':              'Subdivisión',
     // ISV V6 values (minúsculas — por si llegan directamente)
     'fix_and_flip':              'Fix & Flip',
     'rental_long_term':          'Renta',
