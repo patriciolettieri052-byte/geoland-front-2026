@@ -72,8 +72,15 @@ interface Layer1AssetCardProps {
 }
 
 export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) {
-    const { expectedIrr, gScore, backgroundImageUrl } = asset.layer1;
-    const precio = asset.layer2.metrics.baseCapex;
+    const layer1 = asset?.layer1 || {};
+    const layer2 = asset?.layer2 || { metrics: { baseCapex: 0 } };
+    
+    // El backend v1.3 devuelve aqs_score, en el front lo mapeamos a gScore
+    const gScore = layer1.gScore ?? (asset as any).aqs_score ?? 0;
+    const expectedIrr = layer1.expectedIrr ?? 0;
+    const backgroundImageUrl = layer1.backgroundImageUrl ?? "";
+    
+    const precio = layer2.metrics?.baseCapex ?? 0;
     const strategyLabel = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
 
     const formatPrecio = (n: number) => {

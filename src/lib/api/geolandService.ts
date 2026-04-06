@@ -6,12 +6,12 @@ import { FiltrosDuros, FiltrosBlandosIsv, PreferenciasAgro } from "@/store/useGe
 import { Asset } from "@/lib/mockEngine";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://geoland-backend-final.onrender.com';
-const API_KEY = process.env.NEXT_PUBLIC_GEOLAND_API_KEY || 'geoland-dev-key-abc123';
+const API_KEY = process.env.NEXT_PUBLIC_GEOLAND_API_KEY || 'geoland-dev-key';
 
 function getHeaders(): HeadersInit {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (API_KEY) {
-        headers['X-API-Key'] = API_KEY;
+        headers['x-api-key'] = API_KEY;
     } else {
         console.warn('[GeolandService] NEXT_PUBLIC_GEOLAND_API_KEY no configurada');
     }
@@ -61,7 +61,7 @@ export interface RecalculateResponse {
     deltas: { deltaIrr: number; deltaRoi: number };
 }
 
-// ── POST /api/v1/core/match ───────────────────────────────────────
+// ── GET /api/v1/match/search ───────────────────────────────────────
 function sanitizeFiltrosDuros(f: FiltrosDuros): FiltrosDuros {
     return {
         ubicacion:         f?.ubicacion         ?? "todos",
@@ -193,29 +193,35 @@ export function buildMatchPayloadFromV6(
 }
 
 export async function fetchMatch(payload: MatchPayload): Promise<Asset[]> {
-    const mercado = payload.filtrosDuros.ubicacion ?? 'Madrid';
-    // Construimos la URL con query params para el nuevo backend
-    const url = `${API_URL}/api/v1/match/search?mercado=${encodeURIComponent(mercado)}&min_aqs=45`;
-    
+    const params = new URLSearchParams();
+
+    const mercado = payload.filtrosDuros.ubicacion;
+    const estrategia = payload.filtrosBlandosIsv.estrategiaObjetivo;
+
+    if (mercado && mercado !== 'todos') {
+        params.append('mercado', mercado);
+    }
+    if (estrategia && estrategia !== 'todas') {
+        params.append('strategy', estrategia);
+    }
+
+    const url = `${API_URL}/api/v1/match/search?${params.toString()}&min_aqs=45`;
+
     console.log(`[GeolandService] Buscando en: ${url}`);
-    
+
     const res = await fetch(url, {
         method: 'GET',
         headers: getHeaders(),
     });
 
-    if (res.status === 404) {
-        throw new Error('NO_ASSETS_MATCH');
-    }
+    if (res.status === 404) throw new Error('NO_ASSETS_MATCH');
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Backend error en /match/search');
+        throw new Error(err.message || 'Backend error');
     }
 
     const data = await res.json();
-    // Nuestro backend devuelve { count: N, results: [...] } o [...] 
-    // Según database.py:search_assets devuelve una lista [...]
-    return data;
+    return data.results ?? [];  // ← clave correcta es "results"
 }
 
 // ── POST /api/v1/core/recalculate ─────────────────────────────────

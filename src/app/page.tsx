@@ -90,15 +90,26 @@ export default function GeolandOS() {
 
     let result = [...assets];
     return result.map(a => {
-      // Deterministic pseudo-randomness based on ID + ISV length for visual layout if required
-      const seed = a.id.length + (filtrosBlandosIsv.estrategiaObjetivo?.length || 0) + (iterandoResultados ? 1 : 0);
+      // Manejar tanto el formato del mock (id) como el del backend (asset_id)
+      const id = a.id || a.asset_id || "unknown";
+      
+      // Deterministic pseudo-randomness based on ID + ISV length for visual layout
+      const seed = id.length + (filtrosBlandosIsv.estrategiaObjetivo?.length || 0) + (iterandoResultados ? 1 : 0);
       const mockGScore = 80 + (seed % 18);
+
+      // Usar aqs_score del backend si existe
+      const aqs = a.layer1?.gScore || a.aqs_score || mockGScore;
 
       return {
         ...a,
-        layer1: { ...a.layer1, gScore: a.layer1?.gScore || mockGScore }
+        id, // Asegurar ID
+        layer1: { 
+            ...(a.layer1 || {}), 
+            gScore: aqs 
+        },
+        layer2: a.layer2 || { metrics: { baseCapex: 0 } } // Asegurar layer2
       };
-    }).sort((a, b) => b.layer1.gScore - a.layer1.gScore);
+    }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
 
   }, [assets, perfilCompletado, isRefining, iterandoResultados, filtrosBlandosIsv]);
 
