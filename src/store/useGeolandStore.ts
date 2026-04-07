@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { mockDatabase } from '@/lib/mockEngine';
 
 export interface FiltrosDuros {
     ubicacion: string | null;
@@ -367,16 +368,17 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         isvV6: {
             ...initialIsvV6,
             strategy_primary: 'rental_long_term',
-            preferred_markets: ['Montevideo'],
+            preferred_markets: ['Madrid'],
             budget: { amount_raw: '500000', amount_min: 100000, amount_max: 500000, currency: 'USD' },
             isv_sufficient: true,
             confirmed_by_user: true
         },
+        assets: mockDatabase.assets,
         perfilCompletado: true,
-        isRefining: true,
+        isRefining: false,
         chatHistory: [
             ...state.chatHistory,
-            { role: 'assistant', content: 'TEST MODE ACTIVATED. Saltando onboarding...' }
+            { role: 'assistant', content: 'MOCK MODE ACTIVATED. Visualizando assets de prueba para feedback estético...' }
         ]
     })),
 }));
