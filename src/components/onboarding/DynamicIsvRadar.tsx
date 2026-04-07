@@ -90,8 +90,8 @@ export function DynamicIsvRadar() {
                 </ResponsiveContainer>
             </motion.div>
 
-            <div className="absolute bottom-20 text-center bg-black/40 backdrop-blur-md border border-white/5 py-1 px-3.5 rounded-full">
-                <Typography variant="label" className="text-white text-[9px] tracking-[0.15em] font-light uppercase">
+            <div className="absolute bottom-10 text-center bg-black/40 backdrop-blur-md border border-white/5 py-0.5 px-2.5 rounded-full">
+                <Typography variant="label" className="text-white text-[7.5px] tracking-[0.15em] font-light uppercase">
                     Investor Strategy Vector
                 </Typography>
             </div>

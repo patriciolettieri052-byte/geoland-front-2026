@@ -100,10 +100,11 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
         >
             {/* FOTO — 28% */}
-            <div
-                className="relative w-[28%] shrink-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${backgroundImageUrl})` }}
-            >
+            <div className="relative w-[28%] shrink-0">
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-85"
+                    style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+                />
                 {badge && (
                     <div className={`absolute top-2 left-2 text-[9px] font-medium px-2 py-0.5 rounded tracking-widest uppercase shadow-md ${badge.className}`}>
                         {badge.label}
@@ -127,45 +128,43 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
                 {/* Strategy badge sobre foto */}
                 <div className="absolute bottom-2 left-2">
-                    <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-black/55 backdrop-blur-sm text-white/90">
+                    <span className="text-[9px] font-normal px-1.5 py-0.5 rounded bg-black/55 backdrop-blur-sm text-white/90">
                         {strategyLabel}
                     </span>
                 </div>
             </div>
 
-            {/* CONTENIDO CENTRAL — 47% */}
             <div className="flex flex-col justify-center px-4 w-[47%] shrink-0 border-r border-black/6">
-                <p className="text-[9px] text-gray-400 uppercase tracking-[0.15em] font-medium mb-0.5">
+                <p className="text-[9px] text-gray-400 uppercase tracking-[0.15em] font-normal mb-0.5">
                     {asset.location}
                 </p>
 
-                <p className="text-[13px] font-medium text-[#6b6b8d] leading-tight mb-1 truncate">
+                <p className="text-[13px] font-normal text-[#6b6b8d] leading-tight mb-1 truncate">
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
 
-                {/* NUEVO: Asset Type tag */}
                 {(asset as any).assetType && (
                     <div className="mb-2">
-                        <span className="inline-block bg-[#6b6b8d]/10 text-[#6b6b8d] text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-medium">
+                        <span className="inline-block bg-[#6b6b8d]/10 text-[#6b6b8d] text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-normal">
                             {(asset as any).assetType}
                         </span>
                     </div>
                 )}
 
                 <div>
-                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-medium">Precio</p>
-                    <p className="text-[12px] font-medium text-[#6b6b8d]">{formatPrecio(precio)}</p>
+                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-normal">Precio</p>
+                    <p className="text-[12px] font-bold text-[#6b6b8d]">{formatPrecio(precio)}</p>
                 </div>
 
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
                     <div className="flex gap-1 mt-1.5 flex-wrap">
                         {asset.zona_agroecologica && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#98D1C1]/20 text-[#7ba99d] border border-[#98D1C1]/30">
                                 {ZONA_LABELS[asset.zona_agroecologica]}
                             </span>
                         )}
                         {asset.acceso_agua && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200">
+                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-blue-100/50 text-blue-800 border border-blue-200">
                                 {AGUA_LABELS[asset.acceso_agua]}
                             </span>
                         )}
@@ -176,18 +175,18 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             {/* DERECHA — 25%: G-Score + ROI */}
             <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-1.5">
                 <div className="flex flex-col items-end gap-1">
-                    <span className="text-[#6b6b8d] text-[10px] font-medium tracking-wide">
+                    <span className="bg-[#5a4282] text-white text-[9px] font-normal px-2 py-0.5 rounded-full tracking-wide">
                         G-Score {gScore}
                     </span>
                     
                     {/* NUEVO: Confidence % con color dinámico */}
                     {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
                         <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 ${
-                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-emerald-500/50 text-emerald-600' :
+                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-[#98D1C1]/50 text-[#7ba99d]' :
                             ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'border-amber-500/50 text-amber-600' : 'border-rose-500/50 text-rose-600'
                         }`}>
                             <span className="text-[7px] uppercase tracking-tighter opacity-70">Confidence</span>
-                            <span className="text-[9px] font-medium">
+                            <span className="text-[9px] font-normal">
                                 {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                             </span>
                         </div>
@@ -195,8 +194,8 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
 
                 <div className="text-right">
-                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-medium">ROI Est.</p>
-                    <p className="text-[15px] font-medium text-emerald-500 leading-tight">
+                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-normal">ROI Est.</p>
+                    <p className="text-[15px] font-normal text-[#98D1C1] leading-tight">
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>
@@ -204,7 +203,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 {/* NUEVO: Cap Rate */}
                 {(asset as any).capRate !== undefined && (
                     <div className="text-right border-t border-[#6b6b8d]/10 pt-1 w-full mt-0.5">
-                        <p className="text-[9px] text-[#6b6b8d]/80 font-medium">
+                        <p className="text-[9px] text-[#6b6b8d]/80 font-normal">
                             Cap Rate {((asset as any).capRate * 100).toFixed(1)}%
                         </p>
                     </div>

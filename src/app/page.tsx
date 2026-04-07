@@ -147,10 +147,17 @@ export default function GeolandOS() {
 
             {/* Logo — alineado con borde izquierdo del contenedor */}
             <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
-              <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
-              <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase`}>
-                The Infrastructure for Global Real Estate Investment Decisions
-              </span>
+              <div className="flex items-end gap-6">
+                <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
+                <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block`}>
+                  The Infrastructure for Global Real Estate Investment Decisions
+                </span>
+              </div>
+              
+              {/* User Profile indicator */}
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-medium text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all">
+                P
+              </div>
             </div>
 
             {/* Floating Glass Container (45/55 Split) */}
@@ -199,7 +206,7 @@ export default function GeolandOS() {
                       style={{ scrollbarWidth: 'none' }}
                     >
                       <div className="text-center mb-8 shrink-0">
-                        <Typography variant="h3" className="mb-1 font-light tracking-wide text-white/90">Matched Opportunities</Typography>
+                        <Typography variant="p" className="mb-1 font-medium text-sm tracking-[0.2em] uppercase text-white/70">Matched Opportunities</Typography>
                         <Typography variant="p" className="text-sm text-white/60">
                           {filteredAssets.length} Assets matching strategy.
                         </Typography>

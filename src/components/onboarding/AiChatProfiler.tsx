@@ -208,7 +208,7 @@ export function AiChatProfiler() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-2xl px-6 relative">
+        <div className="flex flex-col h-full w-full max-w-[510px] px-6 relative">
 
             {/* ── ACTIVE_SUPPORT badge (FRONT-ISV-EXP-04) ──────────────── */}
             {currentState === 'ACTIVE_SUPPORT' && (
@@ -228,11 +228,11 @@ export function AiChatProfiler() {
                             animate={{ opacity: 1, y: 0 }}
                             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            <div className="max-w-[85%] p-4 flex gap-4 bg-white/5 border border-white/10 shadow-sm backdrop-blur-md rounded-2xl">
+                            <div className="max-w-[85%] p-3 flex gap-3 bg-white/5 border border-white/10 shadow-sm backdrop-blur-md rounded-2xl">
                                 <div className="mt-1 flex-shrink-0">
-                                    {msg.role === 'user' ? <User size={18} className="text-white/60" /> : <div className="w-[18px] h-[18px] flex items-center justify-center bg-white/20 text-white font-bold text-[10px] rounded-sm">G</div>}
+                                    {msg.role === 'user' ? <User size={14} className="text-white/60" /> : <div className="w-[14px] h-[14px] flex items-center justify-center bg-white/20 text-white font-bold text-[7.5px] rounded-sm">G</div>}
                                 </div>
-                                <p className="text-sm md:text-base font-medium leading-relaxed text-white/90">
+                                <p className="text-[10.5px] md:text-[12.2px] font-medium leading-relaxed text-white/90">
                                     {msg.content}
                                 </p>
                             </div>
@@ -240,11 +240,11 @@ export function AiChatProfiler() {
                     ))}
                     {isLoading && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none">
-                                <div className="flex space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full animate-bounce opacity-80" />
-                                    <div className="w-2 h-2 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.1s' }} />
-                                    <div className="w-2 h-2 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.2s' }} />
+                            <div className="bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-none">
+                                <div className="flex space-x-1.5">
+                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" />
+                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.1s' }} />
+                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.2s' }} />
                                 </div>
                             </div>
                         </motion.div>
@@ -277,14 +277,14 @@ export function AiChatProfiler() {
                         disabled={isLoading}
                         ref={inputRef}
                         autoFocus
-                        className="w-full bg-white/5 border-0 rounded-full py-4 pl-6 pr-14 text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors shadow-lg backdrop-blur-xl"
+                        className="w-full bg-white/5 border-0 rounded-full py-3 pl-[18px] pr-10 text-[12.2px] placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors shadow-lg backdrop-blur-xl"
                     />
                     <button
                         type="submit"
                         disabled={isLoading || !input.trim()}
-                        className="absolute right-2 p-3 bg-black text-white rounded-full hover:bg-black/80 disabled:opacity-50 transition-all font-bold border border-white/10"
+                        className="absolute right-1.5 p-[9px] bg-black text-white rounded-full hover:bg-black/80 disabled:opacity-50 transition-all font-bold border border-white/10"
                     >
-                        <Send size={18} fill="white" stroke="white" />
+                        <Send size={14} fill="white" stroke="white" />
                     </button>
                 </form>
             </div>
