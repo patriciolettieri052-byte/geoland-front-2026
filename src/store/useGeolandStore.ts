@@ -375,7 +375,7 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         },
         assets: mockDatabase.assets,
         perfilCompletado: true,
-        isRefining: false,
+        isRefining: true,
         chatHistory: [
             ...state.chatHistory,
             { role: 'assistant', content: 'MOCK MODE ACTIVATED. Visualizando assets de prueba para feedback estético...' }
