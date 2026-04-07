@@ -203,6 +203,7 @@ export interface GeolandState {
     resetIsvV6: () => void;
     contradictionDetected: boolean;
     setContradictionDetected: (v: boolean) => void;
+    triggerTestMode: () => void;
 }
 
 const initialFiltrosDuros: FiltrosDuros = {
@@ -362,4 +363,20 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     resetIsvV6: () => set({ isvV6: initialIsvV6 }),
     contradictionDetected: false,
     setContradictionDetected: (contradictionDetected) => set({ contradictionDetected }),
+    triggerTestMode: () => set((state) => ({
+        isvV6: {
+            ...initialIsvV6,
+            strategy_primary: 'rental_long_term',
+            preferred_markets: ['Montevideo'],
+            budget: { amount_raw: '500000', amount_min: 100000, amount_max: 500000, currency: 'USD' },
+            isv_sufficient: true,
+            confirmed_by_user: true
+        },
+        perfilCompletado: true,
+        isRefining: true,
+        chatHistory: [
+            ...state.chatHistory,
+            { role: 'assistant', content: 'TEST MODE ACTIVATED. Saltando onboarding...' }
+        ]
+    })),
 }));

@@ -36,12 +36,14 @@ async function ingest() {
         }
 
         const result = await response.json();
-        console.log('✅ Ingesta completada con éxito!');
-        console.log('Resumen:', {
-            status: result.status,
-            contados: result.count,
-            primeros_ids: result.results?.slice(0, 3).map(r => r.asset_id) || []
-        });
+        console.log('✅ Ingesta enviada con éxito!');
+        console.log('Resumen del Backend:', JSON.stringify(result, null, 2));
+        
+        if (result.status === 'completed_sync') {
+            console.log(`✨ Sincronización completa: ${result.count} activos procesados.`);
+        } else {
+            console.warn(`⚠ El backend respondió con status: ${result.status}`);
+        }
 
     } catch (error) {
         console.error('❌ Error fatal durante la ingesta:');

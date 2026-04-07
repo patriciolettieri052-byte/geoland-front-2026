@@ -25,6 +25,7 @@ export function AiChatProfiler() {
         setContradictionDetected,
         contradictionDetected,
         currentState,
+        triggerTestMode,
     } = useGeolandStore();
 
     const [input, setInput] = useState('');
@@ -86,8 +87,14 @@ export function AiChatProfiler() {
 
         // Optimistic append
         setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
-        setIsLoading(true);
 
+        // 🛠️ TEST MODE BYPASS
+        if (userMessage.toLowerCase() === 'test mode') {
+            triggerTestMode();
+            return;
+        }
+
+        setIsLoading(true);
         const currentHistoryForApi = [...messages, { role: 'user' as const, content: userMessage }];
 
         try {
@@ -233,11 +240,11 @@ export function AiChatProfiler() {
                     ))}
                     {isLoading && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                            <div className="bg-primary/10 border border-primary/20 p-4 rounded-2xl rounded-tl-none animate-pulse">
+                            <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none">
                                 <div className="flex space-x-2">
-                                    <div className="w-2 h-2 bg-primary rounded-full" />
-                                    <div className="w-2 h-2 bg-primary rounded-full animation-delay-200" />
-                                    <div className="w-2 h-2 bg-primary rounded-full animation-delay-400" />
+                                    <div className="w-2 h-2 bg-white rounded-full animate-bounce opacity-80" />
+                                    <div className="w-2 h-2 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.1s' }} />
+                                    <div className="w-2 h-2 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.2s' }} />
                                 </div>
                             </div>
                         </motion.div>

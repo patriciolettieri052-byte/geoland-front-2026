@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { Oswald } from 'next/font/google';
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { AiChatProfiler } from '@/components/onboarding/AiChatProfiler';
 import { DynamicIsvRadar } from '@/components/onboarding/DynamicIsvRadar';
@@ -10,6 +11,12 @@ import { Layer2Immersion } from '@/components/marketplace/Layer2_Immersion';
 import { Asset } from '@/lib/mockEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '@/components/ui/Typography';
+
+const oswald = Oswald({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: 'normal',
+});
 
 export default function GeolandOS() {
   const {
@@ -139,23 +146,23 @@ export default function GeolandOS() {
             <div className="absolute inset-0 bg-black/25" />
 
             {/* Logo — alineado con borde izquierdo del contenedor */}
-            <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-center justify-between relative z-30">
+            <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
               <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
-              <span className="text-white/40 text-[11px] font-light tracking-wide italic">
-                The Decision Infrastructure for Global Real Estate
+              <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase`}>
+                The Infrastructure for Global Real Estate Investment Decisions
               </span>
             </div>
 
-            {/* Floating Glass Container (60/40 Split) */}
+            {/* Floating Glass Container (45/55 Split) */}
             <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10 transition-all duration-700">
 
-              {/* 60% Left Side - Persistent Chat */}
-              <div className="w-full md:w-[60%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
+              {/* 45% Left Side - Persistent Chat */}
+              <div className="w-full md:w-[45%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
                 <AiChatProfiler />
               </div>
 
-              {/* 40% Right Side - Stateful Content */}
-              <div className="w-full md:w-[40%] h-full relative overflow-hidden bg-white/5">
+              {/* 55% Right Side - Stateful Content */}
+              <div className="w-full md:w-[55%] h-full relative overflow-hidden bg-white/5">
                 <AnimatePresence mode="wait">
                   {!perfilCompletado ? (
                     /* STATE A: ISV RADAR (ONBOARDING) */
@@ -192,7 +199,7 @@ export default function GeolandOS() {
                       style={{ scrollbarWidth: 'none' }}
                     >
                       <div className="text-center mb-8 shrink-0">
-                        <Typography variant="h3" className="mb-1 font-light tracking-wide text-white/90">Global Index</Typography>
+                        <Typography variant="h3" className="mb-1 font-light tracking-wide text-white/90">Matched Opportunities</Typography>
                         <Typography variant="p" className="text-sm text-white/60">
                           {filteredAssets.length} Assets matching strategy.
                         </Typography>

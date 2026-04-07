@@ -90,24 +90,10 @@ export function DynamicIsvRadar() {
                 </ResponsiveContainer>
             </motion.div>
 
-            <div className="absolute bottom-8 text-center bg-black/40 backdrop-blur-md border border-white/5 py-3 px-8 rounded-full">
-                <Typography variant="label" className="text-white">Investor Strategy Vector</Typography>
-            </div>
-
-            {/* Confidence bar */}
-            <div className="w-full px-6 mt-4">
-                <div className="flex justify-between text-xs text-white/50 mb-1">
-                    <span>Confianza del perfil</span>
-                    <span>{cs.toFixed(0)}%</span>
-                </div>
-                <div className="w-full bg-white/10 rounded-full h-1.5">
-                    <motion.div
-                        className={`h-1.5 rounded-full transition-colors duration-300 ${isConfident ? 'bg-emerald-400' : 'bg-orange-400'}`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${cs}%` }}
-                        transition={{ duration: 0.5, ease: 'easeOut' }}
-                    />
-                </div>
+            <div className="absolute bottom-20 text-center bg-black/40 backdrop-blur-md border border-white/5 py-1.5 px-4 rounded-full">
+                <Typography variant="label" className="text-white text-[10px] tracking-[0.2em] font-light uppercase">
+                    Investor Strategy Vector
+                </Typography>
             </div>
 
             {/* Tags */}

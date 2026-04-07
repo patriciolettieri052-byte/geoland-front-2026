@@ -52,18 +52,18 @@ const AGUA_LABELS: Record<string, string> = {
 const RANK_BADGES: Record<number, { label: string; className: string; ring: string }> = {
     1: {
         label: 'Gold',
-        className: 'bg-gradient-to-r from-yellow-500 to-amber-400 text-black',
-        ring: 'ring-2 ring-amber-400/70',
+        className: 'bg-yellow-100/90 text-yellow-700',
+        ring: 'ring-0',
     },
     2: {
         label: 'Silver',
-        className: 'bg-gradient-to-r from-slate-300 to-gray-400 text-black',
-        ring: 'ring-2 ring-slate-300/60',
+        className: 'bg-slate-100/90 text-slate-600',
+        ring: 'ring-0',
     },
     3: {
         label: 'Bronze',
-        className: 'bg-gradient-to-r from-orange-700 to-amber-700 text-white',
-        ring: 'ring-2 ring-orange-600/50',
+        className: 'bg-orange-100/90 text-orange-700',
+        ring: 'ring-0',
     },
 };
 
@@ -91,11 +91,10 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     };
 
     const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
-    const ringClass = badge ? badge.ring : 'ring-1 ring-black/8';
 
     return (
         <motion.div
-            className={`flex flex-row items-stretch h-[110px] bg-white/85 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg hover:bg-white/95 ${ringClass}`}
+            className="flex flex-row items-stretch h-[110px] bg-white/70 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg hover:bg-white/95"
             onClick={() => onClick(asset.id)}
             whileHover={{ scale: 1.015, y: -2 }}
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
@@ -140,13 +139,22 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     {asset.location}
                 </p>
 
-                <p className="text-[13px] font-bold text-gray-900 leading-tight mb-2 truncate">
+                <p className="text-[13px] font-bold text-[#6b6b8d] leading-tight mb-1 truncate">
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
 
+                {/* NUEVO: Asset Type tag */}
+                {(asset as any).assetType && (
+                    <div className="mb-2">
+                        <span className="inline-block bg-[#6b6b8d]/10 text-[#6b6b8d] text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-semibold">
+                            {(asset as any).assetType}
+                        </span>
+                    </div>
+                )}
+
                 <div>
                     <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">Precio</p>
-                    <p className="text-[12px] font-bold text-gray-800">{formatPrecio(precio)}</p>
+                    <p className="text-[12px] font-bold text-[#6b6b8d]">{formatPrecio(precio)}</p>
                 </div>
 
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
@@ -166,10 +174,25 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             </div>
 
             {/* DERECHA — 25%: G-Score + ROI */}
-            <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-2">
-                <span className="bg-black text-white text-[10px] font-black px-2 py-0.5 rounded tracking-wide">
-                    G-Score {gScore}
-                </span>
+            <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-1.5">
+                <div className="flex flex-col items-end gap-1">
+                    <span className="text-[#6b6b8d] text-[10px] font-black tracking-wide">
+                        G-Score {gScore}
+                    </span>
+                    
+                    {/* NUEVO: Confidence % con color dinámico */}
+                    {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
+                        <div className="flex items-center gap-1">
+                            <span className="text-[7px] text-[#6b6b8d]/60 uppercase tracking-tighter">Confidence</span>
+                            <span className={`text-[9px] font-black ${
+                                ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'text-emerald-500' :
+                                ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'text-amber-500' : 'text-rose-500'
+                            }`}>
+                                {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
+                            </span>
+                        </div>
+                    )}
+                </div>
 
                 <div className="text-right">
                     <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">ROI Est.</p>
@@ -177,6 +200,15 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>
+
+                {/* NUEVO: Cap Rate */}
+                {(asset as any).capRate !== undefined && (
+                    <div className="text-right border-t border-[#6b6b8d]/10 pt-1 w-full mt-0.5">
+                        <p className="text-[9px] text-[#6b6b8d]/80 font-medium">
+                            Cap Rate {((asset as any).capRate * 100).toFixed(1)}%
+                        </p>
+                    </div>
+                )}
             </div>
         </motion.div>
     );

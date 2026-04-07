@@ -1,21 +1,41 @@
 'use client';
 
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '../ui/Typography';
 
 interface TheOracleLoaderProps {
     onComplete: () => void;
 }
 
+const LOADING_PHRASES = [
+    "Analizando ISV",
+    "Buscando activos con mayor potencial",
+    "Calculando G-Scores personalizados"
+];
+
+const PHRASE_DURATION = 2000; // 2 segundos por frase
+const TOTAL_DURATION = 6000; // 6 segundos total
+
 export function TheOracleLoader({ onComplete }: TheOracleLoaderProps) {
+    const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+
     useEffect(() => {
+        // Rotación de frases cada 2 segundos
+        const phraseInterval = setInterval(() => {
+            setCurrentPhraseIndex((prev) => (prev + 1) % LOADING_PHRASES.length);
+        }, PHRASE_DURATION);
+
+        // Completar loader después de 6 segundos
         const timer = setTimeout(() => {
             onComplete();
-        }, 4000); // 4 segundos fijos — independiente de Framer Motion
+        }, TOTAL_DURATION);
 
-        return () => clearTimeout(timer); // cleanup si se desmonta antes
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        return () => {
+            clearInterval(phraseInterval);
+            clearTimeout(timer);
+        };
+    }, [onComplete]);
 
     return (
         <motion.div
@@ -24,24 +44,29 @@ export function TheOracleLoader({ onComplete }: TheOracleLoaderProps) {
             exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center p-8 w-full h-full"
         >
-            <div className="relative flex items-center justify-center mb-6">
+            <div className="relative flex items-center justify-center mb-10">
                 <motion.div
-                    className="w-12 h-12 rounded-full border-2 border-white/20 border-t-white"
+                    className="w-16 h-16 rounded-full border-2 border-white/10 border-t-white/80"
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                 />
             </div>
 
-            <motion.div
-                className="text-center z-20"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-            >
-                <Typography variant="p" className="text-white/60 tracking-wider font-light">
-                    analizando los activos recomendados para ti
-                </Typography>
-            </motion.div>
+            <div className="h-8 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentPhraseIndex}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        <Typography variant="p" className="text-white/70 tracking-[0.2em] font-light text-xs uppercase">
+                            {LOADING_PHRASES[currentPhraseIndex]}
+                        </Typography>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
         </motion.div>
     );
 }
