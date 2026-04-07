@@ -105,7 +105,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 style={{ backgroundImage: `url(${backgroundImageUrl})` }}
             >
                 {badge && (
-                    <div className={`absolute top-2 left-2 text-[9px] font-black px-2 py-0.5 rounded tracking-widest uppercase shadow-md ${badge.className}`}>
+                    <div className={`absolute top-2 left-2 text-[9px] font-medium px-2 py-0.5 rounded tracking-widest uppercase shadow-md ${badge.className}`}>
                         {badge.label}
                     </div>
                 )}
@@ -127,7 +127,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
                 {/* Strategy badge sobre foto */}
                 <div className="absolute bottom-2 left-2">
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-black/55 backdrop-blur-sm text-white/90">
+                    <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-black/55 backdrop-blur-sm text-white/90">
                         {strategyLabel}
                     </span>
                 </div>
@@ -139,22 +139,22 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     {asset.location}
                 </p>
 
-                <p className="text-[13px] font-bold text-[#6b6b8d] leading-tight mb-1 truncate">
+                <p className="text-[13px] font-medium text-[#6b6b8d] leading-tight mb-1 truncate">
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
 
                 {/* NUEVO: Asset Type tag */}
                 {(asset as any).assetType && (
                     <div className="mb-2">
-                        <span className="inline-block bg-[#6b6b8d]/10 text-[#6b6b8d] text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-semibold">
+                        <span className="inline-block bg-[#6b6b8d]/10 text-[#6b6b8d] text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-medium">
                             {(asset as any).assetType}
                         </span>
                     </div>
                 )}
 
                 <div>
-                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">Precio</p>
-                    <p className="text-[12px] font-bold text-[#6b6b8d]">{formatPrecio(precio)}</p>
+                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-medium">Precio</p>
+                    <p className="text-[12px] font-medium text-[#6b6b8d]">{formatPrecio(precio)}</p>
                 </div>
 
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
@@ -176,18 +176,18 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             {/* DERECHA — 25%: G-Score + ROI */}
             <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-1.5">
                 <div className="flex flex-col items-end gap-1">
-                    <span className="text-[#6b6b8d] text-[10px] font-black tracking-wide">
+                    <span className="text-[#6b6b8d] text-[10px] font-medium tracking-wide">
                         G-Score {gScore}
                     </span>
                     
                     {/* NUEVO: Confidence % con color dinámico */}
                     {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
-                        <div className="flex items-center gap-1">
-                            <span className="text-[7px] text-[#6b6b8d]/60 uppercase tracking-tighter">Confidence</span>
-                            <span className={`text-[9px] font-black ${
-                                ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'text-emerald-500' :
-                                ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'text-amber-500' : 'text-rose-500'
-                            }`}>
+                        <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 ${
+                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-emerald-500/50 text-emerald-600' :
+                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'border-amber-500/50 text-amber-600' : 'border-rose-500/50 text-rose-600'
+                        }`}>
+                            <span className="text-[7px] uppercase tracking-tighter opacity-70">Confidence</span>
+                            <span className="text-[9px] font-medium">
                                 {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                             </span>
                         </div>
@@ -195,8 +195,8 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
 
                 <div className="text-right">
-                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-semibold">ROI Est.</p>
-                    <p className="text-[15px] font-black text-emerald-500 leading-tight">
+                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-medium">ROI Est.</p>
+                    <p className="text-[15px] font-medium text-emerald-500 leading-tight">
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>

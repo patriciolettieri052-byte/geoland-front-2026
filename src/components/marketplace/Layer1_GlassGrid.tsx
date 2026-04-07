@@ -29,7 +29,7 @@ const itemVariants = {
 export function Layer1GlassGrid({ assets, onAssetClick }: Layer1GlassGridProps) {
     return (
         <motion.div
-            className="flex flex-col gap-3 w-full max-w-[690px] mx-auto"
+            className="flex flex-col gap-3 w-full max-w-[760px] mx-auto"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
