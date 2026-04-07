@@ -150,7 +150,7 @@ export const mockDatabase: { assets: Asset[] } = {
                 liquidity: "Muy Baja",
                 riskLevel: "Alto",
                 rationale: "",
-                backgroundImageUrl: "https://images.unsplash.com/photo-1589139268383-af6cf65eaed3?q=80&w=2670&auto=format&fit=crop",
+                backgroundImageUrl: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?q=80&w=2670&auto=format&fit=crop",
             },
             layer2: {
                 metrics: { roiTotal: 0.26, netMargin: 0.20, baseCapex: 250000 },
