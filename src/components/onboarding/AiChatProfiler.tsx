@@ -208,7 +208,7 @@ export function AiChatProfiler() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-[510px] px-6 relative">
+        <div className="flex flex-col h-full w-full max-w-[562px] px-6 relative">
 
             {/* ── ACTIVE_SUPPORT badge (FRONT-ISV-EXP-04) ──────────────── */}
             {currentState === 'ACTIVE_SUPPORT' && (
@@ -228,11 +228,11 @@ export function AiChatProfiler() {
                             animate={{ opacity: 1, y: 0 }}
                             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            <div className="max-w-[85%] p-3 flex gap-3 bg-white/5 border border-white/10 shadow-sm backdrop-blur-md rounded-2xl">
+                            <div className="max-w-[85%] p-[13.5px] flex gap-[13.5px] bg-white/5 border border-white/10 shadow-sm backdrop-blur-md rounded-2xl">
                                 <div className="mt-1 flex-shrink-0">
-                                    {msg.role === 'user' ? <User size={14} className="text-white/60" /> : <div className="w-[14px] h-[14px] flex items-center justify-center bg-white/20 text-white font-bold text-[7.5px] rounded-sm">G</div>}
+                                    {msg.role === 'user' ? <User size={15} className="text-white/60" /> : <div className="w-[15px] h-[15px] flex items-center justify-center bg-white/20 text-white font-bold text-[8.5px] rounded-sm">G</div>}
                                 </div>
-                                <p className="text-[10.5px] md:text-[12.2px] font-medium leading-relaxed text-white/90">
+                                <p className="text-[12px] md:text-[13.5px] font-medium leading-relaxed text-white/90">
                                     {msg.content}
                                 </p>
                             </div>
@@ -240,7 +240,7 @@ export function AiChatProfiler() {
                     ))}
                     {isLoading && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                            <div className="bg-white/5 border border-white/10 p-3 rounded-2xl rounded-tl-none">
+                            <div className="bg-white/5 border border-white/10 p-[13.5px] rounded-2xl rounded-tl-none">
                                 <div className="flex space-x-1.5">
                                     <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" />
                                     <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.1s' }} />
@@ -277,14 +277,14 @@ export function AiChatProfiler() {
                         disabled={isLoading}
                         ref={inputRef}
                         autoFocus
-                        className="w-full bg-white/5 border-0 rounded-full py-3 pl-[18px] pr-10 text-[12.2px] placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors shadow-lg backdrop-blur-xl"
+                        className="w-full bg-white/5 border-0 rounded-full py-[13.5px] pl-[20px] pr-12 text-[13.5px] placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors shadow-lg backdrop-blur-xl"
                     />
                     <button
                         type="submit"
                         disabled={isLoading || !input.trim()}
-                        className="absolute right-1.5 p-[9px] bg-black text-white rounded-full hover:bg-black/80 disabled:opacity-50 transition-all font-bold border border-white/10"
+                        className="absolute right-2 p-[10px] bg-black text-white rounded-full hover:bg-black/80 disabled:opacity-50 transition-all font-bold border border-white/10"
                     >
-                        <Send size={14} fill="white" stroke="white" />
+                        <Send size={15} fill="white" stroke="white" />
                     </button>
                 </form>
             </div>

@@ -159,7 +159,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
                     <div className="flex gap-1 mt-1.5 flex-wrap">
                         {asset.zona_agroecologica && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#98D1C1]/20 text-[#7ba99d] border border-[#98D1C1]/30">
+                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#7BA99D]/20 text-[#618E84] border border-[#7BA99D]/30">
                                 {ZONA_LABELS[asset.zona_agroecologica]}
                             </span>
                         )}
@@ -182,7 +182,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     {/* NUEVO: Confidence % con color dinámico */}
                     {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
                         <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 ${
-                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-[#98D1C1]/50 text-[#7ba99d]' :
+                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-[#7BA99D]/50 text-[#618E84]' :
                             ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'border-amber-500/50 text-amber-600' : 'border-rose-500/50 text-rose-600'
                         }`}>
                             <span className="text-[7px] uppercase tracking-tighter opacity-70">Confidence</span>
@@ -195,7 +195,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
                 <div className="text-right">
                     <p className="text-[8px] text-gray-400 uppercase tracking-widest font-normal">ROI Est.</p>
-                    <p className="text-[15px] font-normal text-[#98D1C1] leading-tight">
+                    <p className="text-[15px] font-normal text-[#7BA99D] leading-tight">
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>

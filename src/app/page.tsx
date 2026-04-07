@@ -206,8 +206,8 @@ export default function GeolandOS() {
                       style={{ scrollbarWidth: 'none' }}
                     >
                       <div className="text-center mb-8 shrink-0">
-                        <Typography variant="p" className="mb-1 font-medium text-sm tracking-[0.2em] uppercase text-white/70">Matched Opportunities</Typography>
-                        <Typography variant="p" className="text-sm text-white/60">
+                        <Typography variant="p" className="mb-1 font-medium text-[13px] tracking-[0.2em] uppercase text-white/70">Matched Opportunities</Typography>
+                        <Typography variant="p" className="text-[13px] text-white/60">
                           {filteredAssets.length} Assets matching strategy.
                         </Typography>
                       </div>
