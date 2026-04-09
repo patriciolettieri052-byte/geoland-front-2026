@@ -7,7 +7,8 @@ import { AiChatProfiler } from '@/components/onboarding/AiChatProfiler';
 import { DynamicIsvRadar } from '@/components/onboarding/DynamicIsvRadar';
 import { TheOracleLoader } from '@/components/orchestrator/TheOracleLoader';
 import { Layer1GlassGrid } from '@/components/marketplace/Layer1_GlassGrid';
-import { Layer2Immersion } from '@/components/marketplace/Layer2_Immersion';
+import { Layer2Container } from '@/components/marketplace/Layer2Container';
+import { ChatSidebar } from '@/components/marketplace/ChatSidebar';  // NUEVO
 import { Asset } from '@/lib/mockEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '@/components/ui/Typography';
@@ -24,31 +25,30 @@ export default function GeolandOS() {
     iterandoResultados,
     activeAssetId,
     setActiveAsset,
+    chatSidebarOpen,  // NUEVO
+    setChatSidebarOpen,  // NUEVO
     filtrosDuros,
     filtrosBlandosIsv,
     assets,
     setAssets,
     isRefining,
-    setIsRefining
+    setIsRefining,
+    chatHistory,  // Requerido para ChatSidebar
   } = useGeolandStore();
 
   const [error, setError] = useState<string | null>(null);
 
-  // Handle flow transitions based on Zustand state
+  // Lógica existente de fetchMatch (sin cambios)
   useEffect(() => {
     if (!perfilCompletado || assets.length > 0) return;
-
     let cancelled = false;
-
     const timeoutId = setTimeout(() => {
         if (!cancelled) {
             setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
             setIsRefining(false);
         }
     }, 30000);
-
     setIsRefining(true);
-
     (async () => {
         try {
             const { fetchMatch, buildMatchPayloadFromV6 } = await import('@/lib/api/geolandService');
@@ -74,7 +74,6 @@ export default function GeolandOS() {
             if (!cancelled) setIsRefining(false);
         }
     })();
-
     return () => {
         cancelled = true;
         clearTimeout(timeoutId);
@@ -82,52 +81,45 @@ export default function GeolandOS() {
   }, [perfilCompletado]);
 
   const handleLoaderComplete = () => {
-    // El fetch ya corrió en el useEffect de arriba.
-    // Esta función solo cierra el loader visualmente cuando los assets ya llegaron.
     if (assets.length > 0 || error) {
         setIsRefining(false);
     }
-    // Si assets todavía está vacío y no hay error, el fetch sigue corriendo —
-    // el loader se mantiene hasta que el useEffect llame setIsRefining(false).
   };
 
-  // 🧠 THE MATCHMAKER ENGINE - Only client side sorting rendering now, backend filters the arrays.
+  // Filtered assets (sin cambios)
   const filteredAssets = useMemo(() => {
     if (!perfilCompletado || isRefining) return [];
-
     let result = [...assets];
     return result.map(a => {
-      // Manejar tanto el formato del mock (id) como el del backend (asset_id)
       const id = a.id || a.asset_id || "unknown";
-      
-      // Deterministic pseudo-randomness based on ID + ISV length for visual layout
       const seed = id.length + (filtrosBlandosIsv.estrategiaObjetivo?.length || 0) + (iterandoResultados ? 1 : 0);
       const mockGScore = 80 + (seed % 18);
-
-      // Usar aqs_score del backend si existe
       const aqs = a.layer1?.gScore || a.aqs_score || mockGScore;
-
       return {
         ...a,
-        id, // Asegurar ID
-        layer1: { 
-            ...(a.layer1 || {}), 
-            gScore: aqs 
-        },
-        layer2: a.layer2 || { metrics: { baseCapex: 0 } } // Asegurar layer2
+        id,
+        layer1: { ...(a.layer1 || {}), gScore: aqs },
+        layer2: a.layer2 || { metrics: { baseCapex: 0 } }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
-
   }, [assets, perfilCompletado, isRefining, iterandoResultados, filtrosBlandosIsv]);
 
-
   const activeAsset = assets.find(a => a.id === activeAssetId);
+
+  // Auto-close chat sidebar cuando se cierra Layer 2
+  useEffect(() => {
+    if (!activeAsset) {
+      setChatSidebarOpen(false);
+    }
+  }, [activeAsset, setChatSidebarOpen]);
 
   return (
     <main className="min-h-screen w-full relative overflow-hidden bg-background text-foreground">
 
-      {/* MAIN SYSTEM CONTAINER (ONBOARDING & LAYER 1 MARKETPLACE) */}
-      <AnimatePresence>
+      {/* ═════════════════════════════════════════════════════════════════════
+          ESTADO 1 & 2: ONBOARDING + LAYER 1 (sin Layer 2 activo)
+          ═════════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence mode="wait">
         {!activeAsset && (
           <motion.div
             key="main-container"
@@ -140,12 +132,11 @@ export default function GeolandOS() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.5 }}
           >
-            {/* Dark overlay to ensure text contrast */}
             <div className="absolute inset-0 bg-black/25" />
 
-            {/* Logo — alineado con borde izquierdo del contenedor */}
+            {/* Header — Logo */}
             <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
               <div className="flex items-end gap-6">
                 <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
@@ -153,26 +144,23 @@ export default function GeolandOS() {
                   The Infrastructure for Global Real Estate Investment Decisions
                 </span>
               </div>
-              
-              {/* User Profile indicator */}
               <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-medium text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all">
                 P
               </div>
             </div>
 
-            {/* Floating Glass Container (45/55 Split) */}
+            {/* CONTENEDOR PRINCIPAL — Glass Container */}
             <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10 transition-all duration-700">
 
-              {/* 45% Left Side - Persistent Chat */}
+              {/* Left: Chat Profiler (45% cuando !activeAsset) */}
               <div className="w-full md:w-[45%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
                 <AiChatProfiler />
               </div>
 
-              {/* 55% Right Side - Stateful Content */}
+              {/* Right: Radar/Grid/Loading (55% cuando !activeAsset) */}
               <div className="w-full md:w-[55%] h-full relative overflow-hidden bg-white/5">
                 <AnimatePresence mode="wait">
                   {!perfilCompletado ? (
-                    /* STATE A: ISV RADAR (ONBOARDING) */
                     <motion.div
                       key="radar-view"
                       initial={{ opacity: 0, x: 20 }}
@@ -184,7 +172,6 @@ export default function GeolandOS() {
                       <DynamicIsvRadar />
                     </motion.div>
                   ) : isRefining ? (
-                    /* STATE B: LOCALIZED LOADER (40% PANEL) */
                     <motion.div
                       key="loader-view"
                       initial={{ opacity: 0 }}
@@ -195,7 +182,6 @@ export default function GeolandOS() {
                       <TheOracleLoader onComplete={handleLoaderComplete} />
                     </motion.div>
                   ) : perfilCompletado && !isRefining ? (
-                    /* STATE C: GLOBAL INDEX (LAYER 1) */
                     <motion.div
                       key="index-view"
                       initial={{ opacity: 0, x: 20 }}
@@ -249,10 +235,59 @@ export default function GeolandOS() {
         )}
       </AnimatePresence>
 
-      {/* IMMERSIVE VIEW (LAYER 2) */}
-      <AnimatePresence>
+      {/* ═════════════════════════════════════════════════════════════════════
+          ESTADO 3: LAYER 2 (ChatSidebar aparece SOLO aquí)
+          ═════════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence mode="wait">
         {activeAsset && perfilCompletado && !isRefining && (
-          <Layer2Immersion key="layer2" asset={activeAsset} onClose={() => setActiveAsset(null)} />
+          <motion.div
+            key="layer2-container"
+            className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
+            style={{
+              backgroundImage: `url('/monolith2.jpeg')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="absolute inset-0 bg-black/25" />
+
+            {/* Header — Logo (Mantenido para consistencia) */}
+            <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
+              <div className="flex items-end gap-6">
+                <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
+                <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block`}>
+                  The Infrastructure for Global Real Estate Investment Decisions
+                </span>
+              </div>
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-medium text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all">
+                P
+              </div>
+            </div>
+
+            {/* CONTENEDOR PRINCIPAL — Glass Container (mismo que en Onboarding) */}
+            <div className="w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10 flex">
+
+              {/* ChatSidebar — Thin (60px) o 30% abierto — SOLO APARECE AQUÍ */}
+              <ChatSidebar 
+                messages={chatHistory || []} 
+                isLoading={false}
+              />
+
+              {/* Layer 2 — Ocupa espacio restante */}
+              <div className="flex-1 relative z-0">
+                <Layer2Container 
+                  asset={activeAsset} 
+                  onClose={() => setActiveAsset(null)} 
+                />
+              </div>
+
+            </div>
+
+          </motion.div>
         )}
       </AnimatePresence>
 

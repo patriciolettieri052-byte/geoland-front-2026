@@ -177,6 +177,10 @@ export interface GeolandState {
     activeAssetId: string | null;
     setActiveAsset: (id: string | null) => void;
 
+    // NUEVO: Chat Sidebar State
+    chatSidebarOpen: boolean;
+    setChatSidebarOpen: (val: boolean) => void;
+
     // 3. Sensibilidad en Vivo de Capa 2
     sensitivity: {
         exitCapRate: number;
@@ -205,6 +209,10 @@ export interface GeolandState {
     contradictionDetected: boolean;
     setContradictionDetected: (v: boolean) => void;
     triggerTestMode: () => void;
+    
+    // 6. Layer 2 Scroll Persistence
+    scrollPosition: Record<string, number>;
+    setScrollPosition: (assetId: string, scrollTop: number) => void;
 }
 
 const initialFiltrosDuros: FiltrosDuros = {
@@ -322,6 +330,10 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     activeAssetId: null,
     setActiveAsset: (id) => set({ activeAssetId: id }),
 
+    // NUEVO: Chat Sidebar
+    chatSidebarOpen: false,
+    setChatSidebarOpen: (val) => set({ chatSidebarOpen: val }),
+
     sensitivity: initialSensitivity,
     updateSensitivity: (key, value) =>
         set((state) => ({
@@ -380,5 +392,14 @@ export const useGeolandStore = create<GeolandState>((set) => ({
             ...state.chatHistory,
             { role: 'assistant', content: 'MOCK MODE ACTIVATED. Visualizando assets de prueba para feedback estético...' }
         ]
+    })),
+    
+    // 6. Layer 2 Scroll Persistence
+    scrollPosition: {},
+    setScrollPosition: (assetId, scrollTop) => set((state) => ({
+        scrollPosition: {
+            ...state.scrollPosition,
+            [assetId]: scrollTop
+        }
     })),
 }));
