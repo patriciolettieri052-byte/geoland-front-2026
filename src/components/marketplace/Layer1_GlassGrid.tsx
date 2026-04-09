@@ -1,11 +1,11 @@
 'use client';
 
-import { Asset } from '@/lib/mockEngine';
+import { AssetMatchItem } from '@/types/geoland';
 import { Layer1AssetCard } from './Layer1_AssetCard';
 import { motion } from 'framer-motion';
 
 interface Layer1GlassGridProps {
-    assets: Asset[];
+    assets: AssetMatchItem[];
     onAssetClick: (id: string) => void;
 }
 
@@ -35,8 +35,14 @@ export function Layer1GlassGrid({ assets, onAssetClick }: Layer1GlassGridProps) 
             animate="visible"
         >
             {assets.map((asset, index) => (
-                <motion.div key={asset.id} variants={itemVariants} className="w-full">
-                    <Layer1AssetCard asset={asset} onClick={onAssetClick} rank={index + 1} />
+                <motion.div 
+                    key={asset.id} 
+                    variants={itemVariants} 
+                    className="w-full cursor-pointer"
+                    onClick={() => onAssetClick(asset.id)}
+                >
+                    {/* onClick passed to card is a no-op since wrapper handles it */}
+                    <Layer1AssetCard asset={asset as any} onClick={() => {}} rank={index + 1} />
                 </motion.div>
             ))}
         </motion.div>
