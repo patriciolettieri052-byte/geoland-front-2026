@@ -136,13 +136,13 @@ export default function GeolandOS() {
         {/* CONTENEDOR PRINCIPAL — Glass Container */}
         <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10">
 
-          {/* Left: Chat Profiler (45%) — Permanente */}
-          <div className="w-full md:w-[45%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
+          {/* Left: Chat Profiler (20%) — Permanente */}
+          <div className="w-full md:w-[20%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
             <AiChatProfiler />
           </div>
 
-          {/* Right: Radar/Grid/Layer2 (55%) */}
-          <div className="w-full md:w-[55%] h-full relative overflow-hidden bg-white/5">
+          {/* Right: Radar/Grid/Layer2 (80%) */}
+          <div className="w-full md:w-[80%] h-full relative overflow-hidden bg-white/5">
             <AnimatePresence mode="wait">
               {activeAsset ? (
                 /* LAYER 2 */
