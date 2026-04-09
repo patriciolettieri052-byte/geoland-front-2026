@@ -8,7 +8,6 @@ import { DynamicIsvRadar } from '@/components/onboarding/DynamicIsvRadar';
 import { TheOracleLoader } from '@/components/orchestrator/TheOracleLoader';
 import { Layer1GlassGrid } from '@/components/marketplace/Layer1_GlassGrid';
 import { Layer2Container } from '@/components/marketplace/Layer2Container';
-import { ChatSidebar } from '@/components/marketplace/ChatSidebar';  // NUEVO
 import { Asset } from '@/lib/mockEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '@/components/ui/Typography';
@@ -25,8 +24,6 @@ export default function GeolandOS() {
     iterandoResultados,
     activeAssetId,
     setActiveAsset,
-    chatSidebarOpen,  // NUEVO
-    setChatSidebarOpen,  // NUEVO
     filtrosDuros,
     filtrosBlandosIsv,
     assets,
@@ -106,190 +103,137 @@ export default function GeolandOS() {
 
   const activeAsset = assets.find(a => a.id === activeAssetId);
 
-  // Auto-close chat sidebar cuando se cierra Layer 2
-  useEffect(() => {
-    if (!activeAsset) {
-      setChatSidebarOpen(false);
-    }
-  }, [activeAsset, setChatSidebarOpen]);
-
   return (
     <main className="min-h-screen w-full relative overflow-hidden bg-background text-foreground">
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          ESTADO 1 & 2: ONBOARDING + LAYER 1 (sin Layer 2 activo)
-          ═════════════════════════════════════════════════════════════════════ */}
-      <AnimatePresence mode="wait">
-        {!activeAsset && (
-          <motion.div
-            key="main-container"
-            className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-            style={{
-              backgroundImage: `url('/monolith2.jpeg')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="absolute inset-0 bg-black/25" />
+      <motion.div
+        key="stable-container"
+        className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
+        style={{
+          backgroundImage: `url('/monolith2.jpeg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="absolute inset-0 bg-black/25" />
 
-            {/* Header — Logo */}
-            <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
-              <div className="flex items-end gap-6">
-                <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
-                <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block`}>
-                  The Infrastructure for Global Real Estate Investment Decisions
-                </span>
-              </div>
-              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-medium text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all">
-                P
-              </div>
-            </div>
+        {/* Header — Logo */}
+        <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
+          <div className="flex items-end gap-6">
+            <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
+            <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block`}>
+              The Infrastructure for Global Real Estate Investment Decisions
+            </span>
+          </div>
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-medium text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all">
+            P
+          </div>
+        </div>
 
-            {/* CONTENEDOR PRINCIPAL — Glass Container */}
-            <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10 transition-all duration-700">
+        {/* CONTENEDOR PRINCIPAL — Glass Container */}
+        <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10">
 
-              {/* Left: Chat Profiler (45% cuando !activeAsset) */}
-              <div className="w-full md:w-[45%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
-                <AiChatProfiler />
-              </div>
+          {/* Left: Chat Profiler (45%) — Permanente */}
+          <div className="w-full md:w-[45%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
+            <AiChatProfiler />
+          </div>
 
-              {/* Right: Radar/Grid/Loading (55% cuando !activeAsset) */}
-              <div className="w-full md:w-[55%] h-full relative overflow-hidden bg-white/5">
-                <AnimatePresence mode="wait">
-                  {!perfilCompletado ? (
-                    <motion.div
-                      key="radar-view"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute inset-0 flex flex-col items-center justify-center"
-                    >
-                      <DynamicIsvRadar />
-                    </motion.div>
-                  ) : isRefining ? (
-                    <motion.div
-                      key="loader-view"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute inset-0 flex items-center justify-center bg-transparent z-50"
-                    >
-                      <TheOracleLoader onComplete={handleLoaderComplete} />
-                    </motion.div>
-                  ) : perfilCompletado && !isRefining ? (
-                    <motion.div
-                      key="index-view"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute inset-0 flex flex-col py-8 px-6 overflow-y-auto scrollbar-hide"
-                      style={{ scrollbarWidth: 'none' }}
-                    >
-                      <div className="text-center mb-8 shrink-0">
-                        <Typography variant="p" className="mb-1 font-medium text-[11px] tracking-[0.2em] uppercase text-white/70">Matched Opportunities</Typography>
-                        <Typography variant="p" className="text-[11px] text-white/60">
-                          {filteredAssets.length} Assets matching strategy.
-                        </Typography>
-                      </div>
+          {/* Right: Radar/Grid/Layer2 (55%) */}
+          <div className="w-full md:w-[55%] h-full relative overflow-hidden bg-white/5">
+            <AnimatePresence mode="wait">
+              {activeAsset ? (
+                /* LAYER 2 */
+                <motion.div
+                  key="layer2"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 flex flex-col z-0"
+                >
+                  <Layer2Container 
+                    asset={activeAsset} 
+                    onClose={() => setActiveAsset(null)} 
+                  />
+                </motion.div>
+              ) : !perfilCompletado ? (
+                /* RADAR */
+                <motion.div
+                  key="radar-view"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 flex flex-col items-center justify-center"
+                >
+                  <DynamicIsvRadar />
+                </motion.div>
+              ) : isRefining ? (
+                /* LOADER */
+                <motion.div
+                  key="loader-view"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex items-center justify-center bg-transparent z-50"
+                >
+                  <TheOracleLoader onComplete={handleLoaderComplete} />
+                </motion.div>
+              ) : (
+                /* GRID (LAYER 1) */
+                <motion.div
+                  key="index-view"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 flex flex-col py-8 px-6 overflow-y-auto scrollbar-hide"
+                  style={{ scrollbarWidth: 'none' }}
+                >
+                  <div className="text-center mb-8 shrink-0">
+                    <Typography variant="p" className="mb-1 font-medium text-[11px] tracking-[0.2em] uppercase text-white/70">Matched Opportunities</Typography>
+                    <Typography variant="p" className="text-[11px] text-white/60">
+                      {filteredAssets.length} Assets matching strategy.
+                    </Typography>
+                  </div>
 
-                      <div className="flex-1">
-                        {error ? (
-                            <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-8">
-                                <p className="text-white/60 text-lg mb-4">{error}</p>
-                                <button
-                                    onClick={() => window.location.reload()}
-                                    className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-                                >
-                                    Reintentar
-                                </button>
-                            </div>
-                        ) : (
-                            <>
-                                <Layer1GlassGrid assets={filteredAssets} onAssetClick={setActiveAsset} />
+                  <div className="flex-1">
+                    {error ? (
+                        <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-8">
+                            <p className="text-white/60 text-lg mb-4">{error}</p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                            >
+                                Reintentar
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <Layer1GlassGrid assets={filteredAssets} onAssetClick={setActiveAsset} />
 
-                                {filteredAssets.length === 0 && (
-                                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center opacity-70">
-                                    <Typography variant="h4" className="text-white/80">Sin coincidencias estrictas</Typography>
-                                    <Typography variant="p" className="max-w-xs mt-4 leading-relaxed text-sm text-white/50">
-                                      Tus filtros duros (Ubicación, Tipo) son restrictivos para el mock actual.
-                                    </Typography>
-                                  </motion.div>
-                                )}
-                            </>
-                        )}
-                      </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              </div>
+                            {filteredAssets.length === 0 && (
+                              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center opacity-70">
+                                <Typography variant="h4" className="text-white/80">Sin coincidencias estrictas</Typography>
+                                <Typography variant="p" className="max-w-xs mt-4 leading-relaxed text-sm text-white/50">
+                                  Tus filtros duros (Ubicación, Tipo) son restrictivos para el mock actual.
+                                </Typography>
+                              </motion.div>
+                            )}
+                        </>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-            </div>
+        </div>
 
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ═════════════════════════════════════════════════════════════════════
-          ESTADO 3: LAYER 2 (ChatSidebar aparece SOLO aquí)
-          ═════════════════════════════════════════════════════════════════════ */}
-      <AnimatePresence mode="wait">
-        {activeAsset && perfilCompletado && !isRefining && (
-          <motion.div
-            key="layer2-container"
-            className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-            style={{
-              backgroundImage: `url('/monolith2.jpeg')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="absolute inset-0 bg-black/25" />
-
-            {/* Header — Logo (Mantenido para consistencia) */}
-            <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
-              <div className="flex items-end gap-6">
-                <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
-                <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block`}>
-                  The Infrastructure for Global Real Estate Investment Decisions
-                </span>
-              </div>
-              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-medium text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all">
-                P
-              </div>
-            </div>
-
-            {/* CONTENEDOR PRINCIPAL — Glass Container (mismo que en Onboarding) */}
-            <div className="w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10 flex">
-
-              {/* ChatSidebar — Thin (60px) o 30% abierto — SOLO APARECE AQUÍ */}
-              <ChatSidebar 
-                messages={chatHistory || []} 
-                isLoading={false}
-              />
-
-              {/* Layer 2 — Ocupa espacio restante */}
-              <div className="flex-1 relative z-0">
-                <Layer2Container 
-                  asset={activeAsset} 
-                  onClose={() => setActiveAsset(null)} 
-                />
-              </div>
-
-            </div>
-
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </motion.div>
 
     </main>
   );
