@@ -108,7 +108,7 @@ export default function GeolandOS() {
         estrategia: "FIX_FLIP",
         nombre: "Residencia Colonial - Abasto",
         ciudad: "Buenos Aires",
-        location: "Abasto, CABA",
+        location: "Abasto, Buenos Aires, Argentina",
         precio_usd: 165000,
         capex_estimado: 48000,
         arv_estimado: 295000,
@@ -122,7 +122,7 @@ export default function GeolandOS() {
         payback_meses: 8,
         precio_m2: 1850,
         precio_m2_zona: 2100,
-        etiqueta_operacion: "Oportunidad de Reforma",
+        etiqueta_operacion: "Oportunidad a largo plazo",
         photo_urls: [
           "/renovation_5.png",
           "/renovation_1.png",
@@ -324,8 +324,8 @@ export default function GeolandOS() {
                   style={{ scrollbarWidth: 'none' }}
                 >
                   <div className="text-center mb-8 shrink-0">
-                    <Typography variant="p" className="mb-0.5 font-bold text-[13.5px] text-white">{t.header.matchedOpportunities}</Typography>
-                    <Typography variant="p" className="text-[11px] text-white/50">
+                    <Typography variant="p" className="mb-0.5 font-bold text-[10.5px] text-white">{t.header.matchedOpportunities}</Typography>
+                    <Typography variant="p" className="text-[8px] text-white/50">
                       {t.header.assetsMatching.replace('{{count}}', filteredAssets.length.toString())}
                     </Typography>
                   </div>

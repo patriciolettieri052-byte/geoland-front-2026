@@ -2,7 +2,7 @@
 
 import { Asset } from '@/lib/mockEngine';
 import { motion } from 'framer-motion';
-import { Bell, Heart } from 'lucide-react';
+import { Bell, Heart, HelpCircle } from 'lucide-react';
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { translations } from '@/lib/translations';
 
@@ -97,6 +97,14 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
 
+    // Lógica de color para G-Score
+    const getGScoreColor = (score: number) => {
+        if (score >= 80) return 'bg-emerald-500';
+        if (score >= 60) return 'bg-yellow-500';
+        if (score >= 40) return 'bg-orange-500';
+        return 'bg-rose-500';
+    };
+
     return (
         <motion.div
             className="flex flex-row items-stretch h-[110px] bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg hover:bg-white/15"
@@ -178,29 +186,38 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             </div>
 
             {/* DERECHA — 25%: G-Score + ROI */}
-            <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-1.5">
-                <div className="flex flex-col items-end gap-1">
-                    <span className="bg-[#5a4282] text-white text-[9px] font-normal px-2 py-0.5 rounded-full tracking-wide">
-                        G-Score {gScore}
-                    </span>
+            <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-1">
+                <div className="flex flex-col items-end gap-1.5">
+                    {/* G-Score Circle */}
+                    <div className="flex items-center gap-1.5" title="G-Score">
+                        <button 
+                            className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors"
+                            title="Desempeño general basado en IA e indicadores técnicos"
+                        >
+                            <HelpCircle size={10} className="text-white/60" />
+                        </button>
+                        <div className={`w-9 h-9 flex items-center justify-center rounded-full ${getGScoreColor(gScore)} text-white font-bold text-[14px] shadow-lg`}>
+                            {gScore}
+                        </div>
+                    </div>
                     
-                    {/* NUEVO: Confidence % con color dinámico */}
+                    {/* Confidence % */}
                     {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
-                        <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 ${
-                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-[#7BA99D]/50 text-[#618E84]' :
-                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'border-amber-500/50 text-amber-600' : 'border-rose-500/50 text-rose-600'
-                        }`}>
-                            <span className="text-[7px] uppercase tracking-tighter opacity-70">{t.assetCard.confidence}</span>
-                            <span className="text-[9px] font-normal">
+                        <div className={`flex items-center gap-1 border-2 rounded-full px-2 py-0.5 ${
+                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-[#4c7c64] text-[#1e3a2f]' :
+                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'border-amber-700/60 text-amber-900' : 'border-rose-900/60 text-rose-950'
+                        } bg-white/30 backdrop-blur-sm`}>
+                            <span className="text-[7px] uppercase font-bold tracking-tighter opacity-80">{t.assetCard.confidence}</span>
+                            <span className="text-[9px] font-bold">
                                 {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                             </span>
                         </div>
                     )}
                 </div>
 
-                <div className="text-right">
+                <div className="text-right mt-1">
                     <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">{t.assetCard.roiEst}</p>
-                    <p className="text-[15px] font-bold text-[#7BA99D] leading-tight">
+                    <p className="text-[15px] font-bold text-[#4d7c0f] leading-tight">
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>
