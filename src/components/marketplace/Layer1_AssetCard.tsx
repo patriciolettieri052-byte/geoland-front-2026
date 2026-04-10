@@ -97,12 +97,19 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
 
-    // Lógica de color para G-Score
+    // Lógica de color pastel para G-Score
     const getGScoreColor = (score: number) => {
-        if (score >= 80) return 'bg-emerald-500';
-        if (score >= 60) return 'bg-yellow-500';
-        if (score >= 40) return 'bg-orange-500';
-        return 'bg-rose-500';
+        if (score >= 80) return 'bg-[#A7F3D0]'; // Emerald 200
+        if (score >= 60) return 'bg-[#FDE68A]'; // Amber 200
+        if (score >= 40) return 'bg-[#FED7AA]'; // Orange 200
+        return 'bg-[#FECACA]'; // Rose 200
+    };
+
+    const getGScoreBorderColor = (score: number) => {
+        if (score >= 80) return 'border-[#6ee7b7]'; 
+        if (score >= 60) return 'border-[#fcd34d]';
+        if (score >= 40) return 'border-[#fdba74]';
+        return 'border-[#fca5a5]';
     };
 
     return (
@@ -196,17 +203,14 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                         >
                             <HelpCircle size={10} className="text-white/60" />
                         </button>
-                        <div className={`w-9 h-9 flex items-center justify-center rounded-full ${getGScoreColor(gScore)} text-white font-bold text-[14px] shadow-lg`}>
+                        <div className={`w-9 h-9 flex items-center justify-center rounded-full ${getGScoreColor(gScore)} text-slate-800 font-bold text-[14px]`}>
                             {gScore}
                         </div>
                     </div>
                     
                     {/* Confidence % */}
                     {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
-                        <div className={`flex items-center gap-1 border-2 rounded-full px-2 py-0.5 ${
-                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-[#4c7c64] text-[#1e3a2f]' :
-                            ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'border-amber-700/60 text-amber-900' : 'border-rose-900/60 text-rose-950'
-                        } bg-white/30 backdrop-blur-sm`}>
+                        <div className={`flex items-center gap-1 border-2 rounded-full px-2 py-0.5 ${getGScoreBorderColor((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))} text-slate-800`}>
                             <span className="text-[7px] uppercase font-bold tracking-tighter opacity-80">{t.assetCard.confidence}</span>
                             <span className="text-[9px] font-bold">
                                 {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
@@ -217,7 +221,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
                 <div className="text-right mt-1">
                     <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">{t.assetCard.roiEst}</p>
-                    <p className="text-[15px] font-bold text-[#4d7c0f] leading-tight">
+                    <p className="text-[19px] font-bold text-[#22c55e] leading-tight">
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>

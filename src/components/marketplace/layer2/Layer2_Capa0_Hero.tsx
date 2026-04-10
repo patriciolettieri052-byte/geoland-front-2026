@@ -73,7 +73,7 @@ function GScoreRing({ score }: { score: number }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <svg width="32" height="32" viewBox="0 0 32 32">
           <circle cx="16" cy="16" r={r} fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="3" />
-          <circle cx="16" cy="16" r={r} fill="none" stroke="rgba(127,119,221,0.8)"
+          <circle cx="16" cy="16" r={r} fill="none" stroke={score >= 80 ? "rgba(16,185,129,0.8)" : "rgba(127,119,221,0.8)"}
             strokeWidth="3" strokeDasharray={`${dash} ${circ}`}
             strokeDashoffset={circ * 0.25} strokeLinecap="round" />
         </svg>
@@ -143,7 +143,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
   const getVal = (field: string) => (asset as Record<string, unknown>)[field] as number | undefined;
 
   return (
-    <div style={{ background: "transparent" }}>
+    <div style={{ background: "transparent", minHeight: "calc(100vh - 140px)", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <div style={{
         padding: "12px 14px 8px",
@@ -181,7 +181,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
       </div>
 
       {/* Grid: izquierda | galería | derecha */}
-      <div style={{ display: "grid", gridTemplateColumns: "135px 1fr 135px", gap: 12, padding: "12px 14px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "150px 1fr 150px", gap: 16, padding: "16px 18px", flex: 1 }}>
         {/* Columna izquierda */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <MetricModule
@@ -197,8 +197,8 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
           />
         </div>
 
-        {/* Galería central */}
-        <div style={{ display: "flex" }}>
+        {/* Galería central - Enlarged verticaly */}
+        <div style={{ display: "flex", minHeight: 400 }}>
           <GalleryModule photos={asset.photo_urls} />
         </div>
 
@@ -214,13 +214,12 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
         {/* Informe de Asset (Ancho total) */}
         <div style={{ 
           gridColumn: "1 / -1", 
-          marginTop: 6,
+          marginTop: 12,
           background: "rgba(255,255,255,0.30)",
           border: "0.5px solid rgba(0,0,0,0.12)",
           borderRadius: 12,
-          padding: "14px 18px",
-          width: "calc(100% + 12px)", // 20% más ancha visualmente (simulado con offset)
-          marginLeft: -6
+          padding: "16px 20px",
+          width: "100%", 
         }}>
           <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: 8 }}>Informe de Inversión Geoland</div>
           <div style={{ fontSize: 13, color: "#2D2E35", lineHeight: 1.6, fontWeight: 500 }}>
