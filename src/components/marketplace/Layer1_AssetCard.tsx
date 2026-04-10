@@ -69,11 +69,11 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     const layer1 = asset?.layer1 || {};
     const layer2 = asset?.layer2 || { metrics: { baseCapex: 0 } };
 
-    const gScore        = layer1.gScore ?? (asset as any).aqs_score ?? 0;
-    const expectedIrr   = layer1.expectedIrr ?? 0;
+    const gScore             = layer1.gScore ?? (asset as any).aqs_score ?? 0;
+    const expectedIrr        = layer1.expectedIrr ?? 0;
     const backgroundImageUrl = layer1.backgroundImageUrl ?? '';
-    const precio        = layer2.metrics?.baseCapex ?? 0;
-    const strategyLabel = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
+    const precio             = layer2.metrics?.baseCapex ?? 0;
+    const strategyLabel      = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
 
     const formatPrecio = (n: number) => {
         if (!n || n === 0) return '—';
@@ -90,6 +90,12 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
         ? (confVal >= 80 ? '#059669' : confVal >= 60 ? '#D97706' : '#DC2626')
         : '#9CA3AF';
 
+    // Anillo confidence
+    const ringSize = 52;
+    const r = 20;
+    const circ = 2 * Math.PI * r;
+    const dash = confVal !== null ? (confVal / 100) * circ : 0;
+
     return (
         <motion.div
             className="flex flex-row items-stretch h-[128px] rounded-xl overflow-hidden cursor-pointer"
@@ -99,8 +105,8 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
         >
 
-            {/* ── FOTO 28% ─────────────────────────────────────────── */}
-            <div className="relative w-[28%] shrink-0">
+            {/* ── FOTO 22% ─────────────────────────────────────────── */}
+            <div className="relative shrink-0" style={{ width: '22%' }}>
                 <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${backgroundImageUrl})`, opacity: 0.85 }}
@@ -125,8 +131,8 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
             </div>
 
-            {/* ── CENTRO 44% ───────────────────────────────────────── */}
-            <div className="flex flex-col justify-center px-4 w-[44%] shrink-0" style={{ borderRight: '1px solid #F3F4F6' }}>
+            {/* ── CENTRO 38% ───────────────────────────────────────── */}
+            <div className="flex flex-col justify-center px-4 shrink-0" style={{ width: '38%', borderRight: '1px solid #F3F4F6' }}>
                 <p style={{ fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9CA3AF', marginBottom: '2px' }}>
                     {asset.location}
                 </p>
@@ -160,66 +166,88 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
             </div>
 
-            {/* ── MÉTRICAS 28% ─────────────────────────────────────── */}
-            <div style={{ width: '28%', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 16px', gap: '8px' }}>
+            {/* ── MÉTRICAS 40% — 3 columnas horizontales ───────────── */}
+            <div style={{
+                width: '40%',
+                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                padding: '0 12px',
+            }}>
 
-                {/* G-Score | divider | ROI */}
-                <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '4px' }}>
-
-                    {/* G-Score */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                            <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>G-Score</span>
-                            <HelpCircle size={8} color="#D1D5DB" />
-                        </div>
-                        <span style={{ fontSize: '36px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums', color: gScoreColor }}>
-                            {gScore}
-                        </span>
+                {/* G-SCORE */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>G-Score</span>
+                        <HelpCircle size={8} color="#D1D5DB" />
                     </div>
-
-                    {/* Divisor */}
-                    <div style={{ width: '1px', height: '32px', backgroundColor: '#F3F4F6', flexShrink: 0 }} />
-
-                    {/* ROI */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                        <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>ROI EST.</span>
-                        <span style={{ fontSize: '36px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums', color: '#16A34A' }}>
-                            {(expectedIrr * 100).toFixed(1)}%
-                        </span>
-                    </div>
-
+                    <span style={{
+                        fontSize: '42px',
+                        fontWeight: 300,
+                        lineHeight: 1,
+                        letterSpacing: '-0.03em',
+                        fontVariantNumeric: 'tabular-nums',
+                        color: gScoreColor,
+                    }}>
+                        {gScore}
+                    </span>
                 </div>
 
-                {/* Confidence Ring */}
-                {confVal !== null && (() => {
-                    const r = 12;
-                    const circ = 2 * Math.PI * r;
-                    const dash = (confVal / 100) * circ;
-                    return (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                            <span style={{ fontSize: '7px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF' }}>
-                                Confidence
+                {/* Divisor */}
+                <div style={{ width: '1px', height: '40px', backgroundColor: '#F3F4F6', flexShrink: 0 }} />
+
+                {/* ROI EST. */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
+                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>ROI EST.</span>
+                    <span style={{
+                        fontSize: '42px',
+                        fontWeight: 300,
+                        lineHeight: 1,
+                        letterSpacing: '-0.03em',
+                        fontVariantNumeric: 'tabular-nums',
+                        color: '#16A34A',
+                    }}>
+                        {(expectedIrr * 100).toFixed(1)}%
+                    </span>
+                </div>
+
+                {/* Divisor */}
+                <div style={{ width: '1px', height: '40px', backgroundColor: '#F3F4F6', flexShrink: 0 }} />
+
+                {/* CONFIDENCE RING */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
+                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>Confidence</span>
+                    {confVal !== null ? (
+                        <div style={{ position: 'relative', width: `${ringSize}px`, height: `${ringSize}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width={ringSize} height={ringSize} viewBox={`0 0 ${ringSize} ${ringSize}`} style={{ position: 'absolute', top: 0, left: 0 }}>
+                                <circle cx={ringSize/2} cy={ringSize/2} r={r} fill="none" stroke="#F3F4F6" strokeWidth="3" />
+                                <circle
+                                    cx={ringSize/2} cy={ringSize/2} r={r}
+                                    fill="none"
+                                    stroke={confColor}
+                                    strokeWidth="3"
+                                    strokeDasharray={`${dash} ${circ}`}
+                                    strokeDashoffset={circ * 0.25}
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                            <span style={{
+                                fontSize: '13px',
+                                fontWeight: 400,
+                                fontVariantNumeric: 'tabular-nums',
+                                color: confColor,
+                                position: 'relative',
+                                zIndex: 1,
+                            }}>
+                                {confVal.toFixed(0)}%
                             </span>
-                            <div style={{ position: 'relative', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <svg width="36" height="36" viewBox="0 0 36 36" style={{ position: 'absolute', top: 0, left: 0 }}>
-                                    <circle cx="18" cy="18" r={r} fill="none" stroke="#F3F4F6" strokeWidth="2.5" />
-                                    <circle
-                                        cx="18" cy="18" r={r}
-                                        fill="none"
-                                        stroke={confColor}
-                                        strokeWidth="2.5"
-                                        strokeDasharray={`${dash} ${circ}`}
-                                        strokeDashoffset={circ * 0.25}
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                                <span style={{ fontSize: '9px', fontWeight: 500, fontVariantNumeric: 'tabular-nums', color: confColor, position: 'relative', zIndex: 1 }}>
-                                    {confVal.toFixed(0)}%
-                                </span>
-                            </div>
                         </div>
-                    );
-                })()}
+                    ) : (
+                        <span style={{ fontSize: '13px', color: '#D1D5DB' }}>—</span>
+                    )}
+                </div>
 
             </div>
 
