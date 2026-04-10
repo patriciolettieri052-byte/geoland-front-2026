@@ -21,7 +21,6 @@ const STRATEGY_LABELS: Record<string, string> = {
     'FORESTRY':                 'Forestal',
     'BUY_AND_HOLD_APPRECIATION': 'Buy & Hold',
     'SUBDIVISION':              'Subdivisión',
-    // ISV V6 values (minúsculas — por si llegan directamente)
     'fix_and_flip':              'Fix & Flip',
     'rental_long_term':          'Renta',
     'rental_short_term':         'Renta Corta',
@@ -51,22 +50,10 @@ const AGUA_LABELS: Record<string, string> = {
     'riego_pleno': 'Riego Pleno',
 };
 
-const RANK_BADGES: Record<number, { label: string; className: string; ring: string }> = {
-    1: {
-        label: 'Gold',
-        className: 'bg-yellow-100/90 text-yellow-700',
-        ring: 'ring-0',
-    },
-    2: {
-        label: 'Silver',
-        className: 'bg-slate-100/90 text-slate-600',
-        ring: 'ring-0',
-    },
-    3: {
-        label: 'Bronze',
-        className: 'bg-orange-100/90 text-orange-700',
-        ring: 'ring-0',
-    },
+const RANK_BADGES: Record<number, { label: string; className: string }> = {
+    1: { label: 'Gold',   className: 'bg-yellow-100/90 text-yellow-700' },
+    2: { label: 'Silver', className: 'bg-slate-100/90 text-slate-600'   },
+    3: { label: 'Bronze', className: 'bg-orange-100/90 text-orange-700' },
 };
 
 interface Layer1AssetCardProps {
@@ -81,13 +68,11 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     const layer1 = asset?.layer1 || {};
     const layer2 = asset?.layer2 || { metrics: { baseCapex: 0 } };
-    
-    // El backend v1.3 devuelve aqs_score, en el front lo mapeamos a gScore
-    const gScore = layer1.gScore ?? (asset as any).aqs_score ?? 0;
-    const expectedIrr = layer1.expectedIrr ?? 0;
-    const backgroundImageUrl = layer1.backgroundImageUrl ?? "";
-    
-    const precio = layer2.metrics?.baseCapex ?? 0;
+
+    const gScore        = layer1.gScore ?? (asset as any).aqs_score ?? 0;
+    const expectedIrr   = layer1.expectedIrr ?? 0;
+    const backgroundImageUrl = layer1.backgroundImageUrl ?? '';
+    const precio        = layer2.metrics?.baseCapex ?? 0;
     const strategyLabel = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
 
     const formatPrecio = (n: number) => {
@@ -97,101 +82,77 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
 
-    // Lógica de color pastel para G-Score
-    const getGScoreColor = (score: number) => {
-        if (score >= 80) return 'bg-[#A7F3D0]'; // Emerald 200
-        if (score >= 60) return 'bg-[#FDE68A]'; // Amber 200
-        if (score >= 40) return 'bg-[#FED7AA]'; // Orange 200
-        return 'bg-[#FECACA]'; // Rose 200
-    };
+    const gScoreColor = gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626';
 
-    const getGScoreBorderHex = (score: number) => {
-        if (score >= 80) return '#6ee7b7'; 
-        if (score >= 60) return '#fcd34d';
-        if (score >= 40) return '#fdba74';
-        return '#fca5a5';
-    };
+    const confRaw = (asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : null);
+    const confVal = confRaw !== null ? Number(confRaw) : null;
+    const confColor = confVal !== null
+        ? (confVal >= 80 ? '#059669' : confVal >= 60 ? '#D97706' : '#DC2626')
+        : '#9CA3AF';
 
     return (
         <motion.div
-            className="flex flex-row items-stretch h-[128px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-200"
-            style={{
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #E5E7EB',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
-            }}
+            className="flex flex-row items-stretch h-[128px] rounded-xl overflow-hidden cursor-pointer"
+            style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
             whileHover={{ scale: 1.008, y: -1, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}
             onClick={() => onClick(asset.id)}
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
         >
-            {/* FOTO — 28% */}
+
+            {/* ── FOTO 28% ─────────────────────────────────────────── */}
             <div className="relative w-[28%] shrink-0">
-                <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-85"
-                    style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+                <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${backgroundImageUrl})`, opacity: 0.85 }}
                 />
                 {badge && (
                     <div className={`absolute top-2 left-2 text-[9px] font-semibold px-2 py-0.5 rounded-md tracking-widest uppercase shadow-sm ${badge.className}`}>
                         {t.header.rank[badge.label as keyof typeof t.header.rank] || badge.label}
                     </div>
                 )}
-
                 <div className="absolute top-2 right-2 flex gap-1">
-                    <button
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-6 h-6 flex items-center justify-center rounded-full transition-colors"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
-                    >
+                    <button onClick={(e) => e.stopPropagation()} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}>
                         <Bell size={10} style={{ color: '#374151' }} />
                     </button>
-                    <button
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-6 h-6 flex items-center justify-center rounded-full transition-colors"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
-                    >
+                    <button onClick={(e) => e.stopPropagation()} className="w-6 h-6 flex items-center justify-center rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}>
                         <Heart size={10} style={{ color: '#374151' }} />
                     </button>
                 </div>
-
-                {/* Strategy badge sobre foto */}
                 <div className="absolute bottom-2 left-2">
-                    <span className="text-[9px] font-normal px-1.5 py-0.5 rounded bg-black/55 backdrop-blur-sm text-white/90">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded text-white/90" style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}>
                         {strategyLabel}
                     </span>
                 </div>
             </div>
 
-            <div className="flex flex-col justify-center px-4 w-[47%] shrink-0" style={{ borderRight: '1px solid #F3F4F6' }}>
-                <p className="text-[9px] uppercase tracking-[0.15em] font-semibold mb-0.5" style={{ color: '#9CA3AF' }}>
+            {/* ── CENTRO 44% ───────────────────────────────────────── */}
+            <div className="flex flex-col justify-center px-4 w-[44%] shrink-0" style={{ borderRight: '1px solid #F3F4F6' }}>
+                <p style={{ fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9CA3AF', marginBottom: '2px' }}>
                     {asset.location}
                 </p>
-
-                <p className="text-[13px] font-semibold leading-tight mb-1 truncate" style={{ color: '#0F1117' }}>
+                <p style={{ fontSize: '13px', fontWeight: 600, color: '#0F1117', lineHeight: 1.3, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
-
                 {(asset as any).assetType && (
-                    <div className="mb-2">
-                        <span className="inline-block text-[8px] px-1.5 py-0.5 rounded-md uppercase tracking-wider font-semibold" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
+                    <div style={{ marginBottom: '6px' }}>
+                        <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#F3F4F6', color: '#6B7280', padding: '2px 6px', borderRadius: '4px' }}>
                             {(asset as any).assetType}
                         </span>
                     </div>
                 )}
-
                 <div>
-                    <p className="text-[8px] uppercase tracking-widest font-semibold" style={{ color: '#9CA3AF' }}>{t.assetCard.price}</p>
-                    <p className="text-[12px] font-bold num" style={{ color: '#0F1117' }}>{formatPrecio(precio)}</p>
+                    <p style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>{t.assetCard.price}</p>
+                    <p style={{ fontSize: '12px', fontWeight: 700, color: '#0F1117', fontVariantNumeric: 'tabular-nums' }}>{formatPrecio(precio)}</p>
                 </div>
-
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
-                    <div className="flex gap-1 mt-1.5 flex-wrap">
+                    <div style={{ display: 'flex', gap: '4px', marginTop: '6px', flexWrap: 'wrap' }}>
                         {asset.zona_agroecologica && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-md font-medium" style={{ backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0' }}>
+                            <span style={{ fontSize: '8px', fontWeight: 500, padding: '2px 6px', borderRadius: '4px', backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0' }}>
                                 {ZONA_LABELS[asset.zona_agroecologica]}
                             </span>
                         )}
                         {asset.acceso_agua && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-blue-100/50 text-blue-800 border border-blue-200">
+                            <span style={{ fontSize: '8px', fontWeight: 500, padding: '2px 6px', borderRadius: '4px', backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
                                 {AGUA_LABELS[asset.acceso_agua]}
                             </span>
                         )}
@@ -199,67 +160,69 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
             </div>
 
-            {/* DERECHA — 32%: G-Score + ROI + Confidence (PURE INLINE STYLES) */}
-            <div 
-                style={{
-                    width: '32%',
-                    flexShrink: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '0 24px',
-                    gap: '16px',
-                    borderLeft: '1px solid #F3F4F6'
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                    {/* G-Score Group */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }} title="G-Score">
-                            <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF' }}>G-Score</span>
-                            <HelpCircle size={9} style={{ color: '#9CA3AF' }} />
+            {/* ── MÉTRICAS 28% ─────────────────────────────────────── */}
+            <div style={{ width: '28%', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 16px', gap: '8px' }}>
+
+                {/* G-Score | divider | ROI */}
+                <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: '4px' }}>
+
+                    {/* G-Score */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>G-Score</span>
+                            <HelpCircle size={8} color="#D1D5DB" />
                         </div>
-                        <div className="num" style={{ fontSize: '38px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.05em', color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
+                        <span style={{ fontSize: '36px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums', color: gScoreColor }}>
                             {gScore}
-                        </div>
-                    </div>
-
-                    {/* Fina línea sutil vertical */}
-                    <div style={{ width: '1px', height: '40px', backgroundColor: '#F3F4F6', marginLeft: '8px', marginRight: '8px' }} />
-
-                    {/* ROI Group */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                        <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px', color: '#9CA3AF' }}>{t.assetCard.roiEst}</span>
-                        <div className="num" style={{ fontSize: '38px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.05em', color: '#16A34A' }}>
-                            {(expectedIrr * 100).toFixed(1)}%
-                        </div>
-                    </div>
-                </div>
-
-                {/* Confidence Badge - Premium Pill */}
-                {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
-                    <div 
-                        style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px',
-                            border: `2px solid ${getGScoreBorderHex((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))}`,
-                            borderRadius: '9999px',
-                            padding: '6px 16px',
-                            backgroundColor: 'rgba(255,255,255,0.5)',
-                            transition: 'all 0.2s ease'
-                        }}
-                    >
-                        <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>{t.assetCard.confidence}</span>
-                        <span className="num" style={{ fontSize: '13px', fontWeight: 800, color: '#1e293b' }}>
-                            {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                         </span>
                     </div>
-                )}
+
+                    {/* Divisor */}
+                    <div style={{ width: '1px', height: '32px', backgroundColor: '#F3F4F6', flexShrink: 0 }} />
+
+                    {/* ROI */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                        <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>ROI EST.</span>
+                        <span style={{ fontSize: '36px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums', color: '#16A34A' }}>
+                            {(expectedIrr * 100).toFixed(1)}%
+                        </span>
+                    </div>
+
+                </div>
+
+                {/* Confidence Ring */}
+                {confVal !== null && (() => {
+                    const r = 12;
+                    const circ = 2 * Math.PI * r;
+                    const dash = (confVal / 100) * circ;
+                    return (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                            <span style={{ fontSize: '7px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9CA3AF' }}>
+                                Confidence
+                            </span>
+                            <div style={{ position: 'relative', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <svg width="36" height="36" viewBox="0 0 36 36" style={{ position: 'absolute', top: 0, left: 0 }}>
+                                    <circle cx="18" cy="18" r={r} fill="none" stroke="#F3F4F6" strokeWidth="2.5" />
+                                    <circle
+                                        cx="18" cy="18" r={r}
+                                        fill="none"
+                                        stroke={confColor}
+                                        strokeWidth="2.5"
+                                        strokeDasharray={`${dash} ${circ}`}
+                                        strokeDashoffset={circ * 0.25}
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                                <span style={{ fontSize: '9px', fontWeight: 500, fontVariantNumeric: 'tabular-nums', color: confColor, position: 'relative', zIndex: 1 }}>
+                                    {confVal.toFixed(0)}%
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })()}
+
             </div>
+
         </motion.div>
     );
 }
