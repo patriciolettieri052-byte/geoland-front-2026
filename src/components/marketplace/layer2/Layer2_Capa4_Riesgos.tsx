@@ -135,8 +135,8 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
             const s = SEVERITY_STYLES[r.severity];
             return (
               <div key={i} style={{
-                background: "rgba(226,75,74,0.45)",
-                border: `0.5px solid rgba(226,75,74,0.25)`,
+                background: "rgba(226,75,74,0.30)",
+                border: `0.5px solid rgba(226,75,74,0.18)`,
                 borderRadius: 7,
                 padding: "7px 10px",
                 display: "flex",
@@ -168,8 +168,8 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
         <button
           onClick={() => onRequestLayer3 ? onRequestLayer3(asset.id) : console.log("Layer 3 requested for:", asset.id)}
           style={{
-            background: "rgba(255,255,255,0.45)",
-            border: "0.5px solid rgba(0,0,0,0.15)",
+            background: "rgba(255,255,255,0.30)",
+            border: "0.5px solid rgba(0,0,0,0.12)",
             color: "#2D2E35",
             fontSize: 12,
             padding: "10px 20px",

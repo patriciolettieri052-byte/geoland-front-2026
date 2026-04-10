@@ -22,9 +22,9 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
       <div
         className="sticky top-0 z-10 flex items-center gap-2 px-3 py-2"
         style={{
-          background: "rgba(255,255,255,0.8)",
+          background: "rgba(255,255,255,0.40)",
           backdropFilter: "blur(12px)",
-          borderBottom: "0.5px solid rgba(0,0,0,0.08)",
+          borderBottom: "0.5px solid rgba(0,0,0,0.12)",
         }}
       >
         <button

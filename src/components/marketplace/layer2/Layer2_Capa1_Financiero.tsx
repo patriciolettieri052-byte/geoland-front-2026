@@ -44,7 +44,7 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
 
           return (
             <div key={i} style={{
-              background: "rgba(255,255,255,0.44)",
+              background: "rgba(255,255,255,0.30)",
               border: "0.5px solid rgba(0,0,0,0.1)",
               borderRadius: 7,
               padding: "7px 9px",

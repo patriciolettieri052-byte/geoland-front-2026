@@ -93,28 +93,43 @@ export default function GeolandOS() {
       const mockGScore = 80 + (seed % 18);
       const aqs = a.layer1?.gScore || a.aqs_score || mockGScore;
       
-      // Inject Fix & Flip mockup data for demo
+      // Inject Enriched Fix & Flip mockup data for demo
       return {
         ...a,
         id,
         estrategia: "FIX_FLIP",
-        nombre: "Casa Histórica - Abasto",
+        nombre: "Residencia Colonial - Abasto",
         ciudad: "Buenos Aires",
-        precio_usd: 145000,
-        capex_estimado: 45000,
-        arv_estimado: 265000,
-        roiTotal: 0.38,
-        irr_equivalente: 0.245,
-        risk_score: 32,
+        location: "Abasto, CABA",
+        precio_usd: 165000,
+        capex_estimado: 48000,
+        arv_estimado: 295000,
+        roiTotal: 0.385,
+        irr_equivalente: 0.242,
+        risk_score: 28,
+        confidence_final: 0.89,
+        g_score: 84,
+        ingreso_neto_anual: 0,
+        descuento_pct: 0.12,
+        payback_meses: 8,
+        precio_m2: 1850,
+        precio_m2_zona: 2100,
+        etiqueta_operacion: "Oportunidad de Reforma",
         photo_urls: [
-          "/renovation_5_facade_1775780438213.png",
-          "/renovation_1_living_room_1775780380158.png",
-          "/renovation_2_kitchen_1775780394880.png",
-          "/renovation_3_bedroom_1775780410141.png",
-          "/renovation_4_bathroom_1775780423874.png"
+          "/renovation_5.png",
+          "/renovation_1.png",
+          "/renovation_2.png",
+          "/renovation_3.png",
+          "/renovation_4.png"
         ],
-        layer1: { ...(a.layer1 || {}), gScore: aqs },
-        layer2: a.layer2 || { metrics: { baseCapex: 145000 } }
+        layer1: { ...(a.layer1 || {}), gScore: 84 },
+        layer2: a.layer2 || { 
+          metrics: { 
+            baseCapex: 165000,
+            renovationEstimate: 48000,
+            projectDuration: 8
+          } 
+        }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
   }, [assets, perfilCompletado, isRefining, iterandoResultados, filtrosBlandosIsv]);

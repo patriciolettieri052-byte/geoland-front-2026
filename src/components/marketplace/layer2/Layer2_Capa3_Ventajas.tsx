@@ -12,8 +12,8 @@ function AdvCard({ title, value, description, barPercent, color }: {
 }) {
   return (
     <div style={{
-      background: "rgba(255,255,255,0.24)",
-      border: "0.5px solid rgba(255,255,255,0.07)",
+      background: "rgba(255,255,255,0.30)",
+      border: "0.5px solid rgba(0,0,0,0.1)",
       borderRadius: 8,
       padding: "9px 11px",
     }}>

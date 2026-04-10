@@ -30,8 +30,8 @@ function MetricModule({ label, value, sub, showBar, barWidth }: {
 }) {
   return (
     <div style={{
-      background: "rgba(255,255,255,0.44)",
-      border: "0.5px solid rgba(0,0,0,0.08)",
+      background: "rgba(255,255,255,0.30)",
+      border: "0.5px solid rgba(0,0,0,0.1)",
       borderRadius: 10,
       padding: "10px 12px",
       display: "flex",
@@ -44,10 +44,10 @@ function MetricModule({ label, value, sub, showBar, barWidth }: {
       <div style={{ fontSize: 19, fontWeight: 700, color: "#2D2E35", lineHeight: 1 }}>
         {value}
       </div>
-      {sub && <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)" }}>{sub}</div>}
+      {sub && <div style={{ fontSize: 9, color: "rgba(0,0,0,0.45)", fontWeight: 500 }}>{sub}</div>}
       {showBar && barWidth !== undefined && (
-        <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, marginTop: 4, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${barWidth}%`, background: "rgba(29,158,117,0.6)", borderRadius: 2 }} />
+        <div style={{ height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 2, marginTop: 4, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${barWidth}%`, background: "rgba(29,158,117,0.75)", borderRadius: 2 }} />
         </div>
       )}
     </div>
@@ -61,8 +61,8 @@ function GScoreRing({ score }: { score: number }) {
   const dash = (score / 100) * circ;
   return (
     <div style={{
-      background: "rgba(255,255,255,0.44)",
-      border: "0.5px solid rgba(0,0,0,0.08)",
+      background: "rgba(255,255,255,0.30)",
+      border: "0.5px solid rgba(0,0,0,0.1)",
       borderRadius: 10,
       padding: "10px 12px",
       display: "flex",
@@ -92,12 +92,13 @@ function GalleryModule({ photos }: { photos?: string[] }) {
   const total = photos?.length || 4;
   return (
     <div style={{
-      background: "rgba(255,255,255,0.44)",
-      border: "0.5px solid rgba(0,0,0,0.1)",
+      background: "rgba(255,255,255,0.30)",
+      border: "0.5px solid rgba(0,0,0,0.15)",
       borderRadius: 10,
       overflow: "hidden",
       display: "flex",
       flexDirection: "column",
+      height: "100%", // Stretch to fill container
     }}>
       <div style={{
         flex: 1,
@@ -114,18 +115,18 @@ function GalleryModule({ photos }: { photos?: string[] }) {
         }
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: 6, borderTop: "0.5px solid rgba(255,255,255,0.05)" }}>
-        <button onClick={() => setCurrent(Math.max(0, current - 1))} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.25)", cursor: "pointer", fontSize: 11 }}>{"<"}</button>
+        <button onClick={() => setCurrent(Math.max(0, current - 1))} style={{ background: "none", border: "none", color: "rgba(0,0,0,0.3)", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>{"<"}</button>
         {Array.from({ length: total }).map((_, i) => (
           <div key={i} onClick={() => setCurrent(i)} style={{
-            width: i === current ? 12 : 5,
-            height: 5,
-            borderRadius: i === current ? 2 : "50%",
-            background: i === current ? "rgba(175,169,236,0.7)" : "rgba(255,255,255,0.2)",
+            width: i === current ? 14 : 6,
+            height: 6,
+            borderRadius: i === current ? 3 : "50%",
+            background: i === current ? "rgba(90,66,130,0.8)" : "rgba(0,0,0,0.15)",
             cursor: "pointer",
             transition: "all 0.2s",
           }} />
         ))}
-        <button onClick={() => setCurrent(Math.min(total - 1, current + 1))} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.25)", cursor: "pointer", fontSize: 11 }}>{">"}</button>
+        <button onClick={() => setCurrent(Math.min(total - 1, current + 1))} style={{ background: "none", border: "none", color: "rgba(0,0,0,0.3)", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>{">"}</button>
       </div>
     </div>
   );
@@ -147,7 +148,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
       <div style={{
         padding: "12px 14px 8px",
         borderBottom: "0.5px solid rgba(255,255,255,0.07)",
-        background: "rgba(255,255,255,0.22)",
+        background: "rgba(255,255,255,0.15)",
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "space-between",
@@ -180,14 +181,14 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
       </div>
 
       {/* Grid: izquierda | galería | derecha */}
-      <div style={{ display: "grid", gridTemplateColumns: "115px 1fr 115px", gap: 10, padding: "10px 12px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "135px 1fr 135px", gap: 12, padding: "12px 14px" }}>
         {/* Columna izquierda */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <MetricModule
             label={config.topLeft.label}
             value={formatValue(getVal(config.topLeft.field), config.topLeft.format)}
             showBar
-            barWidth={Math.min(100, (getVal(config.topLeft.field) || 0) * (config.topLeft.format === "percent" ? 500 : 1))}
+            barWidth={Math.min(100, (getVal(config.topLeft.field) || 0) * (config.topLeft.format === "percent" ? 100 / (config.topLeft.barMax || 1) : 1))}
           />
           <MetricModule
             label={config.bottomLeft.label}
@@ -196,33 +197,43 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
           />
         </div>
 
-        {/* Galería central + Informe de Asset */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {/* Galería central */}
+        <div style={{ display: "flex" }}>
           <GalleryModule photos={asset.photo_urls} />
-          
-          <div style={{
-            background: "rgba(255,255,255,0.45)",
-            border: "0.5px solid rgba(0,0,0,0.08)",
-            borderRadius: 10,
-            padding: "12px 14px",
-            flex: 1
-          }}>
-            <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em", marginBottom: 6 }}>Informe de Asset</div>
-            <div style={{ fontSize: 12, color: "#2D2E35", lineHeight: 1.5, fontWeight: 500 }}>
-              Propiedad en ubicación estratégica con alto potencial de revalorización tras reforma. 
-              Estimación de CapEx optimizada con proveedores locales y pipeline de salida corto. 
-              {asset.descripcion && <div style={{ marginTop: 8 }}>{asset.descripcion}</div>}
-            </div>
-          </div>
         </div>
 
         {/* Columna derecha */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <GScoreRing score={asset.g_score || 0} />
           <MetricModule
             label={config.bottomRight.label}
             value={formatValue(getVal(config.bottomRight.field), config.bottomRight.format)}
           />
+        </div>
+
+        {/* Informe de Asset (Ancho total) */}
+        <div style={{ 
+          gridColumn: "1 / -1", 
+          marginTop: 6,
+          background: "rgba(255,255,255,0.30)",
+          border: "0.5px solid rgba(0,0,0,0.12)",
+          borderRadius: 12,
+          padding: "14px 18px",
+          width: "calc(100% + 12px)", // 20% más ancha visualmente (simulado con offset)
+          marginLeft: -6
+        }}>
+          <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.08em", marginBottom: 8 }}>Informe de Inversión Geoland</div>
+          <div style={{ fontSize: 13, color: "#2D2E35", lineHeight: 1.6, fontWeight: 500 }}>
+            <p style={{ marginBottom: 6 }}>
+              Activo identificado mediante algoritmos de ISV como oportunidad crítica de **Fix & Flip**. 
+              Ubicación en zona de alta demanda con ratio de absorción acelerado.
+            </p>
+            <p>
+              Estructura financiera optimizada: Precio de adquisición {formatValue(asset.precio_usd, "currency")} con CapEx proyectado de {formatValue(asset.capex_estimado, "currency")}. 
+              Retorno a la inversión (ROI) del {formatValue(asset.roiTotal, "percent")} en un horizonte de salida de {asset.payback_meses || 8} meses.
+            </p>
+            {asset.descripcion && <div style={{ marginTop: 10, paddingTop: 10, borderTop: "0.5px solid rgba(0,0,0,0.06)" }}>{asset.descripcion}</div>}
+          </div>
         </div>
       </div>
 
