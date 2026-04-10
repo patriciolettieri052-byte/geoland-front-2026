@@ -3,8 +3,15 @@
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
+import { Oswald } from 'next/font/google';
 import { Typography } from '../ui/Typography';
 import { translations } from '@/lib/translations';
+ 
+const oswald = Oswald({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: 'normal',
+});
 
 export function DynamicIsvRadar() {
     const { isvV6, language } = useGeolandStore();
@@ -92,10 +99,11 @@ export function DynamicIsvRadar() {
                 </ResponsiveContainer>
             </motion.div>
 
-            <div className="absolute bottom-10 text-center bg-black/40 backdrop-blur-md border border-white/5 py-0.5 px-2.5 rounded-full">
-                <Typography variant="label" className="text-white text-[8.5px] tracking-[0.15em] font-light">
+            <div className="absolute bottom-12 flex flex-col items-center gap-2 mt-4">
+                <div className="w-10 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <span className={`${oswald.className} text-white/30 text-[9px] tracking-[0.4em] font-light uppercase`}>
                     {t.radar.investorVector}
-                </Typography>
+                </span>
             </div>
 
             {/* Tags */}
