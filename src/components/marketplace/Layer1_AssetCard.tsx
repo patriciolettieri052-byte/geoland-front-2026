@@ -114,7 +114,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     return (
         <motion.div
-            className="flex flex-row items-stretch h-[112px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-200"
+            className="flex flex-row items-stretch h-[128px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-200"
             style={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E5E7EB',
@@ -199,37 +199,37 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
             </div>
 
-            {/* DERECHA — 25%: G-Score + ROI + Confidence */}
-            <div className="flex flex-col items-center justify-center px-4 w-[25%] shrink-0 gap-2">
+            {/* DERECHA — 32%: G-Score + ROI + Confidence */}
+            <div className="flex flex-col items-center justify-center px-6 w-[32%] shrink-0 gap-4">
                 <div className="flex items-center justify-between w-full">
                     {/* G-Score Group */}
                     <div className="flex flex-col items-center flex-1">
-                        <div className="flex items-center gap-0.5 mb-1" title="G-Score">
-                            <span className="text-[8px] uppercase font-bold tracking-tight" style={{ color: '#9CA3AF' }}>G-Score</span>
-                            <HelpCircle size={8} style={{ color: '#9CA3AF' }} />
+                        <div className="flex items-center gap-1 mb-1.5" title="G-Score">
+                            <span className="text-[9px] uppercase font-bold tracking-[0.05em]" style={{ color: '#9CA3AF' }}>G-Score</span>
+                            <HelpCircle size={9} style={{ color: '#9CA3AF' }} />
                         </div>
-                        <div className={`text-[26px] font-bold num leading-none`} style={{ color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
+                        <div className="text-[32px] font-bold num leading-none" style={{ color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
                             {gScore}
                         </div>
                     </div>
 
                     {/* Fina línea sutil vertical */}
-                    <div className="w-[1px] h-8 bg-gray-100" />
+                    <div className="w-[1px] h-10 bg-gray-100 mx-2" />
 
                     {/* ROI Group */}
                     <div className="flex flex-col items-center flex-1">
-                        <span className="text-[8px] uppercase font-bold tracking-tight mb-1" style={{ color: '#9CA3AF' }}>{t.assetCard.roiEst}</span>
-                        <div className="text-[26px] font-bold leading-none num" style={{ color: '#16A34A' }}>
+                        <span className="text-[9px] uppercase font-bold tracking-[0.05em] mb-1.5" style={{ color: '#9CA3AF' }}>{t.assetCard.roiEst}</span>
+                        <div className="text-[32px] font-bold leading-none num" style={{ color: '#16A34A' }}>
                             {(expectedIrr * 100).toFixed(1)}%
                         </div>
                     </div>
                 </div>
 
-                {/* Confidence Badge - Ocupando el mismo ancho que la suma de G-score+ROI */}
+                {/* Confidence Badge - Premium Pill */}
                 {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
-                    <div className={`w-full flex items-center justify-center gap-1.5 border-2 rounded-full py-0.5 ${getGScoreBorderColor((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))} text-slate-800`}>
-                        <span className="text-[8px] uppercase font-bold tracking-tight opacity-80">{t.assetCard.confidence}</span>
-                        <span className="text-[11px] font-bold num">
+                    <div className={`w-full flex items-center justify-center gap-2 border-2 rounded-full py-1.5 px-4 ${getGScoreBorderColor((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))} transition-all`} style={{ backgroundColor: 'rgba(255,255,255,0.5)' }}>
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">{t.assetCard.confidence}</span>
+                        <span className="text-[13px] font-extrabold num text-slate-800">
                             {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                         </span>
                     </div>
