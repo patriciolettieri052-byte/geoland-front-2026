@@ -30,7 +30,7 @@ function MetricModule({ label, value, sub, showBar, barWidth }: {
 }) {
   return (
     <div style={{
-      background: "rgba(255,255,255,0.05)",
+      background: "rgba(255,255,255,0.25)",
       border: "0.5px solid rgba(255,255,255,0.09)",
       borderRadius: 10,
       padding: "10px 12px",
@@ -61,7 +61,7 @@ function GScoreRing({ score }: { score: number }) {
   const dash = (score / 100) * circ;
   return (
     <div style={{
-      background: "rgba(255,255,255,0.05)",
+      background: "rgba(255,255,255,0.25)",
       border: "0.5px solid rgba(255,255,255,0.09)",
       borderRadius: 10,
       padding: "10px 12px",
@@ -92,7 +92,7 @@ function GalleryModule({ photos }: { photos?: string[] }) {
   const total = photos?.length || 4;
   return (
     <div style={{
-      background: "rgba(255,255,255,0.04)",
+      background: "rgba(255,255,255,0.24)",
       border: "0.5px solid rgba(255,255,255,0.08)",
       borderRadius: 10,
       overflow: "hidden",
@@ -147,7 +147,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
       <div style={{
         padding: "12px 14px 8px",
         borderBottom: "0.5px solid rgba(255,255,255,0.07)",
-        background: "rgba(255,255,255,0.02)",
+        background: "rgba(255,255,255,0.22)",
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "space-between",

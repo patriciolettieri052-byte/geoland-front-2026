@@ -135,7 +135,7 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
             const s = SEVERITY_STYLES[r.severity];
             return (
               <div key={i} style={{
-                background: "rgba(226,75,74,0.05)",
+                background: "rgba(226,75,74,0.25)",
                 border: `0.5px solid rgba(226,75,74,0.15)`,
                 borderRadius: 7,
                 padding: "7px 10px",

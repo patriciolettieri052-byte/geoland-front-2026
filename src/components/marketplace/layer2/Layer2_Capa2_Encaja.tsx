@@ -11,7 +11,7 @@ function CheckItem({ label, status }: { label: string; status: "ok" | "warn" | "
   const s = STATUS_STYLES[status];
   return (
     <div style={{
-      background: "rgba(255,255,255,0.04)",
+      background: "rgba(255,255,255,0.24)",
       border: "0.5px solid rgba(255,255,255,0.07)",
       borderRadius: 7,
       padding: "6px 9px",

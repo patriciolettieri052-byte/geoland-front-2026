@@ -94,7 +94,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     return (
         <motion.div
-            className="flex flex-row items-stretch h-[110px] bg-white/70 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg hover:bg-white/95"
+            className="flex flex-row items-stretch h-[110px] bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg hover:bg-white/15"
             onClick={() => onClick(asset.id)}
             whileHover={{ scale: 1.015, y: -2 }}
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
@@ -114,15 +114,15 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div className="absolute top-2 right-2 flex gap-1">
                     <button
                         onClick={(e) => e.stopPropagation()}
-                        className="w-6 h-6 flex items-center justify-center bg-white/80 backdrop-blur rounded-full hover:bg-white transition-colors"
+                        className="w-6 h-6 flex items-center justify-center bg-white/20 backdrop-blur rounded-full hover:bg-white transition-colors"
                     >
-                        <Bell size={10} className="text-black/60" />
+                        <Bell size={10} className="text-white" />
                     </button>
                     <button
                         onClick={(e) => e.stopPropagation()}
-                        className="w-6 h-6 flex items-center justify-center bg-white/80 backdrop-blur rounded-full hover:bg-white transition-colors"
+                        className="w-6 h-6 flex items-center justify-center bg-white/20 backdrop-blur rounded-full hover:bg-white transition-colors"
                     >
-                        <Heart size={10} className="text-black/60" />
+                        <Heart size={10} className="text-white" />
                     </button>
                 </div>
 
@@ -134,26 +134,26 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
             </div>
 
-            <div className="flex flex-col justify-center px-4 w-[47%] shrink-0 border-r border-black/6">
-                <p className="text-[9px] text-gray-400 uppercase tracking-[0.15em] font-normal mb-0.5">
+            <div className="flex flex-col justify-center px-4 w-[47%] shrink-0 border-r border-white/10">
+                <p className="text-[9px] text-white uppercase tracking-[0.15em] font-bold mb-0.5">
                     {asset.location}
                 </p>
 
-                <p className="text-[13px] font-normal text-[#6b6b8d] leading-tight mb-1 truncate">
+                <p className="text-[13px] font-bold text-white leading-tight mb-1 truncate">
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
 
                 {(asset as any).assetType && (
                     <div className="mb-2">
-                        <span className="inline-block bg-[#6b6b8d]/10 text-[#6b6b8d] text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-normal">
+                        <span className="inline-block bg-white/5 text-white text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">
                             {(asset as any).assetType}
                         </span>
                     </div>
                 )}
 
                 <div>
-                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-normal">Precio</p>
-                    <p className="text-[12px] font-bold text-[#6b6b8d]">{formatPrecio(precio)}</p>
+                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">Precio</p>
+                    <p className="text-[12px] font-bold text-white">{formatPrecio(precio)}</p>
                 </div>
 
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
@@ -194,16 +194,16 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
 
                 <div className="text-right">
-                    <p className="text-[8px] text-gray-400 uppercase tracking-widest font-normal">ROI Est.</p>
-                    <p className="text-[15px] font-normal text-[#7BA99D] leading-tight">
+                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">ROI Est.</p>
+                    <p className="text-[15px] font-bold text-[#7BA99D] leading-tight">
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>
 
                 {/* NUEVO: Cap Rate */}
                 {(asset as any).capRate !== undefined && (
-                    <div className="text-right border-t border-[#6b6b8d]/10 pt-1 w-full mt-0.5">
-                        <p className="text-[9px] text-[#6b6b8d]/80 font-normal">
+                    <div className="text-right border-t border-white/10 pt-1 w-full mt-0.5">
+                        <p className="text-[9px] text-white font-bold">
                             Cap Rate {((asset as any).capRate * 100).toFixed(1)}%
                         </p>
                     </div>
