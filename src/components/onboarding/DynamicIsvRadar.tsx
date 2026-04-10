@@ -93,7 +93,7 @@ export function DynamicIsvRadar() {
             </motion.div>
 
             <div className="absolute bottom-10 text-center bg-black/40 backdrop-blur-md border border-white/5 py-0.5 px-2.5 rounded-full">
-                <Typography variant="label" className="text-white text-[3.5px] tracking-[0.15em] font-light uppercase">
+                <Typography variant="label" className="text-white text-[8.5px] tracking-[0.15em] font-light uppercase">
                     {t.radar.investorVector}
                 </Typography>
             </div>
