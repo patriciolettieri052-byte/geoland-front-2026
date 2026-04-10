@@ -3,6 +3,8 @@
 import { Asset } from '@/lib/mockEngine';
 import { motion } from 'framer-motion';
 import { Bell, Heart } from 'lucide-react';
+import { useGeolandStore } from '@/store/useGeolandStore';
+import { translations } from '@/lib/translations';
 
 const STRATEGY_LABELS: Record<string, string> = {
     'FIX_AND_FLIP':             'Fix & Flip',
@@ -74,6 +76,9 @@ interface Layer1AssetCardProps {
 }
 
 export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) {
+    const { language } = useGeolandStore();
+    const t = translations[language];
+
     const layer1 = asset?.layer1 || {};
     const layer2 = asset?.layer2 || { metrics: { baseCapex: 0 } };
     
@@ -107,7 +112,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 />
                 {badge && (
                     <div className={`absolute top-2 left-2 text-[9px] font-medium px-2 py-0.5 rounded tracking-widest uppercase shadow-md ${badge.className}`}>
-                        {badge.label}
+                        {t.header.rank[badge.label as keyof typeof t.header.rank] || badge.label}
                     </div>
                 )}
 
@@ -152,7 +157,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
 
                 <div>
-                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">Precio</p>
+                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">{t.assetCard.price}</p>
                     <p className="text-[12px] font-bold text-white">{formatPrecio(precio)}</p>
                 </div>
 
@@ -185,7 +190,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                             ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 80 ? 'border-[#7BA99D]/50 text-[#618E84]' :
                             ((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)) >= 50 ? 'border-amber-500/50 text-amber-600' : 'border-rose-500/50 text-rose-600'
                         }`}>
-                            <span className="text-[7px] uppercase tracking-tighter opacity-70">Confidence</span>
+                            <span className="text-[7px] uppercase tracking-tighter opacity-70">{t.assetCard.confidence}</span>
                             <span className="text-[9px] font-normal">
                                 {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                             </span>
@@ -194,7 +199,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
 
                 <div className="text-right">
-                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">ROI Est.</p>
+                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">{t.assetCard.roiEst}</p>
                     <p className="text-[15px] font-bold text-[#7BA99D] leading-tight">
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
@@ -204,7 +209,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 {(asset as any).capRate !== undefined && (
                     <div className="text-right border-t border-white/10 pt-1 w-full mt-0.5">
                         <p className="text-[9px] text-white font-bold">
-                            Cap Rate {((asset as any).capRate * 100).toFixed(1)}%
+                            {t.assetCard.capRate} {((asset as any).capRate * 100).toFixed(1)}%
                         </p>
                     </div>
                 )}

@@ -4,9 +4,11 @@ import { useGeolandStore } from '@/store/useGeolandStore';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 import { Typography } from '../ui/Typography';
+import { translations } from '@/lib/translations';
 
 export function DynamicIsvRadar() {
-    const { isvV6 } = useGeolandStore();
+    const { isvV6, language } = useGeolandStore();
+    const t = translations[language];
 
     // Strategy score desde cluster length
     const strategyScore = (() => {
@@ -35,11 +37,11 @@ export function DynamicIsvRadar() {
         val && map[val] !== undefined ? map[val] : 10;
 
     const data = [
-        { subject: 'Strategy', A: strategyScore,                                  fullMark: 100 },
-        { subject: 'Horizon',  A: mapVal(isvV6.time_horizon, HORIZON_MAP),        fullMark: 100 },
-        { subject: 'Involve',  A: mapVal(isvV6.effort_level, EFFORT_MAP),         fullMark: 100 },
-        { subject: 'Risk',     A: mapVal(isvV6.decision_tradeoff, TRADEOFF_MAP),  fullMark: 100 },
-        { subject: 'Budget',   A: budgetScore,                                    fullMark: 100 },
+        { subject: t.radar.strategy, A: strategyScore,                                  fullMark: 100 },
+        { subject: t.radar.horizon,  A: mapVal(isvV6.time_horizon, HORIZON_MAP),        fullMark: 100 },
+        { subject: t.radar.involve,  A: mapVal(isvV6.effort_level, EFFORT_MAP),         fullMark: 100 },
+        { subject: t.radar.risk,     A: mapVal(isvV6.decision_tradeoff, TRADEOFF_MAP),  fullMark: 100 },
+        { subject: t.radar.budget,   A: budgetScore,                                    fullMark: 100 },
     ];
 
     const cs = isvV6.confidence_score ?? 0;
@@ -52,7 +54,7 @@ export function DynamicIsvRadar() {
             {isvV6.user_name && (
                 <div className="absolute top-4 text-center w-full z-10">
                     <Typography variant="label" className="text-white/50 text-xs tracking-widest uppercase">
-                        Perfil de {isvV6.user_name}
+                        {t.radar.userProfile.replace('{{name}}', isvV6.user_name)}
                     </Typography>
                 </div>
             )}
@@ -91,8 +93,8 @@ export function DynamicIsvRadar() {
             </motion.div>
 
             <div className="absolute bottom-10 text-center bg-black/40 backdrop-blur-md border border-white/5 py-0.5 px-2.5 rounded-full">
-                <Typography variant="label" className="text-white text-[5.5px] tracking-[0.15em] font-light uppercase">
-                    Investor Strategy Vector
+                <Typography variant="label" className="text-white text-[3.5px] tracking-[0.15em] font-light uppercase">
+                    {t.radar.investorVector}
                 </Typography>
             </div>
 
@@ -105,7 +107,7 @@ export function DynamicIsvRadar() {
                 )}
                 {isvV6.effort_level && (
                     <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
-                        {isvV6.effort_level === 'low' ? 'Pasivo' : isvV6.effort_level === 'medium' ? 'Semi-activo' : 'Activo'}
+                        {isvV6.effort_level === 'low' ? t.radar.passive : isvV6.effort_level === 'medium' ? t.radar.semiActive : t.radar.active}
                     </span>
                 )}
                 {isvV6.budget?.currency && isvV6.budget?.amount_max && (
@@ -115,12 +117,12 @@ export function DynamicIsvRadar() {
                 )}
                 {isvV6.time_horizon && (
                     <span className="text-xs bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10">
-                        {isvV6.time_horizon === 'short' ? 'Corto plazo' : isvV6.time_horizon === 'medium' ? 'Medio plazo' : 'Largo plazo'}
+                        {isvV6.time_horizon === 'short' ? t.radar.short : isvV6.time_horizon === 'medium' ? t.radar.medium : t.radar.long}
                     </span>
                 )}
                 {isvV6.confirmed_by_user && (
                     <span className="text-xs bg-emerald-900/50 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-400/30">
-                        ✓ Perfil confirmado
+                        {t.radar.confirmed}
                     </span>
                 )}
             </div>

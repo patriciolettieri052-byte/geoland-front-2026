@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, User } from 'lucide-react';
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { GlassCard } from '../ui/GlassCard';
+import { translations } from '@/lib/translations';
 
 export function AiChatProfiler() {
     const {
@@ -26,7 +27,10 @@ export function AiChatProfiler() {
         contradictionDetected,
         currentState,
         triggerTestMode,
+        language,
     } = useGeolandStore();
+
+    const t = translations[language];
 
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +59,7 @@ export function AiChatProfiler() {
         if (messages.length === 0) {
             setMessages(() => [{
                 role: 'assistant',
-                content: 'Hola.\n\nVoy a ayudarte a encontrar oportunidades de inversión.\n\nPara empezar, puedes contarme en una frase qué estás buscando o qué te gustaría hacer con tu inversión.'
+                content: t.chat.welcome
             }]);
         }
     }, [messages.length, setMessages]);
@@ -70,7 +74,7 @@ export function AiChatProfiler() {
             // Directly inject exact text strictly when loader is finishing
             setTimeout(() => {
                 if (isMounted) {
-                    setMessages((prev) => [...prev, { role: 'assistant', content: '¿Estás de acuerdo con mi selección o te gustaría analizar otros?' }]);
+                    setMessages((prev) => [...prev, { role: 'assistant', content: t.chat.refineQuestion }]);
                 }
             }, 6000); // Timer to match the duration of TheOracleLoader
         }
@@ -201,7 +205,7 @@ export function AiChatProfiler() {
 
         } catch (error) {
             console.error('Send message failed', error);
-            setMessages((prev) => [...prev, { role: 'assistant', content: 'Connection to global index failed. Please retry.' }]);
+            setMessages((prev) => [...prev, { role: 'assistant', content: t.chat.errorRetry }]);
         } finally {
             setIsLoading(false);
         }
@@ -214,7 +218,7 @@ export function AiChatProfiler() {
             {currentState === 'ACTIVE_SUPPORT' && (
                 <div className="flex justify-end pb-2">
                     <span className="text-xs bg-blue-500/20 text-blue-300 border border-blue-400/20 px-2 py-1 rounded-full">
-                        Copiloto activo
+                        {t.chat.supportActive}
                     </span>
                 </div>
             )}
@@ -262,7 +266,7 @@ export function AiChatProfiler() {
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-yellow-400/10 border border-yellow-400/30 text-yellow-300 text-xs px-4 py-2 rounded-xl mb-2"
                     >
-                        ⚠️ El agente detectó una posible contradicción — revisá su respuesta
+                        {t.chat.contradiction}
                     </motion.div>
                 )}
 
@@ -273,7 +277,7 @@ export function AiChatProfiler() {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Introduce your investment criteria..."
+                        placeholder={t.chat.placeholder}
                         disabled={isLoading}
                         ref={inputRef}
                         autoFocus

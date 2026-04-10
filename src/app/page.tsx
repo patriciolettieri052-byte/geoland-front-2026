@@ -11,6 +11,8 @@ import { Layer2Container } from '@/components/marketplace/Layer2Container';
 import { Asset } from '@/lib/mockEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '@/components/ui/Typography';
+import { Settings, HelpCircle, Info, User, Star, Bell, BarChart3, CreditCard, LogOut, ChevronRight } from 'lucide-react';
+import { translations } from '@/lib/translations';
 
 const oswald = Oswald({
   subsets: ['latin'],
@@ -31,9 +33,15 @@ export default function GeolandOS() {
     isRefining,
     setIsRefining,
     chatHistory,  // Requerido para ChatSidebar
+    language,
+    setLanguage
   } = useGeolandStore();
 
+  const t = translations[language];
+
   const [error, setError] = useState<string | null>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showGearMenu, setShowGearMenu] = useState(false);
 
   // Lógica existente de fetchMatch (sin cambios)
   useEffect(() => {
@@ -154,15 +162,104 @@ export default function GeolandOS() {
         <div className="absolute inset-0 bg-black/25" />
 
         {/* Header — Logo */}
-        <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-30">
+        <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-50">
           <div className="flex items-end gap-6">
             <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
             <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block`}>
-              The Infrastructure for Global Real Estate Investment Decisions
+              {t.header.infraText}
             </span>
           </div>
-          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-medium text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all">
-            P
+          
+          <div className="flex items-center gap-4 relative">
+            {/* Language Selector */}
+            <div className="flex items-center gap-3 mr-2 bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 border border-white/10">
+              {(['es', 'en', 'pt'] as const).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`text-[10px] font-bold tracking-widest uppercase transition-all hover:text-white ${language === lang ? 'text-white scale-110' : 'text-white/40'}`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+
+            {/* Gear Button */}
+            <div className="relative">
+              <button
+                onClick={() => { setShowGearMenu(!showGearMenu); setShowProfileMenu(false); }}
+                className={`flex items-center justify-center w-9 h-9 rounded-full bg-white/5 text-white/70 shadow-xl border border-white/10 cursor-pointer hover:bg-white/10 hover:text-white transition-all ${showGearMenu ? 'bg-white/10 text-white' : ''}`}
+              >
+                <Settings size={18} />
+              </button>
+
+              <AnimatePresence>
+                {showGearMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 5, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 p-1.5"
+                  >
+                    {[
+                      { icon: HelpCircle, label: t.menus.gear.help },
+                      { icon: Info, label: t.menus.gear.whatIsGeoland }
+                    ].map((item, i) => (
+                      <button
+                        key={i}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all group"
+                        onClick={() => setShowGearMenu(false)}
+                      >
+                        <item.icon size={14} className="group-hover:text-[#5a4282]" />
+                        <span className="font-medium">{item.label}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Profile Button */}
+            <div className="relative">
+              <div 
+                onClick={() => { setShowProfileMenu(!showProfileMenu); setShowGearMenu(false); }}
+                className={`flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-bold text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all ${showProfileMenu ? 'ring-2 ring-white/50' : ''}`}
+              >
+                P
+              </div>
+
+              <AnimatePresence>
+                {showProfileMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 5, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 p-1.5"
+                  >
+                    {[
+                      { icon: BarChart3, label: t.menus.profile.myBureau },
+                      { icon: Star, label: t.menus.profile.myFavorites },
+                      { icon: Bell, label: t.menus.profile.myAlerts },
+                      { icon: Info, label: t.menus.profile.usage },
+                      { icon: CreditCard, label: t.menus.profile.subscription },
+                      { icon: LogOut, label: t.menus.profile.logout, danger: true }
+                    ].map((item, i) => (
+                      <button
+                        key={i}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all group ${item.danger ? 'text-red-400 hover:bg-red-500/10' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
+                        onClick={() => setShowProfileMenu(false)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <item.icon size={14} className={item.danger ? '' : 'group-hover:text-[#5a4282]'} />
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        <ChevronRight size={12} className="opacity-0 group-hover:opacity-40 transition-opacity" />
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
 
@@ -227,9 +324,9 @@ export default function GeolandOS() {
                   style={{ scrollbarWidth: 'none' }}
                 >
                   <div className="text-center mb-8 shrink-0">
-                    <Typography variant="p" className="mb-0.5 font-bold text-[13.5px] text-white">Matched Opportunities</Typography>
+                    <Typography variant="p" className="mb-0.5 font-bold text-[13.5px] text-white">{t.header.matchedOpportunities}</Typography>
                     <Typography variant="p" className="text-[11px] text-white/50">
-                      {filteredAssets.length} Assets matching strategy.
+                      {t.header.assetsMatching.replace('{{count}}', filteredAssets.length.toString())}
                     </Typography>
                   </div>
 
@@ -250,9 +347,9 @@ export default function GeolandOS() {
 
                             {filteredAssets.length === 0 && (
                               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center opacity-70">
-                                <Typography variant="h4" className="text-white/80">Sin coincidencias estrictas</Typography>
+                                <Typography variant="h4" className="text-white/80">{t.header.noMatches}</Typography>
                                 <Typography variant="p" className="max-w-xs mt-4 leading-relaxed text-sm text-white/50">
-                                  Tus filtros duros (Ubicación, Tipo) son restrictivos para el mock actual.
+                                  {t.header.filterWarning}
                                 </Typography>
                               </motion.div>
                             )}

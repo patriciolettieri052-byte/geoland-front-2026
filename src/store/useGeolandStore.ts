@@ -213,6 +213,10 @@ export interface GeolandState {
     // 6. Layer 2 Scroll Persistence
     scrollPosition: Record<string, number>;
     setScrollPosition: (assetId: string, scrollTop: number) => void;
+
+    // 7. Internationalization
+    language: 'es' | 'en' | 'pt';
+    setLanguage: (lang: 'es' | 'en' | 'pt') => void;
 }
 
 const initialFiltrosDuros: FiltrosDuros = {
@@ -402,4 +406,8 @@ export const useGeolandStore = create<GeolandState>((set) => ({
             [assetId]: scrollTop
         }
     })),
+
+    // 7. Internationalization
+    language: 'es',
+    setLanguage: (language) => set({ language }),
 }));
