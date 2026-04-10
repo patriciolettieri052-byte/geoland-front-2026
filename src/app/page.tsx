@@ -92,11 +92,29 @@ export default function GeolandOS() {
       const seed = id.length + (filtrosBlandosIsv.estrategiaObjetivo?.length || 0) + (iterandoResultados ? 1 : 0);
       const mockGScore = 80 + (seed % 18);
       const aqs = a.layer1?.gScore || a.aqs_score || mockGScore;
+      
+      // Inject Fix & Flip mockup data for demo
       return {
         ...a,
         id,
+        estrategia: "FIX_FLIP",
+        nombre: "Casa Histórica - Abasto",
+        ciudad: "Buenos Aires",
+        precio_usd: 145000,
+        capex_estimado: 45000,
+        arv_estimado: 265000,
+        roiTotal: 0.38,
+        irr_equivalente: 0.245,
+        risk_score: 32,
+        photo_urls: [
+          "/renovation_5_facade_1775780438213.png",
+          "/renovation_1_living_room_1775780380158.png",
+          "/renovation_2_kitchen_1775780394880.png",
+          "/renovation_3_bedroom_1775780410141.png",
+          "/renovation_4_bathroom_1775780423874.png"
+        ],
         layer1: { ...(a.layer1 || {}), gScore: aqs },
-        layer2: a.layer2 || { metrics: { baseCapex: 0 } }
+        layer2: a.layer2 || { metrics: { baseCapex: 145000 } }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
   }, [assets, perfilCompletado, isRefining, iterandoResultados, filtrosBlandosIsv]);
@@ -136,13 +154,13 @@ export default function GeolandOS() {
         {/* CONTENEDOR PRINCIPAL — Glass Container */}
         <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10">
 
-          {/* Left: Chat Profiler (30%) — Permanente */}
-          <div className="w-full md:w-[30%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
+          {/* Left: Chat Profiler (16%) — Permanente */}
+          <div className="w-full md:w-[16%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
             <AiChatProfiler />
           </div>
 
-          {/* Right: Radar/Grid/Layer2 (70%) */}
-          <div className="w-full md:w-[70%] h-full relative overflow-hidden bg-white/5">
+          {/* Right: Radar/Grid/Layer2 (84%) */}
+          <div className="w-full md:w-[84%] h-full relative overflow-hidden bg-white/5">
             <AnimatePresence mode="wait">
               {activeAsset ? (
                 /* LAYER 2 */
@@ -194,8 +212,8 @@ export default function GeolandOS() {
                   style={{ scrollbarWidth: 'none' }}
                 >
                   <div className="text-center mb-8 shrink-0">
-                    <Typography variant="p" className="mb-1 font-medium text-[11px] tracking-[0.2em] uppercase text-white/70">Matched Opportunities</Typography>
-                    <Typography variant="p" className="text-[11px] text-white/60">
+                    <Typography variant="p" className="mb-0.5 font-bold text-[13.5px] text-white">Matched Opportunities</Typography>
+                    <Typography variant="p" className="text-[11px] text-white/50">
                       {filteredAssets.length} Assets matching strategy.
                     </Typography>
                   </div>

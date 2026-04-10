@@ -11,15 +11,16 @@ function CheckItem({ label, status }: { label: string; status: "ok" | "warn" | "
   const s = STATUS_STYLES[status];
   return (
     <div style={{
-      background: "rgba(255,255,255,0.24)",
-      border: "0.5px solid rgba(255,255,255,0.07)",
+      background: "rgba(255,255,255,0.44)",
+      border: "0.5px solid rgba(0,0,0,0.1)",
       borderRadius: 7,
       padding: "6px 9px",
       display: "flex",
       alignItems: "center",
       gap: 6,
       fontSize: 10,
-      color: "rgba(255,255,255,0.6)",
+      color: "#2D2E35",
+      fontWeight: 600,
     }}>
       <div style={{
         width: 14, height: 14, borderRadius: "50%",
@@ -54,7 +55,7 @@ export default function Layer2Capa2Encaja({ asset }: { asset: AssetMatchItem }) 
     <div style={{ padding: "12px 12px 10px", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
         <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(29,158,117,0.5)" }} />
-        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
           Cuándo encaja
         </span>
       </div>

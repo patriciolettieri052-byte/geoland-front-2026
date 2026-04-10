@@ -125,8 +125,8 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
       {/* Capa 4: Riesgos */}
       <div style={{ padding: "12px 12px 10px", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-          <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(226,75,74,0.5)" }} />
-          <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(226,75,74,0.8)" }} />
+          <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
             Riesgos &amp; red flags
           </span>
         </div>
@@ -135,21 +135,22 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
             const s = SEVERITY_STYLES[r.severity];
             return (
               <div key={i} style={{
-                background: "rgba(226,75,74,0.25)",
-                border: `0.5px solid rgba(226,75,74,0.15)`,
+                background: "rgba(226,75,74,0.45)",
+                border: `0.5px solid rgba(226,75,74,0.25)`,
                 borderRadius: 7,
                 padding: "7px 10px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
               }}>
-                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.6)" }}>{r.label}</span>
+                <span style={{ fontSize: 11, color: "#2D2E35", fontWeight: 700 }}>{r.label}</span>
                 <span style={{
                   fontSize: 8,
                   padding: "2px 7px",
                   borderRadius: 8,
                   background: s.bg,
-                  color: s.color,
+                  color: "#2D2E35",
+                  fontWeight: 800,
                   border: `0.5px solid ${s.border}`,
                   flexShrink: 0,
                   marginLeft: 8,
@@ -167,15 +168,17 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
         <button
           onClick={() => onRequestLayer3 ? onRequestLayer3(asset.id) : console.log("Layer 3 requested for:", asset.id)}
           style={{
-            background: "rgba(127,119,221,0.12)",
-            border: "0.5px solid rgba(127,119,221,0.35)",
-            color: "#AFA9EC",
-            fontSize: 11,
-            padding: "9px 20px",
+            background: "rgba(255,255,255,0.45)",
+            border: "0.5px solid rgba(0,0,0,0.15)",
+            color: "#2D2E35",
+            fontSize: 12,
+            padding: "10px 20px",
             borderRadius: 8,
             cursor: "pointer",
+            fontWeight: 800,
             letterSpacing: "0.02em",
             width: "100%",
+            transition: "all 0.2s",
           }}
         >
           Generar reporte completo (Layer 3) →

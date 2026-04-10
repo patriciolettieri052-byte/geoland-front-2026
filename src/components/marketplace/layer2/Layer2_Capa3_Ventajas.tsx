@@ -17,13 +17,13 @@ function AdvCard({ title, value, description, barPercent, color }: {
       borderRadius: 8,
       padding: "9px 11px",
     }}>
-      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3 }}>
+      <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3, fontWeight: 700 }}>
         {title}
       </div>
-      <div style={{ fontSize: 18, fontWeight: 500, color: color === "green" ? "#5DCAA5" : color === "purple" ? "#AFA9EC" : "#EF9F27" }}>
+      <div style={{ fontSize: 18, fontWeight: 700, color: color === "green" ? "#1D9E75" : color === "purple" ? "#5A4282" : "#B1720C" }}>
         {value}
       </div>
-      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>{description}</div>
+      <div style={{ fontSize: 10, color: "rgba(0,0,0,0.45)", marginTop: 2, fontWeight: 500 }}>{description}</div>
       <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
         <div style={{ height: "100%", width: `${barPercent}%`, background: BAR_COLORS[color], borderRadius: 2 }} />
       </div>
@@ -50,7 +50,7 @@ export default function Layer2Capa3Ventajas({ asset }: { asset: AssetMatchItem }
     <div style={{ padding: "12px 12px 10px", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
         <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(186,117,23,0.5)" }} />
-        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
           Ventajas estructurales
         </span>
       </div>

@@ -22,9 +22,9 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
       <div
         className="sticky top-0 z-10 flex items-center gap-2 px-3 py-2"
         style={{
-          background: "rgba(0,0,0,0.25)",
-          backdropFilter: "blur(8px)",
-          borderBottom: "0.5px solid rgba(255,255,255,0.07)",
+          background: "rgba(255,255,255,0.8)",
+          backdropFilter: "blur(12px)",
+          borderBottom: "0.5px solid rgba(0,0,0,0.08)",
         }}
       >
         <button
@@ -32,7 +32,8 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
           style={{
             background: "none",
             border: "none",
-            color: "rgba(255,255,255,0.4)",
+            color: "#2D2E35",
+            fontWeight: 700,
             fontSize: 11,
             cursor: "pointer",
             display: "flex",
@@ -42,8 +43,8 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
         >
           ← Volver
         </button>
-        <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 11 }}>|</span>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <span style={{ color: "rgba(0,0,0,0.2)", fontSize: 11 }}>|</span>
+        <span style={{ fontSize: 11, color: "#2D2E35", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {asset.nombre || asset.location}
         </span>
       </div>

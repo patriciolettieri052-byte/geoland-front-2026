@@ -30,18 +30,18 @@ function MetricModule({ label, value, sub, showBar, barWidth }: {
 }) {
   return (
     <div style={{
-      background: "rgba(255,255,255,0.25)",
-      border: "0.5px solid rgba(255,255,255,0.09)",
+      background: "rgba(255,255,255,0.44)",
+      border: "0.5px solid rgba(0,0,0,0.08)",
       borderRadius: 10,
       padding: "10px 12px",
       display: "flex",
       flexDirection: "column",
       gap: 3,
     }}>
-      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+      <div style={{ fontSize: 9, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.07em" }}>
         {label}
       </div>
-      <div style={{ fontSize: 19, fontWeight: 500, color: "#e8e6f0", lineHeight: 1 }}>
+      <div style={{ fontSize: 19, fontWeight: 700, color: "#2D2E35", lineHeight: 1 }}>
         {value}
       </div>
       {sub && <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)" }}>{sub}</div>}
@@ -61,25 +61,25 @@ function GScoreRing({ score }: { score: number }) {
   const dash = (score / 100) * circ;
   return (
     <div style={{
-      background: "rgba(255,255,255,0.25)",
-      border: "0.5px solid rgba(255,255,255,0.09)",
+      background: "rgba(255,255,255,0.44)",
+      border: "0.5px solid rgba(0,0,0,0.08)",
       borderRadius: 10,
       padding: "10px 12px",
       display: "flex",
       flexDirection: "column",
       gap: 3,
     }}>
-      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "0.07em" }}>G-Score</div>
+      <div style={{ fontSize: 9, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.07em" }}>G-Score</div>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <svg width="32" height="32" viewBox="0 0 32 32">
-          <circle cx="16" cy="16" r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="3" />
-          <circle cx="16" cy="16" r={r} fill="none" stroke="rgba(127,119,221,0.7)"
+          <circle cx="16" cy="16" r={r} fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="3" />
+          <circle cx="16" cy="16" r={r} fill="none" stroke="rgba(127,119,221,0.8)"
             strokeWidth="3" strokeDasharray={`${dash} ${circ}`}
             strokeDashoffset={circ * 0.25} strokeLinecap="round" />
         </svg>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 500, color: "#AFA9EC" }}>{Math.round(score)}</div>
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)" }}>/100</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#2D2E35" }}>{Math.round(score)}</div>
+          <div style={{ fontSize: 9, color: "rgba(0,0,0,0.4)" }}>/100</div>
         </div>
       </div>
     </div>
@@ -92,8 +92,8 @@ function GalleryModule({ photos }: { photos?: string[] }) {
   const total = photos?.length || 4;
   return (
     <div style={{
-      background: "rgba(255,255,255,0.24)",
-      border: "0.5px solid rgba(255,255,255,0.08)",
+      background: "rgba(255,255,255,0.44)",
+      border: "0.5px solid rgba(0,0,0,0.1)",
       borderRadius: 10,
       overflow: "hidden",
       display: "flex",
@@ -154,34 +154,35 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
         gap: 12,
       }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 500, color: "#e8e6f0", marginBottom: 2 }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#2D2E35", marginBottom: 2 }}>
             {asset.nombre || asset.ciudad || "Activo sin nombre"}
           </div>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)" }}>
+          <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", fontWeight: 500 }}>
             {asset.ciudad} · {asset.pais || ""} · ID: {asset.id?.slice(0, 8)}
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <span style={{
             background: stratColor,
-            border: `0.5px solid ${stratColor.replace("0.3", "0.5")}`,
-            color: "#e8e6f0",
+            border: `0.5px solid ${stratColor.replace("0.3", "0.6")}`,
+            color: "#2D2E35",
+            fontWeight: 700,
             fontSize: 10,
             padding: "3px 10px",
             borderRadius: 20,
           }}>
             {stratLabel}
           </span>
-          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>
+          <span style={{ fontSize: 10, color: "rgba(0,0,0,0.4)", fontWeight: 500 }}>
             {Math.round((asset.confidence_final || 0) * 100)}% fidelidad
           </span>
         </div>
       </div>
 
       {/* Grid: izquierda | galería | derecha */}
-      <div style={{ display: "grid", gridTemplateColumns: "108px 1fr 108px", gap: 8, padding: "10px 12px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "115px 1fr 115px", gap: 10, padding: "10px 12px" }}>
         {/* Columna izquierda */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <MetricModule
             label={config.topLeft.label}
             value={formatValue(getVal(config.topLeft.field), config.topLeft.format)}
@@ -195,11 +196,28 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
           />
         </div>
 
-        {/* Galería central */}
-        <GalleryModule photos={asset.photo_urls} />
+        {/* Galería central + Informe de Asset */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <GalleryModule photos={asset.photo_urls} />
+          
+          <div style={{
+            background: "rgba(255,255,255,0.45)",
+            border: "0.5px solid rgba(0,0,0,0.08)",
+            borderRadius: 10,
+            padding: "12px 14px",
+            flex: 1
+          }}>
+            <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em", marginBottom: 6 }}>Informe de Asset</div>
+            <div style={{ fontSize: 12, color: "#2D2E35", lineHeight: 1.5, fontWeight: 500 }}>
+              Propiedad en ubicación estratégica con alto potencial de revalorización tras reforma. 
+              Estimación de CapEx optimizada con proveedores locales y pipeline de salida corto. 
+              {asset.descripcion && <div style={{ marginTop: 8 }}>{asset.descripcion}</div>}
+            </div>
+          </div>
+        </div>
 
         {/* Columna derecha */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <GScoreRing score={asset.g_score || 0} />
           <MetricModule
             label={config.bottomRight.label}
@@ -208,17 +226,17 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
         </div>
       </div>
 
-      {/* Descripción */}
       <div style={{
         padding: "0 12px 10px",
-        fontSize: 10,
-        color: "rgba(255,255,255,0.35)",
+        fontSize: 11,
+        color: "#2D2E35",
+        fontWeight: 600,
         lineHeight: 1.6,
-        borderTop: "0.5px solid rgba(255,255,255,0.06)",
+        borderTop: "0.5px solid rgba(0,0,0,0.06)",
         paddingTop: 8,
       }}>
         {asset.descripcion || `Activo en ${asset.ciudad} — estrategia ${stratLabel}.`}
-        <span style={{ marginLeft: 8, color: "rgba(127,119,221,0.6)" }}>
+        <span style={{ marginLeft: 8, color: "rgba(127,119,221,0.9)", fontWeight: 700 }}>
           Confianza {Math.round((asset.confidence_final || 0) * 100)}%
         </span>
       </div>

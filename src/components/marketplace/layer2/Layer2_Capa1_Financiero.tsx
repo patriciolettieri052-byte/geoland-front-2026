@@ -26,7 +26,7 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
       {/* Header de sección */}
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
         <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(127,119,221,0.5)" }} />
-        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
           Lógica financiera · {estrategia.replace(/_/g, " ")}
         </span>
       </div>
@@ -44,15 +44,15 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
 
           return (
             <div key={i} style={{
-              background: "rgba(255,255,255,0.24)",
-              border: "0.5px solid rgba(255,255,255,0.07)",
+              background: "rgba(255,255,255,0.44)",
+              border: "0.5px solid rgba(0,0,0,0.1)",
               borderRadius: 7,
               padding: "7px 9px",
             }}>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700 }}>
                 {v.label}
               </div>
-              <div style={{ fontSize: 14, fontWeight: 500, color: valColor, marginTop: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: valColor, marginTop: 1 }}>
                 {fmt(rawVal, v.format)}
               </div>
               {v.showBar && (
