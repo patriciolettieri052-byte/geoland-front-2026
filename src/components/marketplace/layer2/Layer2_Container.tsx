@@ -16,15 +16,14 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
   return (
     <div
       className="h-full overflow-y-auto"
-      style={{ background: "transparent" }}
+      style={{ background: "#F9FAFB" }}
     >
       {/* Sticky back button */}
       <div
         className="sticky top-0 z-10 flex items-center gap-2 px-3 py-2"
         style={{
-          background: "rgba(255,255,255,0.40)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "0.5px solid rgba(0,0,0,0.12)",
+          background: "#FFFFFF",
+          borderBottom: "1px solid #E5E7EB",
         }}
       >
         <button
@@ -32,8 +31,8 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
           style={{
             background: "none",
             border: "none",
-            color: "#2D2E35",
-            fontWeight: 700,
+            color: "#1E3A5F",
+            fontWeight: 600,
             fontSize: 11,
             cursor: "pointer",
             display: "flex",
@@ -43,8 +42,8 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
         >
           ← Volver
         </button>
-        <span style={{ color: "rgba(0,0,0,0.2)", fontSize: 11 }}>|</span>
-        <span style={{ fontSize: 11, color: "#2D2E35", fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <span style={{ color: "#E5E7EB", fontSize: 11 }}>|</span>
+        <span style={{ fontSize: 11, color: "#374151", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {asset.nombre || asset.location}
         </span>
       </div>

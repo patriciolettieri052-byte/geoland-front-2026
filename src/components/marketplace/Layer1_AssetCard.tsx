@@ -114,9 +114,14 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     return (
         <motion.div
-            className="flex flex-row items-stretch h-[110px] bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-lg hover:bg-white/15"
+            className="flex flex-row items-stretch h-[112px] rounded-xl overflow-hidden cursor-pointer group transition-all duration-200"
+            style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)'
+            }}
+            whileHover={{ scale: 1.008, y: -1, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}
             onClick={() => onClick(asset.id)}
-            whileHover={{ scale: 1.015, y: -2 }}
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
         >
             {/* FOTO — 28% */}
@@ -126,7 +131,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     style={{ backgroundImage: `url(${backgroundImageUrl})` }}
                 />
                 {badge && (
-                    <div className={`absolute top-2 left-2 text-[9px] font-medium px-2 py-0.5 rounded tracking-widest uppercase shadow-md ${badge.className}`}>
+                    <div className={`absolute top-2 left-2 text-[9px] font-semibold px-2 py-0.5 rounded-md tracking-widest uppercase shadow-sm ${badge.className}`}>
                         {t.header.rank[badge.label as keyof typeof t.header.rank] || badge.label}
                     </div>
                 )}
@@ -134,15 +139,17 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div className="absolute top-2 right-2 flex gap-1">
                     <button
                         onClick={(e) => e.stopPropagation()}
-                        className="w-6 h-6 flex items-center justify-center bg-white/20 backdrop-blur rounded-full hover:bg-white transition-colors"
+                        className="w-6 h-6 flex items-center justify-center rounded-full transition-colors"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
                     >
-                        <Bell size={10} className="text-white" />
+                        <Bell size={10} style={{ color: '#374151' }} />
                     </button>
                     <button
                         onClick={(e) => e.stopPropagation()}
-                        className="w-6 h-6 flex items-center justify-center bg-white/20 backdrop-blur rounded-full hover:bg-white transition-colors"
+                        className="w-6 h-6 flex items-center justify-center rounded-full transition-colors"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
                     >
-                        <Heart size={10} className="text-white" />
+                        <Heart size={10} style={{ color: '#374151' }} />
                     </button>
                 </div>
 
@@ -154,32 +161,32 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
             </div>
 
-            <div className="flex flex-col justify-center px-4 w-[47%] shrink-0 border-r border-white/10">
-                <p className="text-[9px] text-white uppercase tracking-[0.15em] font-bold mb-0.5">
+            <div className="flex flex-col justify-center px-4 w-[47%] shrink-0" style={{ borderRight: '1px solid #F3F4F6' }}>
+                <p className="text-[9px] uppercase tracking-[0.15em] font-semibold mb-0.5" style={{ color: '#9CA3AF' }}>
                     {asset.location}
                 </p>
 
-                <p className="text-[13px] font-bold text-white leading-tight mb-1 truncate">
+                <p className="text-[13px] font-semibold leading-tight mb-1 truncate" style={{ color: '#0F1117' }}>
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
 
                 {(asset as any).assetType && (
                     <div className="mb-2">
-                        <span className="inline-block bg-white/5 text-white text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">
+                        <span className="inline-block text-[8px] px-1.5 py-0.5 rounded-md uppercase tracking-wider font-semibold" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
                             {(asset as any).assetType}
                         </span>
                     </div>
                 )}
 
                 <div>
-                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">{t.assetCard.price}</p>
-                    <p className="text-[12px] font-bold text-white">{formatPrecio(precio)}</p>
+                    <p className="text-[8px] uppercase tracking-widest font-semibold" style={{ color: '#9CA3AF' }}>{t.assetCard.price}</p>
+                    <p className="text-[12px] font-bold num" style={{ color: '#0F1117' }}>{formatPrecio(precio)}</p>
                 </div>
 
                 {(asset.strategy === 'FARMLAND' || asset.strategy === 'LIVESTOCK') && (
                     <div className="flex gap-1 mt-1.5 flex-wrap">
                         {asset.zona_agroecologica && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#7BA99D]/20 text-[#618E84] border border-[#7BA99D]/30">
+                            <span className="text-[8px] px-1.5 py-0.5 rounded-md font-medium" style={{ backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0' }}>
                                 {ZONA_LABELS[asset.zona_agroecologica]}
                             </span>
                         )}
@@ -197,13 +204,13 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div className="flex flex-col items-end gap-1.5">
                     {/* G-Score Circle */}
                     <div className="flex items-center gap-1.5" title="G-Score">
-                        <button 
-                            className="w-4 h-4 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 transition-colors"
+                        <button
+                            className="w-4 h-4 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100" style={{ backgroundColor: '#F3F4F6' }}
                             title="Desempeño general basado en IA e indicadores técnicos"
                         >
-                            <HelpCircle size={10} className="text-white/60" />
+                            <HelpCircle size={10} style={{ color: '#9CA3AF' }} />
                         </button>
-                        <div className={`w-9 h-9 flex items-center justify-center rounded-full ${getGScoreColor(gScore)} text-slate-800 font-bold text-[14px]`}>
+                        <div className={`w-9 h-9 flex items-center justify-center rounded-full ${getGScoreColor(gScore)} font-bold text-[14px] num`} style={{ color: '#1F2937' }}>
                             {gScore}
                         </div>
                     </div>
@@ -212,7 +219,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
                         <div className={`flex items-center gap-1 border-2 rounded-full px-2 py-0.5 ${getGScoreBorderColor((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))} text-slate-800`}>
                             <span className="text-[7px] uppercase font-bold tracking-tighter opacity-80">{t.assetCard.confidence}</span>
-                            <span className="text-[9px] font-bold">
+                            <span className="text-[9px] font-bold num">
                                 {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                             </span>
                         </div>
@@ -220,8 +227,8 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
 
                 <div className="text-right mt-1">
-                    <p className="text-[8px] text-white/70 uppercase tracking-widest font-bold">{t.assetCard.roiEst}</p>
-                    <p className="text-[19px] font-bold text-[#22c55e] leading-tight">
+                    <p className="text-[8px] uppercase tracking-widest font-semibold" style={{ color: '#9CA3AF' }}>{t.assetCard.roiEst}</p>
+                    <p className="text-[19px] font-bold leading-tight num" style={{ color: '#16A34A' }}>
                         {(expectedIrr * 100).toFixed(1)}%
                     </p>
                 </div>
@@ -229,7 +236,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 {/* NUEVO: Cap Rate */}
                 {(asset as any).capRate !== undefined && (
                     <div className="text-right border-t border-white/10 pt-1 w-full mt-0.5">
-                        <p className="text-[9px] text-white font-bold">
+                        <p className="text-[9px] font-semibold num" style={{ color: '#374151' }}>
                             {t.assetCard.capRate} {((asset as any).capRate * 100).toFixed(1)}%
                         </p>
                     </div>

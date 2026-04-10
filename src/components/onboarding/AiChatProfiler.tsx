@@ -217,13 +217,13 @@ export function AiChatProfiler() {
             {/* ── ACTIVE_SUPPORT badge (FRONT-ISV-EXP-04) ──────────────── */}
             {currentState === 'ACTIVE_SUPPORT' && (
                 <div className="flex justify-end pb-2">
-                    <span className="text-xs bg-blue-500/20 text-blue-300 border border-blue-400/20 px-2 py-1 rounded-full">
+                    <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
                         {t.chat.supportActive}
                     </span>
                 </div>
             )}
 
-            <div className="flex-1 overflow-y-auto space-y-6 scrollbar-hide pt-16 pb-8" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex-1 overflow-y-auto space-y-4 scrollbar-hide pt-10 pb-8" style={{ scrollbarWidth: 'none' }}>
                 <AnimatePresence initial={false}>
                     {messages.map((msg, i) => (
                         <motion.div
@@ -232,23 +232,38 @@ export function AiChatProfiler() {
                             animate={{ opacity: 1, y: 0 }}
                             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            <div className="max-w-[85%] p-[13.5px] flex gap-[13.5px] bg-white/5 border border-white/10 shadow-sm backdrop-blur-md rounded-2xl">
-                                <div className="mt-1 flex-shrink-0">
-                                    {msg.role === 'user' ? <User size={15} className="text-white/60" /> : <div className="w-[15px] h-[15px] flex items-center justify-center bg-white/20 text-white font-bold text-[8.5px] rounded-sm">G</div>}
+                            {msg.role === 'assistant' ? (
+                                <div
+                                    className="max-w-[85%] p-[13px] flex gap-[12px] rounded-2xl rounded-tl-sm"
+                                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+                                >
+                                    <div className="mt-0.5 flex-shrink-0 w-[15px] h-[15px] flex items-center justify-center rounded-sm font-bold text-[8px] text-white" style={{ backgroundColor: '#1E3A5F' }}>G</div>
+                                    <p className="text-[13px] font-normal leading-relaxed" style={{ color: '#374151' }}>
+                                        {msg.content}
+                                    </p>
                                 </div>
-                                <p className="text-[12px] md:text-[13.5px] font-medium leading-relaxed text-white/90">
-                                    {msg.content}
-                                </p>
-                            </div>
+                            ) : (
+                                <div
+                                    className="max-w-[85%] p-[13px] flex gap-[12px] rounded-2xl rounded-tr-sm"
+                                    style={{ backgroundColor: '#1E3A5F' }}
+                                >
+                                    <div className="mt-0.5 flex-shrink-0">
+                                        <User size={14} className="text-white/60" />
+                                    </div>
+                                    <p className="text-[13px] font-normal leading-relaxed text-white">
+                                        {msg.content}
+                                    </p>
+                                </div>
+                            )}
                         </motion.div>
                     ))}
                     {isLoading && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                            <div className="bg-white/5 border border-white/10 p-[13.5px] rounded-2xl rounded-tl-none">
+                            <div className="p-[13px] rounded-2xl rounded-tl-sm" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                                 <div className="flex space-x-1.5">
-                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" />
-                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.1s' }} />
-                                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce opacity-80" style={{ animationDelay: '0.2s' }} />
+                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#1E3A5F', opacity: 0.5 }} />
+                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#1E3A5F', opacity: 0.5, animationDelay: '0.1s' }} />
+                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#1E3A5F', opacity: 0.5, animationDelay: '0.2s' }} />
                                 </div>
                             </div>
                         </motion.div>
@@ -264,7 +279,8 @@ export function AiChatProfiler() {
                     <motion.div
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-yellow-400/10 border border-yellow-400/30 text-yellow-300 text-xs px-4 py-2 rounded-xl mb-2"
+                        className="text-xs px-4 py-2 rounded-xl mb-2 font-medium"
+                        style={{ backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', color: '#92400E' }}
                     >
                         {t.chat.contradiction}
                     </motion.div>
@@ -281,12 +297,19 @@ export function AiChatProfiler() {
                         disabled={isLoading}
                         ref={inputRef}
                         autoFocus
-                        className="w-full bg-white/5 border-0 rounded-full py-[13.5px] pl-[20px] pr-12 text-[13.5px] placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors shadow-lg backdrop-blur-xl"
+                        className="w-full rounded-full py-[13px] pl-[20px] pr-12 text-[13px] font-normal focus:outline-none transition-colors"
+                        style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #E5E7EB',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                            color: '#0F1117',
+                        }}
                     />
                     <button
                         type="submit"
                         disabled={isLoading || !input.trim()}
-                        className="absolute right-2 p-[10px] bg-black text-white rounded-full hover:bg-black/80 disabled:opacity-50 transition-all font-bold border border-white/10"
+                        className="absolute right-2 p-[10px] rounded-full disabled:opacity-50 transition-all text-white"
+                        style={{ backgroundColor: '#1E3A5F' }}
                     >
                         <Send size={15} fill="white" stroke="white" />
                     </button>

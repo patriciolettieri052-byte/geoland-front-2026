@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Oswald } from 'next/font/google';
+import { Oswald, Inter } from 'next/font/google';
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { AiChatProfiler } from '@/components/onboarding/AiChatProfiler';
 import { DynamicIsvRadar } from '@/components/onboarding/DynamicIsvRadar';
@@ -18,6 +18,12 @@ const oswald = Oswald({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
   style: 'normal',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
 });
 
 export default function GeolandOS() {
@@ -145,39 +151,36 @@ export default function GeolandOS() {
   const activeAsset = assets.find(a => a.id === activeAssetId);
 
   return (
-    <main className="min-h-screen w-full relative overflow-hidden bg-background text-foreground">
+    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#EAECF0', color: '#0F1117' }}>
 
       <motion.div
         key="stable-container"
         className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-        style={{
-          backgroundImage: `url('/monolith2.jpeg')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        style={{ backgroundColor: '#EAECF0' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="absolute inset-0 bg-black/25" />
+        {/* Sin overlay oscuro */}
 
         {/* Header — Logo */}
         <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-end justify-between relative z-50">
           <div className="flex items-end gap-6">
-            <img src="/logo.png" alt="GEOLAND" className="h-12 w-auto opacity-90" />
-            <span className={`${oswald.className} text-white/40 text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block`}>
+            <img src="/logo-Geoland-OS.png" alt="GEOLAND OS" className="h-10 w-auto" />
+            <span className="font-sans text-[11px] font-medium tracking-wider leading-none mb-1 uppercase hidden md:block" style={{ color: '#9CA3AF' }}>
               {t.header.infraText}
             </span>
           </div>
           
           <div className="flex items-center gap-4 relative">
             {/* Language Selector */}
-            <div className="flex items-center gap-3 mr-2 bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 border border-white/10">
+            <div className="flex items-center gap-3 mr-2 rounded-full px-4 py-1.5 border" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}>
               {(['es', 'en', 'pt'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
-                  className={`text-[10px] font-bold tracking-widest uppercase transition-all hover:text-white ${language === lang ? 'text-white scale-110' : 'text-white/40'}`}
+                  className={`text-[10px] font-bold tracking-widest uppercase transition-all ${language === lang ? 'scale-110' : ''}`}
+                  style={{ color: language === lang ? '#1E3A5F' : '#9CA3AF' }}
                 >
                   {lang}
                 </button>
@@ -188,7 +191,12 @@ export default function GeolandOS() {
             <div className="relative">
               <button
                 onClick={() => { setShowGearMenu(!showGearMenu); setShowProfileMenu(false); }}
-                className={`flex items-center justify-center w-9 h-9 rounded-full bg-white/5 text-white/70 shadow-xl border border-white/10 cursor-pointer hover:bg-white/10 hover:text-white transition-all ${showGearMenu ? 'bg-white/10 text-white' : ''}`}
+                className="flex items-center justify-center w-9 h-9 rounded-full border transition-all hover:shadow-sm"
+                style={{
+                  backgroundColor: showGearMenu ? '#F3F4F6' : '#FFFFFF',
+                  borderColor: '#E5E7EB',
+                  color: '#6B7280'
+                }}
               >
                 <Settings size={18} />
               </button>
@@ -199,7 +207,8 @@ export default function GeolandOS() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 5, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 p-1.5"
+                    className="absolute right-0 top-full mt-2 w-48 rounded-2xl shadow-lg overflow-hidden z-50 p-1.5 border"
+                    style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}
                   >
                     {[
                       { icon: HelpCircle, label: t.menus.gear.help },
@@ -207,10 +216,11 @@ export default function GeolandOS() {
                     ].map((item, i) => (
                       <button
                         key={i}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-xs text-white/70 hover:text-white hover:bg-white/5 rounded-xl transition-all group"
+                        className="w-full flex items-center gap-3 px-3 py-2 text-xs rounded-xl transition-all group hover:bg-gray-50"
+                        style={{ color: '#6B7280' }}
                         onClick={() => setShowGearMenu(false)}
                       >
-                        <item.icon size={14} className="group-hover:text-[#5a4282]" />
+                        <item.icon size={14} />
                         <span className="font-medium">{item.label}</span>
                       </button>
                     ))}
@@ -223,7 +233,8 @@ export default function GeolandOS() {
             <div className="relative">
               <div 
                 onClick={() => { setShowProfileMenu(!showProfileMenu); setShowGearMenu(false); }}
-                className={`flex items-center justify-center w-9 h-9 rounded-full bg-[#5a4282] text-white font-bold text-sm shadow-xl border border-white/20 cursor-pointer hover:opacity-80 transition-all ${showProfileMenu ? 'ring-2 ring-white/50' : ''}`}
+                className={`flex items-center justify-center w-9 h-9 rounded-full text-white font-bold text-sm shadow-sm border cursor-pointer hover:opacity-90 transition-all ${showProfileMenu ? 'ring-2 ring-offset-1' : ''}`}
+                style={{ backgroundColor: '#1E3A5F', borderColor: '#1E3A5F', ringColor: '#1E3A5F' }}
               >
                 P
               </div>
@@ -234,7 +245,8 @@ export default function GeolandOS() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 5, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 p-1.5"
+                    className="absolute right-0 top-full mt-2 w-56 rounded-2xl shadow-lg overflow-hidden z-50 p-1.5 border"
+                    style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}
                   >
                     {[
                       { icon: BarChart3, label: t.menus.profile.myBureau },
@@ -246,11 +258,12 @@ export default function GeolandOS() {
                     ].map((item, i) => (
                       <button
                         key={i}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all group ${item.danger ? 'text-red-400 hover:bg-red-500/10' : 'text-white/70 hover:text-white hover:bg-white/5'}`}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all group ${item.danger ? 'hover:bg-red-50' : 'hover:bg-gray-50'}`}
+                        style={{ color: item.danger ? '#DC2626' : '#374151' }}
                         onClick={() => setShowProfileMenu(false)}
                       >
                         <div className="flex items-center gap-3">
-                          <item.icon size={14} className={item.danger ? '' : 'group-hover:text-[#5a4282]'} />
+                          <item.icon size={14} />
                           <span className="font-medium">{item.label}</span>
                         </div>
                         <ChevronRight size={12} className="opacity-0 group-hover:opacity-40 transition-opacity" />
@@ -264,15 +277,22 @@ export default function GeolandOS() {
         </div>
 
         {/* CONTENEDOR PRINCIPAL — Glass Container */}
-        <div className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] overflow-hidden rounded-[2.5rem] relative z-10">
+        <div
+          className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] overflow-hidden rounded-[2rem] relative z-10"
+          style={{
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)'
+          }}
+        >
 
-          {/* Left: Chat Profiler (30%) — Permanente */}
-          <div className="w-full md:w-[30%] h-full flex items-center justify-center p-8 border-r border-white/10 relative z-10 bg-black/10">
+          {/* Left: Chat Profiler (22%) — Permanente */}
+          <div className="w-full md:w-[22%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>
             <AiChatProfiler />
           </div>
 
-          {/* Right: Radar/Grid/Layer2 (70%) */}
-          <div className="w-full md:w-[70%] h-full relative overflow-hidden bg-white/5">
+          {/* Right: Radar/Grid/Layer2 (78%) */}
+          <div className="w-full md:w-[78%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
             <AnimatePresence mode="wait">
               {activeAsset ? (
                 /* LAYER 2 */
@@ -324,19 +344,21 @@ export default function GeolandOS() {
                   style={{ scrollbarWidth: 'none' }}
                 >
                   <div className="text-center mb-8 shrink-0">
-                    <Typography variant="p" className="mb-0.5 font-bold text-[10.5px] text-white">{t.header.matchedOpportunities}</Typography>
-                    <Typography variant="p" className="text-[8px] text-white/50">
+                    <p className="mb-0.5 font-bold text-[10.5px] tracking-wider uppercase" style={{ color: '#1E3A5F' }}>
+                      {t.header.matchedOpportunities}
+                    </p>
+                    <p className="text-[8px]" style={{ color: '#9CA3AF' }}>
                       {t.header.assetsMatching.replace('{{count}}', filteredAssets.length.toString())}
-                    </Typography>
+                    </p>
                   </div>
 
                   <div className="flex-1">
                     {error ? (
                         <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-8">
-                            <p className="text-white/60 text-lg mb-4">{error}</p>
+                            <p className="text-lg mb-4" style={{ color: '#6B7280' }}>{error}</p>
                             <button
                                 onClick={() => window.location.reload()}
-                                className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                                className="px-6 py-2 rounded-lg transition-colors text-white" style={{ backgroundColor: '#1E3A5F' }}
                             >
                                 Reintentar
                             </button>
@@ -346,11 +368,11 @@ export default function GeolandOS() {
                             <Layer1GlassGrid assets={filteredAssets} onAssetClick={setActiveAsset} />
 
                             {filteredAssets.length === 0 && (
-                              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center opacity-70">
-                                <Typography variant="h4" className="text-white/80">{t.header.noMatches}</Typography>
-                                <Typography variant="p" className="max-w-xs mt-4 leading-relaxed text-sm text-white/50">
+                              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center">
+                                <p className="text-lg" style={{ color: '#374151' }}>{t.header.noMatches}</p>
+                                <p className="max-w-xs mt-4 leading-relaxed text-sm" style={{ color: '#9CA3AF' }}>
                                   {t.header.filterWarning}
-                                </Typography>
+                                </p>
                               </motion.div>
                             )}
                         </>

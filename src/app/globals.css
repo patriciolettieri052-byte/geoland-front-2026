@@ -2,44 +2,93 @@
 
 @theme {
   --font-sans: var(--font-inter);
-  
-  --color-background: #0D0E12;
-  --color-foreground: #F8FAFC;
-  
-  --color-card: rgba(20, 21, 28, 0.6);
-  --color-card-border: rgba(255, 255, 255, 0.1);
-  
-  --color-primary: #10b981; /* Emerald/Accent for ISV and G-Score */
+
+  --color-background: #EAECF0;
+  --color-foreground: #0F1117;
+
+  --color-card: #FFFFFF;
+  --color-card-border: #E5E7EB;
+
+  --color-primary: #1E3A5F;
   --color-primary-foreground: #ffffff;
-  
-  --color-secondary: #1E222B;
-  --color-accent: #38bdf8; /* Blue accent for contrast */
+
+  --color-secondary: #F3F4F6;
+  --color-accent: #2563EB;
+
+  --color-muted: #6B7280;
+  --color-muted-light: #9CA3AF;
+
+  --color-positive: #16A34A;
+  --color-negative: #DC2626;
+  --color-warning: #D97706;
 }
 
 @layer base {
   :root {
-    --background: #0D0E12;
-    --foreground: #F8FAFC;
+    --background: #EAECF0;
+    --foreground: #0F1117;
   }
-  
+
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "tnum" 1;
     -webkit-font-smoothing: antialiased;
-    /* Soft noise texture or gradient could be applied here */
-    background-image: radial-gradient(circle at top right, rgba(30,34,43,0.8), transparent 40%),
-                      radial-gradient(circle at bottom left, rgba(16,185,129,0.05), transparent 40%);
-    background-attachment: fixed;
+    background-image: none;
   }
 }
 
 @layer utilities {
-  .glass-panel {
-    @apply bg-[var(--color-card)] backdrop-blur-xl border border-[var(--color-card-border)] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+  /* Card institucional — reemplaza glass-panel */
+  .inst-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    border-radius: 1rem;
   }
-  
+
+  /* Card con sombra media */
+  .inst-card-md {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+    border-radius: 1.25rem;
+  }
+
+  /* Sombra grande — contenedor principal */
+  .inst-card-lg {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-radius: 1.5rem;
+  }
+
+  /* Números financieros — tabular nums */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* glass-panel legacy — mantener para GlassCard si se usa en Layer2 */
+  .glass-panel {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
   .text-glow {
-    text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    color: #1E3A5F;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  input::placeholder {
+    color: #9CA3AF;
   }
 }

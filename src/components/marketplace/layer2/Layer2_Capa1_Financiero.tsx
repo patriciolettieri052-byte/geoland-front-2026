@@ -22,11 +22,11 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
   const data = asset as Record<string, unknown>;
 
   return (
-    <div style={{ padding: "12px 12px 10px", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
+    <div style={{ padding: "12px 12px 10px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
       {/* Header de sección */}
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-        <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(127,119,221,0.5)" }} />
-        <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
+        <div style={{ width: 2, height: 9, borderRadius: 1, background: "#1E3A5F" }} />
+        <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
           Lógica financiera · {estrategia.replace(/_/g, " ")}
         </span>
       </div>
@@ -39,25 +39,26 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
           const barPct = v.showBar && v.barMax ? Math.min(100, (numVal / v.barMax) * 100) : 0;
           const isPos = v.positive === "high" ? numVal > 0 : v.positive === "low" ? numVal < (v.barMax || 999999) : false;
           const valColor = v.positive
-            ? (isPos ? "rgba(29,158,117,0.9)" : "rgba(226,75,74,0.9)")
-            : "#e8e6f0";
+            ? (isPos ? "#16A34A" : "#DC2626")
+            : "#0F1117";
 
           return (
             <div key={i} style={{
-              background: "rgba(255,255,255,0.30)",
-              border: "0.5px solid rgba(0,0,0,0.1)",
-              borderRadius: 7,
-              padding: "7px 9px",
+              background: "#FFFFFF",
+              border: "1px solid #E5E7EB",
+              borderRadius: 8,
+              padding: "8px 10px",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
             }}>
-              <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700 }}>
+              <div style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700 }}>
                 {v.label}
               </div>
               <div style={{ fontSize: 14, fontWeight: 700, color: valColor, marginTop: 1 }}>
                 {fmt(rawVal, v.format)}
               </div>
               {v.showBar && (
-                <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, marginTop: 4, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${barPct}%`, background: "rgba(127,119,221,0.5)", borderRadius: 2, transition: "width 0.4s" }} />
+                <div style={{ height: 3, background: "#F3F4F6", borderRadius: 2, marginTop: 4, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${barPct}%`, background: "rgba(30,58,95,0.55)", borderRadius: 2, transition: "width 0.4s" }} />
                 </div>
               )}
             </div>
