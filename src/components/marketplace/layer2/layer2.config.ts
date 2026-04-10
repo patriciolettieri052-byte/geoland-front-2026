@@ -35,14 +35,14 @@ export const STRATEGY_LABELS: Record<string, string> = {
 // Métricas del Hero por estrategia
 // topRight = siempre G-Score (universal)
 export const HERO_METRICS_CONFIG: Record<string, {
-  topLeft: { label: string; field: string; format: string; color: string };
-  bottomLeft: { label: string; field: string; format: string; color: string };
-  bottomRight: { label: string; field: string; format: string; color: string };
+  topLeft: { label: string; field: string; format: string; color: string; barMax?: number };
+  bottomLeft: { label: string; field: string; format: string; color: string; barMax?: number };
+  bottomRight: { label: string; field: string; format: string; color: string; barMax?: number };
 }> = {
   FIX_FLIP: {
-    topLeft:    { label: "TIR",          field: "irr_equivalente",   format: "percent", color: "green" },
+    topLeft:    { label: "TIR",          field: "irr_equivalente",   format: "percent", color: "green", barMax: 0.4 },
     bottomLeft: { label: "Riesgo",       field: "risk_score",        format: "score",   color: "amber" },
-    bottomRight:{ label: "Margen bruto", field: "roiTotal",          format: "percent", color: "green" },
+    bottomRight:{ label: "Margen bruto", field: "roiTotal",          format: "percent", color: "green", barMax: 1 },
   },
   RENTA: {
     topLeft:    { label: "Cap Rate",     field: "irr_equivalente",   format: "percent", color: "green" },
