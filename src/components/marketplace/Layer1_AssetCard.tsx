@@ -105,11 +105,11 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
         return 'bg-[#FECACA]'; // Rose 200
     };
 
-    const getGScoreBorderColor = (score: number) => {
-        if (score >= 80) return 'border-[#6ee7b7]'; 
-        if (score >= 60) return 'border-[#fcd34d]';
-        if (score >= 40) return 'border-[#fdba74]';
-        return 'border-[#fca5a5]';
+    const getGScoreBorderHex = (score: number) => {
+        if (score >= 80) return '#6ee7b7'; 
+        if (score >= 60) return '#fcd34d';
+        if (score >= 40) return '#fdba74';
+        return '#fca5a5';
     };
 
     return (
@@ -199,27 +199,39 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
             </div>
 
-            {/* DERECHA — 32%: G-Score + ROI + Confidence */}
-            <div className="flex flex-col items-center justify-center px-6 w-[32%] shrink-0 gap-4">
-                <div className="flex items-center justify-between w-full">
+            {/* DERECHA — 32%: G-Score + ROI + Confidence (PURE INLINE STYLES) */}
+            <div 
+                style={{
+                    width: '32%',
+                    flexShrink: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0 24px',
+                    gap: '16px',
+                    borderLeft: '1px solid #F3F4F6'
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                     {/* G-Score Group */}
-                    <div className="flex flex-col items-center flex-1">
-                        <div className="flex items-center gap-1 mb-1.5" title="G-Score">
-                            <span className="text-[9px] uppercase font-bold tracking-[0.05em]" style={{ color: '#9CA3AF' }}>G-Score</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }} title="G-Score">
+                            <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#9CA3AF' }}>G-Score</span>
                             <HelpCircle size={9} style={{ color: '#9CA3AF' }} />
                         </div>
-                        <div className="text-[38px] font-light num leading-none tracking-tighter" style={{ color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
+                        <div className="num" style={{ fontSize: '38px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.05em', color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
                             {gScore}
                         </div>
                     </div>
 
                     {/* Fina línea sutil vertical */}
-                    <div className="w-[1px] h-10 bg-gray-100 mx-2" />
+                    <div style={{ width: '1px', height: '40px', backgroundColor: '#F3F4F6', marginLeft: '8px', marginRight: '8px' }} />
 
                     {/* ROI Group */}
-                    <div className="flex flex-col items-center flex-1">
-                        <span className="text-[9px] uppercase font-bold tracking-[0.05em] mb-1.5" style={{ color: '#9CA3AF' }}>{t.assetCard.roiEst}</span>
-                        <div className="text-[38px] font-light leading-none num tracking-tighter" style={{ color: '#16A34A' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                        <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px', color: '#9CA3AF' }}>{t.assetCard.roiEst}</span>
+                        <div className="num" style={{ fontSize: '38px', fontWeight: 300, lineHeight: 1, letterSpacing: '-0.05em', color: '#16A34A' }}>
                             {(expectedIrr * 100).toFixed(1)}%
                         </div>
                     </div>
@@ -227,9 +239,22 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
                 {/* Confidence Badge - Premium Pill */}
                 {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
-                    <div className={`w-full flex items-center justify-center gap-2 border-2 rounded-full py-1.5 px-4 ${getGScoreBorderColor((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))} transition-all`} style={{ backgroundColor: 'rgba(255,255,255,0.5)' }}>
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">{t.assetCard.confidence}</span>
-                        <span className="text-[13px] font-extrabold num text-slate-800">
+                    <div 
+                        style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            border: `2px solid ${getGScoreBorderHex((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))}`,
+                            borderRadius: '9999px',
+                            padding: '6px 16px',
+                            backgroundColor: 'rgba(255,255,255,0.5)',
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>{t.assetCard.confidence}</span>
+                        <span className="num" style={{ fontSize: '13px', fontWeight: 800, color: '#1e293b' }}>
                             {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
                         </span>
                     </div>
