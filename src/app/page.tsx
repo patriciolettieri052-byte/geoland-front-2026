@@ -234,7 +234,7 @@ export default function GeolandOS() {
               <div 
                 onClick={() => { setShowProfileMenu(!showProfileMenu); setShowGearMenu(false); }}
                 className={`flex items-center justify-center w-9 h-9 rounded-full text-white font-bold text-sm shadow-sm border cursor-pointer hover:opacity-90 transition-all ${showProfileMenu ? 'ring-2 ring-offset-1' : ''}`}
-                style={{ backgroundColor: '#1E3A5F', borderColor: '#1E3A5F', ringColor: '#1E3A5F' }}
+                style={{ backgroundColor: '#1E3A5F', borderColor: '#1E3A5F' }}
               >
                 P
               </div>

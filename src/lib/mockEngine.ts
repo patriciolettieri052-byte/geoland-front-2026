@@ -132,6 +132,11 @@ export interface Asset {
     walt_anos?: number;
     apreciacion_historica?: number;
     holding_costs_anual?: number;
+    
+    // UI specific
+    nombre?: string;
+    photo_urls?: string[];
+    payback_meses?: number;
 }
 
 export const mockDatabase: { assets: Asset[] } = {

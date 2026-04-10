@@ -2,9 +2,9 @@
 import { AssetMatchItem } from "@/types/geoland";
 
 const BAR_COLORS = {
-  green:  "rgba(29,158,117,0.6)",
-  purple: "rgba(127,119,221,0.6)",
-  amber:  "rgba(186,117,23,0.6)",
+  green:  "rgba(22,163,74,0.6)",
+  purple: "rgba(30,58,95,0.6)",
+  amber:  "rgba(217,119,6,0.6)",
 };
 
 function AdvCard({ title, value, description, barPercent, color }: {
@@ -12,19 +12,20 @@ function AdvCard({ title, value, description, barPercent, color }: {
 }) {
   return (
     <div style={{
-      background: "rgba(255,255,255,0.30)",
-      border: "0.5px solid rgba(0,0,0,0.1)",
+      background: "#FFFFFF",
+      border: "1px solid #E5E7EB",
       borderRadius: 8,
-      padding: "9px 11px",
+      padding: "10px 12px",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
     }}>
-      <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3, fontWeight: 700 }}>
+      <div style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3, fontWeight: 700 }}>
         {title}
       </div>
-      <div style={{ fontSize: 18, fontWeight: 700, color: color === "green" ? "#1D9E75" : color === "purple" ? "#5A4282" : "#B1720C" }}>
+      <div style={{ fontSize: 18, fontWeight: 700, color: color === "green" ? "#16A34A" : color === "purple" ? "#1E3A5F" : "#D97706" }}>
         {value}
       </div>
-      <div style={{ fontSize: 10, color: "rgba(0,0,0,0.45)", marginTop: 2, fontWeight: 500 }}>{description}</div>
-      <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
+      <div style={{ fontSize: 10, color: "#6B7280", marginTop: 2, fontWeight: 500 }}>{description}</div>
+      <div style={{ height: 3, background: "#F3F4F6", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
         <div style={{ height: "100%", width: `${barPercent}%`, background: BAR_COLORS[color], borderRadius: 2 }} />
       </div>
     </div>
@@ -47,10 +48,10 @@ function getMockAdvantages(asset: AssetMatchItem) {
 export default function Layer2Capa3Ventajas({ asset }: { asset: AssetMatchItem }) {
   const advantages = getMockAdvantages(asset);
   return (
-    <div style={{ padding: "12px 12px 10px", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
+    <div style={{ padding: "12px 12px 10px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-        <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(186,117,23,0.5)" }} />
-        <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
+        <div style={{ width: 2, height: 9, borderRadius: 1, background: "#D97706" }} />
+        <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
           Ventajas estructurales
         </span>
       </div>

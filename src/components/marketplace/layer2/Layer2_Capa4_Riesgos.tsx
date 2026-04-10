@@ -2,8 +2,8 @@
 import { AssetMatchItem } from "@/types/geoland";
 
 const SEVERITY_STYLES = {
-  alto:  { bg: "rgba(226,75,74,0.15)",  color: "#F09595", border: "rgba(226,75,74,0.25)",  label: "Alto"  },
-  medio: { bg: "rgba(186,117,23,0.15)", color: "#EF9F27", border: "rgba(186,117,23,0.25)", label: "Medio" },
+  alto:  { bg: "#FEF2F2",  color: "#DC2626", border: "#FCA5A5",  label: "Alto"  },
+  medio: { bg: "#FFFBEB",  color: "#D97706", border: "#FCD34D", label: "Medio" },
 };
 
 // Mock de riesgos por estrategia — se reemplaza con datos reales del pipeline
@@ -123,10 +123,10 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
   return (
     <>
       {/* Capa 4: Riesgos */}
-      <div style={{ padding: "12px 12px 10px", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
+      <div style={{ padding: "12px 12px 10px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-          <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(226,75,74,0.8)" }} />
-          <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
+          <div style={{ width: 2, height: 9, borderRadius: 1, background: "#DC2626" }} />
+          <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
             Riesgos &amp; red flags
           </span>
         </div>
@@ -135,25 +135,27 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
             const s = SEVERITY_STYLES[r.severity];
             return (
               <div key={i} style={{
-                background: "rgba(226,75,74,0.30)",
-                border: `0.5px solid rgba(226,75,74,0.18)`,
-                borderRadius: 7,
-                padding: "7px 10px",
+                background: "#FFFFFF",
+                border: "1px solid #E5E7EB",
+                borderRadius: 8,
+                padding: "8px 12px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
               }}>
-                <span style={{ fontSize: 11, color: "#2D2E35", fontWeight: 700 }}>{r.label}</span>
+                <span style={{ fontSize: 11, color: "#374151", fontWeight: 600 }}>{r.label}</span>
                 <span style={{
                   fontSize: 8,
                   padding: "2px 7px",
                   borderRadius: 8,
                   background: s.bg,
-                  color: "#2D2E35",
-                  fontWeight: 800,
-                  border: `0.5px solid ${s.border}`,
+                  color: s.color,
+                  fontWeight: 700,
+                  border: `1px solid ${s.border}`,
                   flexShrink: 0,
                   marginLeft: 8,
+                  textTransform: "uppercase",
                 }}>
                   {s.label}
                 </span>
@@ -164,26 +166,27 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
       </div>
 
       {/* CTA Layer 3 */}
-      <div style={{ padding: "10px 12px 16px", borderTop: "0.5px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+      <div style={{ padding: "16px 12px 24px", borderTop: "1px solid #E5E7EB", textAlign: "center", background: "#F9FAFB" }}>
         <button
           onClick={() => onRequestLayer3 ? onRequestLayer3(asset.id) : console.log("Layer 3 requested for:", asset.id)}
           style={{
-            background: "rgba(255,255,255,0.30)",
-            border: "0.5px solid rgba(0,0,0,0.12)",
-            color: "#2D2E35",
+            background: "#1E3A5F",
+            border: "none",
+            color: "#FFFFFF",
             fontSize: 12,
-            padding: "10px 20px",
+            padding: "12px 20px",
             borderRadius: 8,
             cursor: "pointer",
-            fontWeight: 800,
+            fontWeight: 600,
             letterSpacing: "0.02em",
             width: "100%",
             transition: "all 0.2s",
+            boxShadow: "0 2px 4px rgba(30,58,95,0.2)",
           }}
         >
           Generar reporte completo (Layer 3) →
         </button>
-        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.18)", marginTop: 5 }}>
+        <div style={{ fontSize: 9, color: "#9CA3AF", marginTop: 8 }}>
           Investment Memo · Risk Report · Financial Deep Dive · ~20s
         </div>
       </div>

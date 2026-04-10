@@ -2,31 +2,32 @@
 import { AssetMatchItem } from "@/types/geoland";
 
 const STATUS_STYLES = {
-  ok:   { bg: "rgba(29,158,117,0.2)",  color: "#5DCAA5", symbol: "✓" },
-  warn: { bg: "rgba(186,117,23,0.2)",  color: "#EF9F27", symbol: "!" },
-  fail: { bg: "rgba(226,75,74,0.2)",   color: "#F09595", symbol: "✗" },
+  ok:   { bg: "#ECFDF5",  color: "#059669", symbol: "✓" },
+  warn: { bg: "#FFFBEB",  color: "#D97706", symbol: "!" },
+  fail: { bg: "#FEF2F2",  color: "#DC2626", symbol: "✗" },
 };
 
 function CheckItem({ label, status }: { label: string; status: "ok" | "warn" | "fail" }) {
   const s = STATUS_STYLES[status];
   return (
     <div style={{
-      background: "rgba(255,255,255,0.30)",
-      border: "0.5px solid rgba(0,0,0,0.1)",
+      background: "#FFFFFF",
+      border: "1px solid #E5E7EB",
       borderRadius: 7,
-      padding: "6px 9px",
+      padding: "8px 10px",
       display: "flex",
       alignItems: "center",
       gap: 6,
       fontSize: 10,
-      color: "#2D2E35",
-      fontWeight: 600,
+      color: "#374151",
+      fontWeight: 500,
+      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
     }}>
       <div style={{
         width: 14, height: 14, borderRadius: "50%",
         background: s.bg, color: s.color,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 8, flexShrink: 0, fontWeight: 700,
+        fontSize: 8, flexShrink: 0, fontWeight: 800,
       }}>
         {s.symbol}
       </div>
@@ -52,10 +53,10 @@ function getMockChecks(asset: AssetMatchItem): Array<{ label: string; status: "o
 export default function Layer2Capa2Encaja({ asset }: { asset: AssetMatchItem }) {
   const checks = getMockChecks(asset);
   return (
-    <div style={{ padding: "12px 12px 10px", borderTop: "0.5px solid rgba(255,255,255,0.06)" }}>
+    <div style={{ padding: "12px 12px 10px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-        <div style={{ width: 2, height: 9, borderRadius: 1, background: "rgba(29,158,117,0.5)" }} />
-        <span style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
+        <div style={{ width: 2, height: 9, borderRadius: 1, background: "#10B981" }} />
+        <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
           Cuándo encaja
         </span>
       </div>
