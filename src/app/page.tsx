@@ -286,13 +286,13 @@ export default function GeolandOS() {
           }}
         >
 
-          {/* Left: Chat Profiler (22%) — Permanente */}
-          <div className="w-full md:w-[22%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>
+          {/* Left: Chat Profiler (30%) — Permanente */}
+          <div className="w-full md:w-[30%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>
             <AiChatProfiler />
           </div>
 
-          {/* Right: Radar/Grid/Layer2 (78%) */}
-          <div className="w-full md:w-[78%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+          {/* Right: Radar/Grid/Layer2 (70%) */}
+          <div className="w-full md:w-[70%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
             <AnimatePresence mode="wait">
               {activeAsset ? (
                 /* LAYER 2 */

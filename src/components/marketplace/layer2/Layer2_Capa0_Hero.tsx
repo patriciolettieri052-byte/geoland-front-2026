@@ -24,7 +24,82 @@ function getRiskLabel(score: number): { label: string; color: string } {
   return             { label: "Alto",   color: "rgba(226,75,74,0.8)"   };
 }
 
-// ─── Módulo de métrica individual ─────────────────────────────────────────────
+// ─── Big Metric (G-Score, ROI) ────────────────────────────────────────────────
+function BigMetric({ label, value, color, sub }: {
+  label: string; value: string; color?: string; sub?: string;
+}) {
+  return (
+    <div style={{
+      background: "#FFFFFF",
+      border: "1px solid #E5E7EB",
+      borderRadius: 12,
+      padding: "14px 16px",
+      display: "flex",
+      flexDirection: "column",
+      gap: 4,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+      width: "100%",
+    }}>
+      <div style={{ fontSize: 9, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 32, fontWeight: 800, color: color || "#0F1117", lineHeight: 1, letterSpacing: "-0.02em" }} className="num">
+        {value}
+      </div>
+      {sub && <div style={{ fontSize: 10, color: "#6B7280", fontWeight: 500, marginTop: 2 }}>{sub}</div>}
+    </div>
+  );
+}
+
+// ─── Ring Metric (Confidence) ──────────────────────────────────────────────────
+function RingMetric({ label, value, percent }: {
+  label: string; value: string; percent: number;
+}) {
+  const r = 24;
+  const circ = 2 * Math.PI * r;
+  const dash = (percent / 100) * circ;
+  
+  // Color dinámico basado en confianza
+  const ringColor = percent >= 80 ? "#10B981" : percent >= 60 ? "#F59E0B" : "#EF4444";
+
+  return (
+    <div style={{
+      background: "#FFFFFF",
+      border: "1px solid #E5E7EB",
+      borderRadius: 12,
+      padding: "14px 16px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 8,
+      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+      width: "100%",
+    }}>
+      <div style={{ fontSize: 9, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, width: "100%" }}>
+        {label}
+      </div>
+      <div style={{ position: "relative", width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <svg width="64" height="64" viewBox="0 0 64 64" style={{ transform: "rotate(-90deg)" }}>
+          <circle cx="32" cy="32" r={r} fill="none" stroke="#F3F4F6" strokeWidth="5" />
+          <circle 
+            cx="32" cy="32" r={r} 
+            fill="none" 
+            stroke={ringColor}
+            strokeWidth="5" 
+            strokeDasharray={`${dash} ${circ}`}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dasharray 0.5s ease" }}
+          />
+        </svg>
+        <div style={{ position: "absolute", fontSize: 13, fontWeight: 800, color: "#1F2937" }} className="num">
+          {value}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MetricModule (Secundarias) ───────────────────────────────────────────────
 function MetricModule({ label, value, sub, showBar, barWidth }: {
   label: string; value: string; sub?: string; showBar?: boolean; barWidth?: number;
 }) {
@@ -39,10 +114,10 @@ function MetricModule({ label, value, sub, showBar, barWidth }: {
       gap: 3,
       boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
     }}>
-      <div style={{ fontSize: 9, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em" }}>
+      <div style={{ fontSize: 9, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 700 }}>
         {label}
       </div>
-      <div style={{ fontSize: 19, fontWeight: 700, color: "#0F1117", lineHeight: 1 }}>
+      <div style={{ fontSize: 18, fontWeight: 700, color: "#374151" }}>
         {value}
       </div>
       {sub && <div style={{ fontSize: 9, color: "#6B7280", fontWeight: 500 }}>{sub}</div>}
@@ -51,39 +126,6 @@ function MetricModule({ label, value, sub, showBar, barWidth }: {
           <div style={{ height: "100%", width: `${barWidth}%`, background: "rgba(30,58,95,0.65)", borderRadius: 2 }} />
         </div>
       )}
-    </div>
-  );
-}
-
-// ─── G-Score ring ─────────────────────────────────────────────────────────────
-function GScoreRing({ score }: { score: number }) {
-  const r = 12;
-  const circ = 2 * Math.PI * r;
-  const dash = (score / 100) * circ;
-  return (
-    <div style={{
-      background: "#FFFFFF",
-      border: "1px solid #E5E7EB",
-      borderRadius: 10,
-      padding: "10px 12px",
-      display: "flex",
-      flexDirection: "column",
-      gap: 3,
-      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-    }}>
-      <div style={{ fontSize: 9, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.07em" }}>G-Score</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <svg width="32" height="32" viewBox="0 0 32 32">
-          <circle cx="16" cy="16" r={r} fill="none" stroke="#F3F4F6" strokeWidth="3" />
-          <circle cx="16" cy="16" r={r} fill="none" stroke={score >= 80 ? "#16A34A" : "#D97706"}
-            strokeWidth="3" strokeDasharray={`${dash} ${circ}`}
-            strokeDashoffset={circ * 0.25} strokeLinecap="round" />
-        </svg>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#0F1117" }}>{Math.round(score)}</div>
-          <div style={{ fontSize: 9, color: "#9CA3AF" }}>/100</div>
-        </div>
-      </div>
     </div>
   );
 }
@@ -184,14 +226,13 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
       </div>
 
       {/* Grid: izquierda | galería | derecha */}
-      <div style={{ display: "grid", gridTemplateColumns: "150px 1fr 150px", gap: 16, padding: "16px 18px", flex: 1 }}>
-        {/* Columna izquierda */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <MetricModule
+      <div style={{ display: "grid", gridTemplateColumns: "170px 1fr 170px", gap: 20, padding: "20px 24px", flex: 1 }}>
+        {/* Columna izquierda: Foco en ROI/TIR */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <BigMetric
             label={config.topLeft.label}
             value={formatValue(getVal(config.topLeft.field), config.topLeft.format)}
-            showBar
-            barWidth={Math.min(100, (getVal(config.topLeft.field) || 0) * (config.topLeft.format === "percent" ? 100 / (config.topLeft.barMax || 1) : 1))}
+            color="#16A34A"
           />
           <MetricModule
             label={config.bottomLeft.label}
@@ -200,14 +241,23 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
           />
         </div>
 
-        {/* Galería central - Enlarged verticaly */}
-        <div style={{ display: "flex", minHeight: 400 }}>
+        {/* Galería central */}
+        <div style={{ display: "flex", minHeight: 450 }}>
           <GalleryModule photos={asset.photo_urls} />
         </div>
 
-        {/* Columna derecha */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <GScoreRing score={asset.g_score || 0} />
+        {/* Columna derecha: Foco en G-Score e Inteligencia */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <BigMetric 
+            label="G-Score" 
+            value={formatValue(asset.g_score, "score")} 
+            color="#1E3A5F" 
+          />
+          <RingMetric 
+            label="Confidence" 
+            percent={Math.round((asset.confidence_final || 0) * 100)} 
+            value={`${Math.round((asset.confidence_final || 0) * 100)}%`}
+          />
           <MetricModule
             label={config.bottomRight.label}
             value={formatValue(getVal(config.bottomRight.field), config.bottomRight.format)}
