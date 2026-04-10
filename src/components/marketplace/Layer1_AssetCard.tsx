@@ -199,46 +199,39 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
             </div>
 
-            {/* DERECHA — 25%: G-Score + ROI */}
-            <div className="flex flex-col items-end justify-center px-4 w-[25%] shrink-0 gap-1">
-                <div className="flex flex-col items-end gap-1.5">
-                    {/* G-Score Circle */}
-                    <div className="flex items-center gap-1.5" title="G-Score">
-                        <button
-                            className="w-4 h-4 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100" style={{ backgroundColor: '#F3F4F6' }}
-                            title="Desempeño general basado en IA e indicadores técnicos"
-                        >
-                            <HelpCircle size={10} style={{ color: '#9CA3AF' }} />
-                        </button>
-                        <div className={`w-9 h-9 flex items-center justify-center rounded-full ${getGScoreColor(gScore)} font-bold text-[14px] num`} style={{ color: '#1F2937' }}>
+            {/* DERECHA — 25%: G-Score + ROI + Confidence */}
+            <div className="flex flex-col items-center justify-center px-4 w-[25%] shrink-0 gap-2">
+                <div className="flex items-center justify-between w-full">
+                    {/* G-Score Group */}
+                    <div className="flex flex-col items-center flex-1">
+                        <div className="flex items-center gap-0.5 mb-1" title="G-Score">
+                            <span className="text-[8px] uppercase font-bold tracking-tight" style={{ color: '#9CA3AF' }}>G-Score</span>
+                            <HelpCircle size={8} style={{ color: '#9CA3AF' }} />
+                        </div>
+                        <div className={`text-[26px] font-bold num leading-none`} style={{ color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
                             {gScore}
                         </div>
                     </div>
-                    
-                    {/* Confidence % */}
-                    {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
-                        <div className={`flex items-center gap-1 border-2 rounded-full px-2 py-0.5 ${getGScoreBorderColor((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))} text-slate-800`}>
-                            <span className="text-[7px] uppercase font-bold tracking-tighter opacity-80">{t.assetCard.confidence}</span>
-                            <span className="text-[9px] font-bold num">
-                                {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
-                            </span>
+
+                    {/* Fina línea sutil vertical */}
+                    <div className="w-[1px] h-8 bg-gray-100" />
+
+                    {/* ROI Group */}
+                    <div className="flex flex-col items-center flex-1">
+                        <span className="text-[8px] uppercase font-bold tracking-tight mb-1" style={{ color: '#9CA3AF' }}>{t.assetCard.roiEst}</span>
+                        <div className="text-[26px] font-bold leading-none num" style={{ color: '#16A34A' }}>
+                            {(expectedIrr * 100).toFixed(1)}%
                         </div>
-                    )}
+                    </div>
                 </div>
 
-                <div className="text-right mt-1">
-                    <p className="text-[8px] uppercase tracking-widest font-semibold" style={{ color: '#9CA3AF' }}>{t.assetCard.roiEst}</p>
-                    <p className="text-[19px] font-bold leading-tight num" style={{ color: '#16A34A' }}>
-                        {(expectedIrr * 100).toFixed(1)}%
-                    </p>
-                </div>
-
-                {/* NUEVO: Cap Rate */}
-                {(asset as any).capRate !== undefined && (
-                    <div className="text-right border-t border-white/10 pt-1 w-full mt-0.5">
-                        <p className="text-[9px] font-semibold num" style={{ color: '#374151' }}>
-                            {t.assetCard.capRate} {((asset as any).capRate * 100).toFixed(1)}%
-                        </p>
+                {/* Confidence Badge - Ocupando el mismo ancho que la suma de G-score+ROI */}
+                {((asset as any).confidenceScore !== undefined || asset.confidence !== undefined) && (
+                    <div className={`w-full flex items-center justify-center gap-1.5 border-2 rounded-full py-0.5 ${getGScoreBorderColor((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0))} text-slate-800`}>
+                        <span className="text-[8px] uppercase font-bold tracking-tight opacity-80">{t.assetCard.confidence}</span>
+                        <span className="text-[11px] font-bold num">
+                            {((asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : 0)).toFixed(0)}%
+                        </span>
                     </div>
                 )}
             </div>
