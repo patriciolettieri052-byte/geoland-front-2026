@@ -46,7 +46,7 @@ export function TheOracleLoader({ onComplete }: TheOracleLoaderProps) {
         >
             <div className="relative flex items-center justify-center mb-10">
                 <motion.div
-                    className="w-16 h-16 rounded-full border-2 border-white/10 border-t-white/80"
+                    className="w-16 h-16 rounded-full border-2 border-gray-200 border-t-[#1E3A5F]"
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                 />
@@ -61,7 +61,7 @@ export function TheOracleLoader({ onComplete }: TheOracleLoaderProps) {
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.4 }}
                     >
-                        <Typography variant="p" className="text-white/70 tracking-[0.2em] font-light text-xs uppercase">
+                        <Typography variant="p" className="text-[#374151] tracking-[0.2em] font-medium text-xs uppercase opacity-80">
                             {LOADING_PHRASES[currentPhraseIndex]}
                         </Typography>
                     </motion.div>
