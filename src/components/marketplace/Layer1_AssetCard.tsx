@@ -208,7 +208,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                             <span className="text-[9px] uppercase font-bold tracking-[0.05em]" style={{ color: '#9CA3AF' }}>G-Score</span>
                             <HelpCircle size={9} style={{ color: '#9CA3AF' }} />
                         </div>
-                        <div className="text-[32px] font-bold num leading-none" style={{ color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
+                        <div className="text-[38px] font-light num leading-none tracking-tighter" style={{ color: gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626' }}>
                             {gScore}
                         </div>
                     </div>
@@ -219,7 +219,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     {/* ROI Group */}
                     <div className="flex flex-col items-center flex-1">
                         <span className="text-[9px] uppercase font-bold tracking-[0.05em] mb-1.5" style={{ color: '#9CA3AF' }}>{t.assetCard.roiEst}</span>
-                        <div className="text-[32px] font-bold leading-none num" style={{ color: '#16A34A' }}>
+                        <div className="text-[38px] font-light leading-none num tracking-tighter" style={{ color: '#16A34A' }}>
                             {(expectedIrr * 100).toFixed(1)}%
                         </div>
                     </div>
