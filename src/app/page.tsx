@@ -159,12 +159,12 @@ export default function GeolandOS() {
   const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
 
   return (
-    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#a6adb3', color: '#0F1117' }}>
+    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#f6f7ed', color: '#0F1117' }}>
 
       <motion.div
         key="stable-container"
         className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-        style={{ backgroundColor: '#a6adb3' }}
+        style={{ backgroundColor: '#f6f7ed' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -174,8 +174,8 @@ export default function GeolandOS() {
         {/* Header — Logo */}
         <div className="w-full max-w-[1664px] mx-auto px-0 mb-6 flex items-center justify-between relative z-50">
           <div className="flex items-end gap-6 h-12">
-            <img src="/logo Geoland OS.svg" alt="GEOLAND OS" className="h-[34px] w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
-            <span className="font-sans text-[8px] font-normal tracking-wider hidden md:block pb-[2px]" style={{ color: '#FFFFFF' }}>
+            <img src="/logo Geoland OS.svg" alt="GEOLAND OS" className="h-[34px] w-auto" />
+            <span className="font-sans text-[8px] font-normal tracking-wider hidden md:block relative top-[15px]" style={{ color: '#000000' }}>
               {t.header.infraText}
             </span>
           </div>
