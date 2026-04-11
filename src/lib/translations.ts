@@ -25,7 +25,7 @@ export const translations = {
       long: "Largo plazo"
     },
     header: {
-      infraText: "The Infrastructure for Global Real Estate Investment Decisions",
+      infraText: "The infrastructure for global real estate investment decisions",
       matchedOpportunities: "Oportunidades Coincidentes",
       assetsMatching: "{{count}} Assets coinciden con tu estrategia.",
       retry: "Reintentar",
@@ -85,7 +85,7 @@ export const translations = {
       long: "Long term"
     },
     header: {
-      infraText: "The Infrastructure for Global Real Estate Investment Decisions",
+      infraText: "The infrastructure for global real estate investment decisions",
       matchedOpportunities: "Matched Opportunities",
       assetsMatching: "{{count}} Assets matching strategy.",
       retry: "Retry",
@@ -145,7 +145,7 @@ export const translations = {
       long: "Longo prazo"
     },
     header: {
-      infraText: "The Infrastructure for Global Real Estate Investment Decisions",
+      infraText: "The infrastructure for global real estate investment decisions",
       matchedOpportunities: "Oportunidades Correspondentes",
       assetsMatching: "{{count}} ativos correspondem à sua estratégia.",
       retry: "Tentar novamente",
