@@ -170,7 +170,7 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
         <button
           onClick={() => onRequestLayer3 ? onRequestLayer3(asset.id) : console.log("Layer 3 requested for:", asset.id)}
           style={{
-            background: "#1E3A5F",
+            background: "#000000",
             border: "none",
             color: "#FFFFFF",
             fontSize: 12,
@@ -181,7 +181,7 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
             letterSpacing: "0.02em",
             width: "100%",
             transition: "all 0.2s",
-            boxShadow: "0 2px 4px rgba(30,58,95,0.2)",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
           }}
         >
           Generar reporte completo (Layer 3) →

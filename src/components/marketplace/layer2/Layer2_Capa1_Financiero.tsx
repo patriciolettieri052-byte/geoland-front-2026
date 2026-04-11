@@ -25,7 +25,7 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
     <div style={{ padding: "12px 12px 10px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
       {/* Header de sección */}
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-        <div style={{ width: 2, height: 9, borderRadius: 1, background: "#1E3A5F" }} />
+        <div style={{ width: 2, height: 9, borderRadius: 1, background: "#000000" }} />
         <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
           Lógica financiera · {estrategia.replace(/_/g, " ")}
         </span>
@@ -58,7 +58,7 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
               </div>
               {v.showBar && (
                 <div style={{ height: 3, background: "#F3F4F6", borderRadius: 2, marginTop: 4, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${barPct}%`, background: "rgba(30,58,95,0.55)", borderRadius: 2, transition: "width 0.4s" }} />
+                  <div style={{ height: "100%", width: `${barPct}%`, background: "rgba(0,0,0,0.55)", borderRadius: 2, transition: "width 0.4s" }} />
                 </div>
               )}
             </div>

@@ -26,7 +26,7 @@ export function Typography({ variant = 'p', className, as, children, ...props }:
         h4: 'text-[#374151]',
         p:  'text-[#6B7280]',
         label: 'text-[#9CA3AF]',
-        metric: 'text-[#1E3A5F]',
+        metric: 'text-[#000000]',
     };
 
     return (

@@ -31,7 +31,7 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
           style={{
             background: "none",
             border: "none",
-            color: "#1E3A5F",
+            color: "#000000",
             fontWeight: 600,
             fontSize: 11,
             cursor: "pointer",

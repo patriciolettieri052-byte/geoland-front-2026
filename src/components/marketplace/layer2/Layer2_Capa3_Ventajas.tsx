@@ -3,7 +3,7 @@ import { AssetMatchItem } from "@/types/geoland";
 
 const BAR_COLORS = {
   green:  "rgba(22,163,74,0.6)",
-  purple: "rgba(30,58,95,0.6)",
+  purple: "rgba(0,0,0,0.6)",
   amber:  "rgba(217,119,6,0.6)",
 };
 
@@ -21,7 +21,7 @@ function AdvCard({ title, value, description, barPercent, color }: {
       <div style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 3, fontWeight: 700 }}>
         {title}
       </div>
-      <div style={{ fontSize: 18, fontWeight: 700, color: color === "green" ? "#16A34A" : color === "purple" ? "#1E3A5F" : "#D97706" }}>
+      <div style={{ fontSize: 18, fontWeight: 700, color: color === "green" ? "#16A34A" : color === "purple" ? "#000000" : "#D97706" }}>
         {value}
       </div>
       <div style={{ fontSize: 10, color: "#6B7280", marginTop: 2, fontWeight: 500 }}>{description}</div>
