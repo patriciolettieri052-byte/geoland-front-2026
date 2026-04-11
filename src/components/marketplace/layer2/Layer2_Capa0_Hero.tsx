@@ -26,8 +26,8 @@ function getRiskLabel(score: number): { label: string; color: string } {
 }
 
 // ─── BigMetric — número grande con barra opcional ─────────────────────────────
-function BigMetric({ label, value, color, sub, showBar, barWidth }: {
-  label: string; value: string; color?: string; sub?: string; showBar?: boolean; barWidth?: number;
+function BigMetric({ label, value, color, sub, showBar, barWidth, showChart }: {
+  label: string; value: string; color?: string; sub?: string; showBar?: boolean; barWidth?: number; showChart?: boolean;
 }) {
   return (
     <div style={{
@@ -60,6 +60,35 @@ function BigMetric({ label, value, color, sub, showBar, barWidth }: {
             transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
             style={{ height: "100%", background: color || "rgba(0,0,0,0.65)", borderRadius: 2 }} 
           />
+        </div>
+      )}
+      {showChart && (
+        <div style={{ height: 30, marginTop: 4, position: 'relative' }}>
+          <svg width="100%" height="100%" viewBox="0 0 100 30" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={`grad-${label}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={color || "#16A34A"} stopOpacity="0.2" />
+                <stop offset="100%" stopColor={color || "#16A34A"} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <motion.path
+                d="M 0 28 Q 20 25 40 20 Q 60 22 80 10 L 100 2"
+                fill="none"
+                stroke={color || "#16A34A"}
+                strokeWidth="2"
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.3 }}
+            />
+            <motion.path
+                d="M 0 28 Q 20 25 40 20 Q 60 22 80 10 L 100 2 V 30 H 0 Z"
+                fill={`url(#grad-${label})`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1.2 }}
+            />
+          </svg>
         </div>
       )}
     </div>
@@ -222,8 +251,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
             label={config.topLeft.label}
             value={tirFormatted}
             color="#16A34A"
-            showBar
-            barWidth={Math.min(100, (tirValue || 0) * (config.topLeft.format === "percent" ? 400 : 1))}
+            showChart
           />
           <BigMetric
             label={config.bottomLeft.label}

@@ -89,24 +89,29 @@
     display: none;
   }
 
-  /* Premium Scrollbar */
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.25);
-    border-radius: 10px;
-    transition: all 0.2s;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
+/* Premium Minimalist Scrollbar - Global */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #000000 !important;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333333 !important;
+}
 
-  input::placeholder {
-    color: #9CA3AF;
-  }
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #000000 transparent;
+}
+
+input::placeholder {
+  color: #9CA3AF;
+}
 }
