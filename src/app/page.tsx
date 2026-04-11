@@ -117,7 +117,7 @@ export default function GeolandOS() {
       return {
         ...a,
         id,
-        estrategia: a.estrategia || "FIX_FLIP",
+        estrategia: a.estrategia || a.strategy || "FIX_FLIP",
         nombre: a.nombre || "Palacio Alcalá - Reforma Integral",
         ciudad: a.ciudad || "Buenos Aires",
         location: a.location || "Recoleta, Buenos Aires",
@@ -142,12 +142,15 @@ export default function GeolandOS() {
           expectedIrr: localIrr,
           backgroundImageUrl: (a.layer1?.backgroundImageUrl) || localPhotos[0]
         },
-        layer2: a.layer2 || { 
-          metrics: { 
-            baseCapex: localPrice,
+        layer2: {
+          ...(a.layer2 || {}),
+          metrics: {
+            ...(a.layer2?.metrics || {}),
+            baseCapex: (a.layer2?.metrics?.baseCapex && a.layer2?.metrics?.baseCapex > 0) ? a.layer2.metrics.baseCapex : localPrice,
             renovationEstimate: a.capex_estimado || 48000,
             projectDuration: a.payback_meses || 9
-          } 
+          },
+          sensitivityConfig: a.layer2?.sensitivityConfig || { capexRange: [localPrice * 0.8, localPrice * 1.2], exitRateRange: [4.0, 6.0] }
         }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
@@ -169,10 +172,10 @@ export default function GeolandOS() {
         {/* Sin overlay oscuro */}
 
         {/* Header — Logo */}
-        <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-center justify-between relative z-50">
+        <div className="w-full max-w-[1664px] mx-auto px-0 mb-1.5 flex items-center justify-between relative z-50">
           <div className="flex items-end gap-6 h-12">
             <img src="/logo Geoland OS.svg" alt="GEOLAND OS" className="h-[42px] w-auto" />
-            <span className="font-sans text-[10px] font-medium tracking-wider uppercase hidden md:block pb-[6px]" style={{ color: '#000000' }}>
+            <span className="font-sans text-[10px] font-medium tracking-wider uppercase hidden md:block pb-[4px]" style={{ color: '#000000' }}>
               {t.header.infraText}
             </span>
           </div>
