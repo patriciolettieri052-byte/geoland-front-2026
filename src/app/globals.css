@@ -3,7 +3,7 @@
 @theme {
   --font-sans: var(--font-inter);
 
-  --color-background: #7f8285;
+  --color-background: #979ca1;
   --color-foreground: #0F1117;
 
   --color-card: #FFFFFF;
@@ -25,7 +25,7 @@
 
 @layer base {
   :root {
-    --background: #7f8285;
+    --background: #979ca1;
     --foreground: #0F1117;
   }
 
