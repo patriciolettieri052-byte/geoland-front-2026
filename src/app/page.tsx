@@ -107,44 +107,44 @@ export default function GeolandOS() {
       return {
         ...a,
         id,
-        estrategia: "FIX_FLIP",
-        nombre: "Residencia Colonial - Abasto",
-        ciudad: "Buenos Aires",
-        location: "Abasto, Buenos Aires, Argentina",
-        precio_usd: 165000,
-        capex_estimado: 48000,
-        arv_estimado: 295000,
-        roiTotal: 0.385,
-        irr_equivalente: 0.242,
-        risk_score: 28,
-        confidence_final: 0.89,
-        g_score: 84,
-        ingreso_neto_anual: 0,
-        descuento_pct: 0.12,
-        payback_meses: 8,
-        precio_m2: 1850,
-        precio_m2_zona: 2100,
-        etiqueta_operacion: "Oportunidad a largo plazo",
-        photo_urls: [
+        estrategia: a.estrategia || "FIX_FLIP",
+        nombre: a.nombre || "Palacio Alcalá - Reforma Integral",
+        ciudad: a.ciudad || "Buenos Aires",
+        location: a.location || "Recoleta, Buenos Aires",
+        precio_usd: a.precio_usd || 165000,
+        capex_estimado: a.capex_estimado || 48000,
+        arv_estimado: a.arv_estimado || 295000,
+        roiTotal: a.roiTotal || 0.385,
+        irr_equivalente: a.irr_equivalente || 0.242,
+        risk_score: a.risk_score || 28,
+        confidence_final: a.confidence_final || 0.89,
+        g_score: a.g_score || 84,
+        ingreso_neto_anual: a.ingreso_neto_anual || 0,
+        descuento_pct: a.descuento_pct || 0.12,
+        payback_meses: a.payback_meses || 9,
+        precio_m2: a.precio_m2 || 1850,
+        precio_m2_zona: a.precio_m2_zona || 2100,
+        etiqueta_operacion: a.etiqueta_operacion || "Oportunidad High-Yield",
+        photo_urls: a.photo_urls && a.photo_urls.length > 0 ? a.photo_urls : [
           "/renovation_5.png",
           "/renovation_1.png",
           "/renovation_2.png",
           "/renovation_3.png",
           "/renovation_4.png"
         ],
-        layer1: { ...(a.layer1 || {}), gScore: 84 },
+        layer1: { ...(a.layer1 || {}), gScore: a.g_score || 84 },
         layer2: a.layer2 || { 
           metrics: { 
-            baseCapex: 165000,
-            renovationEstimate: 48000,
-            projectDuration: 8
+            baseCapex: a.precio_usd || 165000,
+            renovationEstimate: a.capex_estimado || 48000,
+            projectDuration: a.payback_meses || 9
           } 
         }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
   }, [assets, perfilCompletado, isRefining, iterandoResultados, filtrosBlandosIsv]);
 
-  const activeAsset = assets.find(a => a.id === activeAssetId);
+  const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
 
   return (
     <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#D1D5DB', color: '#0F1117' }}>
