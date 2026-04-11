@@ -174,8 +174,8 @@ export default function GeolandOS() {
         {/* Header — Logo */}
         <div className="w-full max-w-[1664px] mx-auto px-0 mb-6 flex items-center justify-between relative z-50">
           <div className="flex items-end gap-6 h-12">
-            <img src="/logo Geoland OS.svg" alt="GEOLAND OS" className="h-[42px] w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
-            <span className="font-sans text-[10px] font-medium tracking-wider hidden md:block pb-[4px]" style={{ color: '#FFFFFF' }}>
+            <img src="/logo Geoland OS.svg" alt="GEOLAND OS" className="h-[38px] w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
+            <span className="font-sans text-[10px] font-medium tracking-wider hidden md:block pb-[1px]" style={{ color: '#FFFFFF' }}>
               {t.header.infraText}
             </span>
           </div>
