@@ -212,7 +212,7 @@ export function AiChatProfiler() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-[562px] px-6 relative">
+        <div className="flex flex-col h-full w-full max-w-[620px] px-6 relative">
 
             {/* ── ACTIVE_SUPPORT badge (FRONT-ISV-EXP-04) ──────────────── */}
             {currentState === 'ACTIVE_SUPPORT' && (
@@ -234,11 +234,11 @@ export function AiChatProfiler() {
                         >
                             {msg.role === 'assistant' ? (
                                 <div
-                                    className="max-w-[85%] p-[13px] flex gap-[12px] rounded-2xl rounded-tl-sm"
-                                    style={{ backgroundColor: '#F2F4F7', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+                                    className="max-w-[85%] p-[13px] flex gap-[12px] rounded-2xl rounded-tl-sm transition-all"
+                                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 2px 5px rgba(0,0,0,0.04)' }}
                                 >
                                     <div className="mt-0.5 flex-shrink-0 w-[15px] h-[15px] flex items-center justify-center rounded-sm font-bold text-[8px] text-white" style={{ backgroundColor: '#000000' }}>G</div>
-                                    <p className="text-[13px] font-normal leading-relaxed" style={{ color: '#374151' }}>
+                                    <p className="text-[13px] font-normal leading-relaxed" style={{ color: '#0F1117' }}>
                                         {msg.content}
                                     </p>
                                 </div>
@@ -259,7 +259,7 @@ export function AiChatProfiler() {
                     ))}
                     {isLoading && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                            <div className="p-[13px] rounded-2xl rounded-tl-sm" style={{ backgroundColor: '#F2F4F7', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                            <div className="p-[13px] rounded-2xl rounded-tl-sm" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 2px 5px rgba(0,0,0,0.04)' }}>
                                 <div className="flex space-x-1.5">
                                     <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#000000', opacity: 0.5 }} />
                                     <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#000000', opacity: 0.5, animationDelay: '0.1s' }} />

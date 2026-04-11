@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { AssetMatchItem } from "@/types/geoland";
 import { HERO_METRICS_CONFIG, STRATEGY_COLORS, STRATEGY_LABELS } from "./layer2.config";
 
@@ -53,7 +54,12 @@ function BigMetric({ label, value, color, sub, showBar, barWidth }: {
       )}
       {showBar && barWidth !== undefined && (
         <div style={{ height: 3, background: "#F3F4F6", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${barWidth}%`, background: color || "rgba(0,0,0,0.65)", borderRadius: 2 }} />
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${barWidth}%` }}
+            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+            style={{ height: "100%", background: color || "rgba(0,0,0,0.65)", borderRadius: 2 }} 
+          />
         </div>
       )}
     </div>
@@ -89,15 +95,16 @@ function RingMetric({ label, value, percent }: {
         <div style={{ position: "relative", width: 72, height: 72, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <svg width="72" height="72" viewBox="0 0 72 72" style={{ position: "absolute", top: 0, left: 0 }}>
             <circle cx="36" cy="36" r={r} fill="none" stroke="#F3F4F6" strokeWidth="5" />
-            <circle
+            <motion.circle
               cx="36" cy="36" r={r}
               fill="none"
               stroke={ringColor}
               strokeWidth="5"
-              strokeDasharray={`${dash} ${circ}`}
+              initial={{ strokeDasharray: `0 ${circ}` }}
+              animate={{ strokeDasharray: `${dash} ${circ}` }}
+              transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }}
               strokeDashoffset={circ * 0.25}
               strokeLinecap="round"
-              style={{ transition: "stroke-dasharray 0.5s ease" }}
             />
           </svg>
           <span style={{ position: "relative", zIndex: 1, fontSize: 14, fontWeight: 500, color: ringColor, fontVariantNumeric: "tabular-nums" }}>
@@ -223,6 +230,8 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
             value={formatValue(getVal(config.bottomLeft.field), config.bottomLeft.format)}
             color={risk.color}
             sub={risk.label}
+            showBar
+            barWidth={100 - (getVal(config.bottomLeft.field) || 50)}
           />
         </div>
 
@@ -237,6 +246,8 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
             label="G-Score"
             value={formatValue(gScore, "score")}
             color={gScore >= 80 ? "#059669" : gScore >= 60 ? "#D97706" : "#DC2626"}
+            showBar
+            barWidth={gScore}
           />
           <RingMetric
             label="Confidence"

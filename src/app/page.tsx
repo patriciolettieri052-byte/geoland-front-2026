@@ -103,7 +103,17 @@ export default function GeolandOS() {
       const mockGScore = 80 + (seed % 18);
       const aqs = a.layer1?.gScore || a.aqs_score || mockGScore;
       
-      // Inject Enriched Fix & Flip mockup data for demo
+      const localPrice = a.precio_usd || 165000;
+      const localIrr = a.irr_equivalente || 0.242;
+      const localGScore = a.g_score || 84;
+      const localPhotos = (a.photo_urls && a.photo_urls.length > 0) ? a.photo_urls : [
+        "/renovation_5.png",
+        "/renovation_1.png",
+        "/renovation_2.png",
+        "/renovation_3.png",
+        "/renovation_4.png"
+      ];
+
       return {
         ...a,
         id,
@@ -111,31 +121,30 @@ export default function GeolandOS() {
         nombre: a.nombre || "Palacio Alcalá - Reforma Integral",
         ciudad: a.ciudad || "Buenos Aires",
         location: a.location || "Recoleta, Buenos Aires",
-        precio_usd: a.precio_usd || 165000,
+        precio_usd: localPrice,
         capex_estimado: a.capex_estimado || 48000,
         arv_estimado: a.arv_estimado || 295000,
         roiTotal: a.roiTotal || 0.385,
-        irr_equivalente: a.irr_equivalente || 0.242,
+        irr_equivalente: localIrr,
         risk_score: a.risk_score || 28,
         confidence_final: a.confidence_final || 0.89,
-        g_score: a.g_score || 84,
+        g_score: localGScore,
         ingreso_neto_anual: a.ingreso_neto_anual || 0,
         descuento_pct: a.descuento_pct || 0.12,
         payback_meses: a.payback_meses || 9,
         precio_m2: a.precio_m2 || 1850,
         precio_m2_zona: a.precio_m2_zona || 2100,
         etiqueta_operacion: a.etiqueta_operacion || "Oportunidad High-Yield",
-        photo_urls: a.photo_urls && a.photo_urls.length > 0 ? a.photo_urls : [
-          "/renovation_5.png",
-          "/renovation_1.png",
-          "/renovation_2.png",
-          "/renovation_3.png",
-          "/renovation_4.png"
-        ],
-        layer1: { ...(a.layer1 || {}), gScore: a.g_score || 84 },
+        photo_urls: localPhotos,
+        layer1: { 
+          ...(a.layer1 || {}), 
+          gScore: localGScore,
+          expectedIrr: localIrr,
+          backgroundImageUrl: (a.layer1?.backgroundImageUrl) || localPhotos[0]
+        },
         layer2: a.layer2 || { 
           metrics: { 
-            baseCapex: a.precio_usd || 165000,
+            baseCapex: localPrice,
             renovationEstimate: a.capex_estimado || 48000,
             projectDuration: a.payback_meses || 9
           } 
@@ -162,8 +171,8 @@ export default function GeolandOS() {
         {/* Header — Logo */}
         <div className="w-full max-w-[1664px] mx-auto px-0 mb-4 flex items-center justify-between relative z-50">
           <div className="flex items-center gap-6">
-            <img src="/logo-Geoland-OS.png" alt="GEOLAND OS" className="h-[50px] w-auto" />
-            <span className="font-sans text-[11px] font-medium tracking-wider leading-none uppercase hidden md:block" style={{ color: '#9CA3AF' }}>
+            <img src="/logo Geoland OS.svg" alt="GEOLAND OS" className="h-[50px] w-auto" />
+            <span className="font-sans text-[11px] font-medium tracking-wider uppercase hidden md:block pt-5" style={{ color: '#000000' }}>
               {t.header.infraText}
             </span>
           </div>
@@ -282,13 +291,13 @@ export default function GeolandOS() {
           }}
         >
 
-          {/* Left: Chat Profiler (30%) — Permanente */}
-          <div className="w-full md:w-[30%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#FFFFFF' }}>
+          {/* Left: Chat Profiler (33%) — Permanente */}
+          <div className="w-full md:w-[33%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>
             <AiChatProfiler />
           </div>
 
-          {/* Right: Radar/Grid/Layer2 (70%) */}
-          <div className="w-full md:w-[70%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+          {/* Right: Radar/Grid/Layer2 (67%) */}
+          <div className="w-full md:w-[67%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
             <AnimatePresence mode="wait">
               {activeAsset ? (
                 /* LAYER 2 */

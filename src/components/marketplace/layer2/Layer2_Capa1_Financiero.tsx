@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { AssetMatchItem } from "@/types/geoland";
 import { FINANCIAL_VARS_CONFIG } from "./layer2.config";
 
@@ -58,7 +59,12 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
               </div>
               {v.showBar && (
                 <div style={{ height: 3, background: "#F3F4F6", borderRadius: 2, marginTop: 4, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${barPct}%`, background: "rgba(0,0,0,0.55)", borderRadius: 2, transition: "width 0.4s" }} />
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${barPct}%` }}
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.1 * i }}
+                    style={{ height: "100%", background: "rgba(0,0,0,0.55)", borderRadius: 2 }} 
+                  />
                 </div>
               )}
             </div>

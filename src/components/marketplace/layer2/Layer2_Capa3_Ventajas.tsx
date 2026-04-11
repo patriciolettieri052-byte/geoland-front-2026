@@ -1,4 +1,5 @@
 "use client";
+import { motion } from "framer-motion";
 import { AssetMatchItem } from "@/types/geoland";
 
 const BAR_COLORS = {
@@ -26,7 +27,12 @@ function AdvCard({ title, value, description, barPercent, color }: {
       </div>
       <div style={{ fontSize: 10, color: "#6B7280", marginTop: 2, fontWeight: 500 }}>{description}</div>
       <div style={{ height: 3, background: "#F3F4F6", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
-        <div style={{ height: "100%", width: `${barPercent}%`, background: BAR_COLORS[color], borderRadius: 2 }} />
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: `${barPercent}%` }}
+          transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+          style={{ height: "100%", background: BAR_COLORS[color], borderRadius: 2 }} 
+        />
       </div>
     </div>
   );

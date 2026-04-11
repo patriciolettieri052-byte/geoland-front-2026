@@ -69,7 +69,7 @@ export function DynamicIsvRadar() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                className="w-full h-full max-h-[600px] z-10"
+                className="w-full h-full max-h-[600px] z-10 pointer-events-none"
             >
                 <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
