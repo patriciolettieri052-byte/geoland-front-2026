@@ -159,12 +159,12 @@ export default function GeolandOS() {
   const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
 
   return (
-    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#fafaf7', color: '#0F1117' }}>
+    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#fffffc', color: '#0F1117' }}>
 
       <motion.div
         key="stable-container"
         className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-        style={{ backgroundColor: '#fafaf7' }}
+        style={{ backgroundColor: '#fffffc' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -180,7 +180,7 @@ export default function GeolandOS() {
             </span>
           </div>
           
-          <div className="flex items-center gap-4 relative">
+          <div className="flex items-end gap-4 h-12 relative pb-[2px]">
             {/* Language Selector */}
             <div className="flex items-center gap-3 mr-2 rounded-full px-4 py-1.5 border" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}>
               {(['es', 'en', 'pt'] as const).map((lang) => (
