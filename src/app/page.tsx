@@ -155,12 +155,12 @@ export default function GeolandOS() {
   const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
 
   return (
-    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#FFFFFF', color: '#0F1117' }}>
+    <main className={`${inter.variable} min-h-screen w-full overflow-auto font-sans`} style={{ backgroundColor: '#FFFFFF', color: '#0F1117' }}>
 
       <motion.div
         key="stable-container"
-        className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-        style={{ backgroundColor: '#FFFFFF' }}
+        className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8" 
+        style={{ backgroundColor: "#FFFFFF", minWidth: "1024px" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -295,11 +295,12 @@ export default function GeolandOS() {
 
         {/* ── CONTENEDOR PRINCIPAL ── */}
         <div
-          className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] overflow-hidden rounded-[2rem] relative z-10"
+          className="flex flex-row w-full max-w-[1664px] h-[85vh] overflow-hidden rounded-[2rem] relative z-10"
           style={{
             backgroundColor: '#FFFFFF',
             border: '1px solid #E5E7EB',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)'
+            boxShadow: '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
+            minWidth: '900px',
           }}
         >
 
