@@ -159,12 +159,12 @@ export default function GeolandOS() {
   const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
 
   return (
-    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#f6f7ed', color: '#0F1117' }}>
+    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#fafaf7', color: '#0F1117' }}>
 
       <motion.div
         key="stable-container"
         className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-        style={{ backgroundColor: '#f6f7ed' }}
+        style={{ backgroundColor: '#fafaf7' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -295,7 +295,7 @@ export default function GeolandOS() {
         >
 
           {/* Left: Chat Profiler (33%) — Permanente */}
-          <div className="w-full md:w-[33%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#F9FAFB' }}>
+          <div className="w-full md:w-[33%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#f0f0f0' }}>
             <AiChatProfiler />
           </div>
 
