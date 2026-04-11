@@ -14,8 +14,6 @@ import { Typography } from '@/components/ui/Typography';
 import { Settings, HelpCircle, Info, User, Star, Bell, BarChart3, CreditCard, LogOut, ChevronRight } from 'lucide-react';
 import { translations } from '@/lib/translations';
 
-
-
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
@@ -34,7 +32,7 @@ export default function GeolandOS() {
     setAssets,
     isRefining,
     setIsRefining,
-    chatHistory,  // Requerido para ChatSidebar
+    chatHistory,
     language,
     setLanguage
   } = useGeolandStore();
@@ -45,7 +43,6 @@ export default function GeolandOS() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showGearMenu, setShowGearMenu] = useState(false);
 
-  // Lógica existente de fetchMatch (sin cambios)
   useEffect(() => {
     if (!perfilCompletado || assets.length > 0) return;
     let cancelled = false;
@@ -93,7 +90,6 @@ export default function GeolandOS() {
     }
   };
 
-  // Filtered assets (sin cambios)
   const filteredAssets = useMemo(() => {
     if (!perfilCompletado || isRefining) return [];
     let result = [...assets];
@@ -159,35 +155,41 @@ export default function GeolandOS() {
   const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
 
   return (
-    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#fffffc', color: '#0F1117' }}>
+    <main className={`${inter.variable} min-h-screen w-full relative overflow-hidden font-sans`} style={{ backgroundColor: '#FFFFFF', color: '#0F1117' }}>
 
       <motion.div
         key="stable-container"
         className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8"
-        style={{ backgroundColor: '#fffffc' }}
+        style={{ backgroundColor: '#FFFFFF' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Sin overlay oscuro */}
 
-        {/* Header — Logo */}
+        {/* ── HEADER ── */}
         <div className="w-full max-w-[1664px] mx-auto px-0 mb-6 flex items-center justify-between relative z-50">
-          <div className="flex items-end gap-6 h-12">
-            <img src="/logo Geoland OS.svg" alt="GEOLAND OS" className="h-[34px] w-auto" />
-            <span className="font-sans text-[8px] font-normal tracking-wider hidden md:block relative top-[5px]" style={{ color: '#000000' }}>
+
+          {/* Izquierda: logo + tagline alineados al centro */}
+          <div className="flex items-center gap-4">
+            <img src="/logo Geoland OS.svg" alt="GEOLAND OS" style={{ height: '32px', width: 'auto' }} />
+            <span style={{ fontSize: '11px', fontWeight: 400, letterSpacing: '0.04em', color: '#9CA3AF' }}>
               {t.header.infraText}
             </span>
           </div>
-          
-          <div className="flex items-end gap-4 h-12 relative pb-[2px]">
+
+          {/* Derecha: idioma + engranaje + avatar — todos centrados en el mismo eje */}
+          <div className="flex items-center gap-3">
+
             {/* Language Selector */}
-            <div className="flex items-center gap-3 mr-2 rounded-full px-4 py-1.5 border" style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}>
+            <div
+              className="flex items-center gap-3 px-4 rounded-full border"
+              style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB', height: '36px' }}
+            >
               {(['es', 'en', 'pt'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setLanguage(lang)}
-                  className={`text-[10px] font-bold tracking-widest uppercase transition-all cursor-pointer ${language === lang ? 'scale-110' : ''}`}
+                  className="text-[10px] font-bold tracking-widest uppercase transition-all cursor-pointer"
                   style={{ color: language === lang ? '#000000' : '#9CA3AF' }}
                 >
                   {lang}
@@ -195,18 +197,20 @@ export default function GeolandOS() {
               ))}
             </div>
 
-            {/* Gear Button */}
+            {/* Gear */}
             <div className="relative">
               <button
                 onClick={() => { setShowGearMenu(!showGearMenu); setShowProfileMenu(false); }}
-                className="flex items-center justify-center w-9 h-9 rounded-full border transition-all hover:shadow-sm cursor-pointer"
+                className="flex items-center justify-center rounded-full border transition-all hover:shadow-sm cursor-pointer"
                 style={{
+                  width: '36px',
+                  height: '36px',
                   backgroundColor: showGearMenu ? '#F3F4F6' : '#FFFFFF',
                   borderColor: '#E5E7EB',
-                  color: '#6B7280'
+                  color: '#6B7280',
                 }}
               >
-                <Settings size={18} />
+                <Settings size={16} />
               </button>
 
               <AnimatePresence>
@@ -224,7 +228,7 @@ export default function GeolandOS() {
                     ].map((item, i) => (
                       <button
                         key={i}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-xs rounded-xl transition-all group hover:bg-gray-50 cursor-pointer"
+                        className="w-full flex items-center gap-3 px-3 py-2 text-xs rounded-xl transition-all hover:bg-gray-50 cursor-pointer"
                         style={{ color: '#6B7280' }}
                         onClick={() => setShowGearMenu(false)}
                       >
@@ -237,12 +241,16 @@ export default function GeolandOS() {
               </AnimatePresence>
             </div>
 
-            {/* Profile Button */}
+            {/* Avatar */}
             <div className="relative">
-              <div 
+              <div
                 onClick={() => { setShowProfileMenu(!showProfileMenu); setShowGearMenu(false); }}
-                className={`flex items-center justify-center w-9 h-9 rounded-full text-white font-bold text-sm shadow-sm border cursor-pointer hover:opacity-90 transition-all ${showProfileMenu ? 'ring-2 ring-offset-1' : ''}`}
-                style={{ backgroundColor: '#000000', borderColor: '#000000' }}
+                className={`flex items-center justify-center rounded-full text-white font-bold text-sm cursor-pointer hover:opacity-90 transition-all ${showProfileMenu ? 'ring-2 ring-offset-1 ring-black' : ''}`}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: '#000000',
+                }}
               >
                 P
               </div>
@@ -258,16 +266,16 @@ export default function GeolandOS() {
                   >
                     {[
                       { icon: BarChart3, label: t.menus.profile.myBureau },
-                      { icon: Star, label: t.menus.profile.myFavorites },
-                      { icon: Bell, label: t.menus.profile.myAlerts },
-                      { icon: Info, label: t.menus.profile.usage },
+                      { icon: Star,     label: t.menus.profile.myFavorites },
+                      { icon: Bell,     label: t.menus.profile.myAlerts },
+                      { icon: Info,     label: t.menus.profile.usage },
                       { icon: CreditCard, label: t.menus.profile.subscription },
-                      { icon: LogOut, label: t.menus.profile.logout, danger: true }
+                      { icon: LogOut,   label: t.menus.profile.logout, danger: true }
                     ].map((item, i) => (
                       <button
                         key={i}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all group cursor-pointer ${item.danger ? 'hover:bg-red-50' : 'hover:bg-gray-50'}`}
-                        style={{ color: item.danger ? '#DC2626' : '#374151' }}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all cursor-pointer ${(item as any).danger ? 'hover:bg-red-50' : 'hover:bg-gray-50'}`}
+                        style={{ color: (item as any).danger ? '#DC2626' : '#374151' }}
                         onClick={() => setShowProfileMenu(false)}
                       >
                         <div className="flex items-center gap-3">
@@ -281,10 +289,11 @@ export default function GeolandOS() {
                 )}
               </AnimatePresence>
             </div>
+
           </div>
         </div>
 
-        {/* CONTENEDOR PRINCIPAL — Glass Container */}
+        {/* ── CONTENEDOR PRINCIPAL ── */}
         <div
           className="flex flex-col md:flex-row w-full max-w-[1664px] h-[85vh] overflow-hidden rounded-[2rem] relative z-10"
           style={{
@@ -294,7 +303,7 @@ export default function GeolandOS() {
           }}
         >
 
-          {/* Left: Chat Profiler (33%) — Permanente */}
+          {/* Left: Chat Profiler (33%) */}
           <div className="w-full md:w-[33%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#f0f0f0' }}>
             <AiChatProfiler />
           </div>
@@ -303,7 +312,6 @@ export default function GeolandOS() {
           <div className="w-full md:w-[67%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
             <AnimatePresence mode="wait">
               {activeAsset ? (
-                /* LAYER 2 */
                 <motion.div
                   key="layer2"
                   initial={{ opacity: 0, x: 20 }}
@@ -312,13 +320,9 @@ export default function GeolandOS() {
                   transition={{ duration: 0.4 }}
                   className="absolute inset-0 flex flex-col z-0"
                 >
-                  <Layer2Container 
-                    asset={activeAsset} 
-                    onClose={() => setActiveAsset(null)} 
-                  />
+                  <Layer2Container asset={activeAsset} onClose={() => setActiveAsset(null)} />
                 </motion.div>
               ) : !perfilCompletado ? (
-                /* RADAR */
                 <motion.div
                   key="radar-view"
                   initial={{ opacity: 0, x: 20 }}
@@ -330,7 +334,6 @@ export default function GeolandOS() {
                   <DynamicIsvRadar />
                 </motion.div>
               ) : isRefining ? (
-                /* LOADER */
                 <motion.div
                   key="loader-view"
                   initial={{ opacity: 0 }}
@@ -341,7 +344,6 @@ export default function GeolandOS() {
                   <TheOracleLoader onComplete={handleLoaderComplete} />
                 </motion.div>
               ) : (
-                /* GRID (LAYER 1) */
                 <motion.div
                   key="index-view"
                   initial={{ opacity: 0, x: 20 }}
@@ -362,28 +364,28 @@ export default function GeolandOS() {
 
                   <div className="flex-1">
                     {error ? (
-                        <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-8">
-                            <p className="text-lg mb-4" style={{ color: '#6B7280' }}>{error}</p>
-                            <button
-                                onClick={() => window.location.reload()}
-                                className="px-6 py-2 rounded-lg transition-colors text-white" style={{ backgroundColor: '#000000' }}
-                            >
-                                Reintentar
-                            </button>
-                        </div>
+                      <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-8">
+                        <p className="text-lg mb-4" style={{ color: '#6B7280' }}>{error}</p>
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="px-6 py-2 rounded-lg transition-colors text-white"
+                          style={{ backgroundColor: '#000000' }}
+                        >
+                          Reintentar
+                        </button>
+                      </div>
                     ) : (
-                        <>
-                            <Layer1GlassGrid assets={filteredAssets} onAssetClick={setActiveAsset} />
-
-                            {filteredAssets.length === 0 && (
-                              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center">
-                                <p className="text-lg" style={{ color: '#374151' }}>{t.header.noMatches}</p>
-                                <p className="max-w-xs mt-4 leading-relaxed text-sm" style={{ color: '#9CA3AF' }}>
-                                  {t.header.filterWarning}
-                                </p>
-                              </motion.div>
-                            )}
-                        </>
+                      <>
+                        <Layer1GlassGrid assets={filteredAssets} onAssetClick={setActiveAsset} />
+                        {filteredAssets.length === 0 && (
+                          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12 text-center w-full flex flex-col items-center">
+                            <p className="text-lg" style={{ color: '#374151' }}>{t.header.noMatches}</p>
+                            <p className="max-w-xs mt-4 leading-relaxed text-sm" style={{ color: '#9CA3AF' }}>
+                              {t.header.filterWarning}
+                            </p>
+                          </motion.div>
+                        )}
+                      </>
                     )}
                   </div>
                 </motion.div>
