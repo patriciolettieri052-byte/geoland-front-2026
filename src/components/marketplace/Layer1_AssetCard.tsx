@@ -56,6 +56,13 @@ const RANK_BADGES: Record<number, { label: string; className: string }> = {
     3: { label: 'Bronze', className: 'bg-orange-100/90 text-orange-700' },
 };
 
+// Semáforo unificado
+function metricColor(value: number, high: number, mid: number): string {
+    if (value >= high) return '#16A34A';
+    if (value >= mid)  return '#D97706';
+    return '#DC2626';
+}
+
 interface Layer1AssetCardProps {
     asset: Asset;
     onClick: (id: string) => void;
@@ -74,6 +81,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     const backgroundImageUrl = layer1.backgroundImageUrl ?? '';
     const precio             = layer2.metrics?.baseCapex ?? 0;
     const strategyLabel      = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
+    const roiPct             = expectedIrr * 100;
 
     const formatPrecio = (n: number) => {
         if (!n || n === 0) return '—';
@@ -82,19 +90,53 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
 
-    const gScoreColor = gScore >= 80 ? '#16A34A' : gScore >= 60 ? '#D97706' : '#DC2626';
+    const gScoreColor = metricColor(gScore, 75, 50);
+    const roiColor    = metricColor(roiPct, 15, 8);
 
     const confRaw = (asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : null);
     const confVal = confRaw !== null ? Number(confRaw) : null;
-    const confColor = confVal !== null
-        ? (confVal >= 80 ? '#16A34A' : confVal >= 60 ? '#D97706' : '#DC2626')
-        : '#9CA3AF';
+    const confColor = confVal !== null ? metricColor(confVal, 75, 50) : '#9CA3AF';
 
-    // Anillo confidence
-    const ringSize = 52;
+    // Anillo SVG — mismo alto que los números (52px)
+    const RING = 52;
     const r = 20;
     const circ = 2 * Math.PI * r;
     const dash = confVal !== null ? (confVal / 100) * circ : 0;
+
+    // Estilo compartido para los 3 grupos de métricas
+    const metricGroup: React.CSSProperties = {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '4px',
+    };
+
+    const labelStyle: React.CSSProperties = {
+        fontSize: '8px',
+        fontWeight: 600,
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em',
+        color: '#9CA3AF',
+        lineHeight: 1,
+    };
+
+    const numStyle = (color: string): React.CSSProperties => ({
+        fontSize: '32px',
+        fontWeight: 300,
+        lineHeight: 1,
+        letterSpacing: '-0.03em',
+        fontVariantNumeric: 'tabular-nums',
+        color,
+    });
+
+    const divider: React.CSSProperties = {
+        width: '1px',
+        height: '36px',
+        backgroundColor: '#F3F4F6',
+        flexShrink: 0,
+    };
 
     return (
         <motion.div
@@ -166,7 +208,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 )}
             </div>
 
-            {/* ── MÉTRICAS 40% — 3 columnas horizontales ───────────── */}
+            {/* ── MÉTRICAS 40% — G-Score | ROI | Confidence en fila ── */}
             <div style={{
                 width: '40%',
                 flexShrink: 0,
@@ -174,59 +216,37 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-evenly',
-                padding: '0 12px',
+                padding: '0 16px',
             }}>
 
                 {/* G-SCORE */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px', height: '12px' }}>
-                        <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>G-Score</span>
+                <div style={metricGroup}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <span style={labelStyle}>G-Score</span>
                         <HelpCircle size={8} color="#D1D5DB" />
                     </div>
-                    <div style={{ height: `${ringSize}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{
-                            fontSize: '38px',
-                            fontWeight: 300,
-                            lineHeight: 1,
-                            letterSpacing: '-0.03em',
-                            fontVariantNumeric: 'tabular-nums',
-                            color: gScoreColor,
-                        }}>
-                            {gScore}
-                        </span>
-                    </div>
-
-                {/* Divisor */}
-                <div style={{ width: '1px', height: '40px', backgroundColor: '#F3F4F6', flexShrink: 0 }} />
-
-                {/* ROI EST. */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
-                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', height: '12px' }}>ROI EST.</span>
-                    <div style={{ height: `${ringSize}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span style={{
-                            fontSize: '38px',
-                            fontWeight: 300,
-                            lineHeight: 1,
-                            letterSpacing: '-0.03em',
-                            fontVariantNumeric: 'tabular-nums',
-                            color: '#16A34A',
-                        }}>
-                            {(expectedIrr * 100).toFixed(1)}%
-                        </span>
-                    </div>
+                    <span style={numStyle(gScoreColor)}>{gScore}</span>
                 </div>
 
-                {/* Divisor */}
-                <div style={{ width: '1px', height: '40px', backgroundColor: '#F3F4F6', flexShrink: 0 }} />
+                <div style={divider} />
+
+                {/* ROI EST. */}
+                <div style={metricGroup}>
+                    <span style={labelStyle}>ROI EST.</span>
+                    <span style={numStyle(roiColor)}>{roiPct.toFixed(1)}%</span>
+                </div>
+
+                <div style={divider} />
 
                 {/* CONFIDENCE RING */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
-                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', height: '12px' }}>Confidence</span>
+                <div style={metricGroup}>
+                    <span style={labelStyle}>Confidence</span>
                     {confVal !== null ? (
-                        <div style={{ position: 'relative', width: `${ringSize}px`, height: `${ringSize}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <svg width={ringSize} height={ringSize} viewBox={`0 0 ${ringSize} ${ringSize}`} style={{ position: 'absolute', top: 0, left: 0 }}>
-                                <circle cx={ringSize/2} cy={ringSize/2} r={r} fill="none" stroke="#F3F4F6" strokeWidth="3" />
+                        <div style={{ position: 'relative', width: `${RING}px`, height: `${RING}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width={RING} height={RING} viewBox={`0 0 ${RING} ${RING}`} style={{ position: 'absolute', top: 0, left: 0 }}>
+                                <circle cx={RING/2} cy={RING/2} r={r} fill="none" stroke="#F3F4F6" strokeWidth="3" />
                                 <circle
-                                    cx={ringSize/2} cy={ringSize/2} r={r}
+                                    cx={RING/2} cy={RING/2} r={r}
                                     fill="none"
                                     stroke={confColor}
                                     strokeWidth="3"
@@ -235,14 +255,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                                     strokeLinecap="round"
                                 />
                             </svg>
-                            <span style={{
-                                fontSize: '13px',
-                                fontWeight: 400,
-                                fontVariantNumeric: 'tabular-nums',
-                                color: confColor,
-                                position: 'relative',
-                                zIndex: 1,
-                            }}>
+                            <span style={{ fontSize: '13px', fontWeight: 500, fontVariantNumeric: 'tabular-nums', color: confColor, position: 'relative', zIndex: 1 }}>
                                 {confVal.toFixed(0)}%
                             </span>
                         </div>
