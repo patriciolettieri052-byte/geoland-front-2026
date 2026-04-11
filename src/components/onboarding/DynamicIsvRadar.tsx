@@ -69,10 +69,10 @@ export function DynamicIsvRadar() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                className="w-full h-full max-h-[600px] z-10 pointer-events-none"
+                className="w-full h-full max-h-[510px] z-10 pointer-events-none"
             >
                 <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="60%" data={data}>
                         <defs>
                           <radialGradient id="isvGradient" cx="50%" cy="50%" r="50%">
                             <stop offset="0%" stopColor="#000000" stopOpacity="0.8" />

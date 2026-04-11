@@ -82,12 +82,12 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
     const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
 
-    const gScoreColor = gScore >= 80 ? '#059669' : gScore >= 60 ? '#D97706' : '#DC2626';
+    const gScoreColor = gScore >= 80 ? '#16A34A' : gScore >= 60 ? '#D97706' : '#DC2626';
 
     const confRaw = (asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : null);
     const confVal = confRaw !== null ? Number(confRaw) : null;
     const confColor = confVal !== null
-        ? (confVal >= 80 ? '#059669' : confVal >= 60 ? '#D97706' : '#DC2626')
+        ? (confVal >= 80 ? '#16A34A' : confVal >= 60 ? '#D97706' : '#DC2626')
         : '#9CA3AF';
 
     // Anillo confidence
@@ -178,39 +178,41 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             }}>
 
                 {/* G-SCORE */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px', height: '12px' }}>
                         <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>G-Score</span>
                         <HelpCircle size={8} color="#D1D5DB" />
                     </div>
-                    <span style={{
-                        fontSize: '42px',
-                        fontWeight: 300,
-                        lineHeight: 1,
-                        letterSpacing: '-0.03em',
-                        fontVariantNumeric: 'tabular-nums',
-                        color: gScoreColor,
-                    }}>
-                        {gScore}
-                    </span>
-                </div>
+                    <div style={{ height: `${ringSize}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{
+                            fontSize: '38px',
+                            fontWeight: 300,
+                            lineHeight: 1,
+                            letterSpacing: '-0.03em',
+                            fontVariantNumeric: 'tabular-nums',
+                            color: gScoreColor,
+                        }}>
+                            {gScore}
+                        </span>
+                    </div>
 
                 {/* Divisor */}
                 <div style={{ width: '1px', height: '40px', backgroundColor: '#F3F4F6', flexShrink: 0 }} />
 
                 {/* ROI EST. */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
-                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>ROI EST.</span>
-                    <span style={{
-                        fontSize: '42px',
-                        fontWeight: 300,
-                        lineHeight: 1,
-                        letterSpacing: '-0.03em',
-                        fontVariantNumeric: 'tabular-nums',
-                        color: '#16A34A',
-                    }}>
-                        {(expectedIrr * 100).toFixed(1)}%
-                    </span>
+                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', height: '12px' }}>ROI EST.</span>
+                    <div style={{ height: `${ringSize}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{
+                            fontSize: '38px',
+                            fontWeight: 300,
+                            lineHeight: 1,
+                            letterSpacing: '-0.03em',
+                            fontVariantNumeric: 'tabular-nums',
+                            color: '#16A34A',
+                        }}>
+                            {(expectedIrr * 100).toFixed(1)}%
+                        </span>
+                    </div>
                 </div>
 
                 {/* Divisor */}
@@ -218,7 +220,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
                 {/* CONFIDENCE RING */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '3px' }}>
-                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF' }}>Confidence</span>
+                    <span style={{ fontSize: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9CA3AF', height: '12px' }}>Confidence</span>
                     {confVal !== null ? (
                         <div style={{ position: 'relative', width: `${ringSize}px`, height: `${ringSize}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <svg width={ringSize} height={ringSize} viewBox={`0 0 ${ringSize} ${ringSize}`} style={{ position: 'absolute', top: 0, left: 0 }}>
