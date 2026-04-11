@@ -217,7 +217,7 @@ export function AiChatProfiler() {
             {/* ── ACTIVE_SUPPORT badge (FRONT-ISV-EXP-04) ──────────────── */}
             {currentState === 'ACTIVE_SUPPORT' && (
                 <div className="flex justify-end pb-2">
-                    <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', border: '1px solid #BFDBFE' }}>
+                    <span className="text-xs px-2 py-1 rounded-full font-medium" style={{ backgroundColor: '#F3F4F6', color: '#000000', border: '1px solid #E5E7EB' }}>
                         {t.chat.supportActive}
                     </span>
                 </div>
@@ -235,9 +235,9 @@ export function AiChatProfiler() {
                             {msg.role === 'assistant' ? (
                                 <div
                                     className="max-w-[85%] p-[13px] flex gap-[12px] rounded-2xl rounded-tl-sm"
-                                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+                                    style={{ backgroundColor: '#F2F4F7', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
                                 >
-                                    <div className="mt-0.5 flex-shrink-0 w-[15px] h-[15px] flex items-center justify-center rounded-sm font-bold text-[8px] text-white" style={{ backgroundColor: '#1E3A5F' }}>G</div>
+                                    <div className="mt-0.5 flex-shrink-0 w-[15px] h-[15px] flex items-center justify-center rounded-sm font-bold text-[8px] text-white" style={{ backgroundColor: '#000000' }}>G</div>
                                     <p className="text-[13px] font-normal leading-relaxed" style={{ color: '#374151' }}>
                                         {msg.content}
                                     </p>
@@ -245,7 +245,7 @@ export function AiChatProfiler() {
                             ) : (
                                 <div
                                     className="max-w-[85%] p-[13px] flex gap-[12px] rounded-2xl rounded-tr-sm"
-                                    style={{ backgroundColor: '#1E3A5F' }}
+                                    style={{ backgroundColor: '#000000' }}
                                 >
                                     <div className="mt-0.5 flex-shrink-0">
                                         <User size={14} className="text-white/60" />
@@ -259,11 +259,11 @@ export function AiChatProfiler() {
                     ))}
                     {isLoading && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                            <div className="p-[13px] rounded-2xl rounded-tl-sm" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                            <div className="p-[13px] rounded-2xl rounded-tl-sm" style={{ backgroundColor: '#F2F4F7', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                                 <div className="flex space-x-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#1E3A5F', opacity: 0.5 }} />
-                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#1E3A5F', opacity: 0.5, animationDelay: '0.1s' }} />
-                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#1E3A5F', opacity: 0.5, animationDelay: '0.2s' }} />
+                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#000000', opacity: 0.5 }} />
+                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#000000', opacity: 0.5, animationDelay: '0.1s' }} />
+                                    <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#000000', opacity: 0.5, animationDelay: '0.2s' }} />
                                 </div>
                             </div>
                         </motion.div>
@@ -309,7 +309,7 @@ export function AiChatProfiler() {
                         type="submit"
                         disabled={isLoading || !input.trim()}
                         className="absolute right-2 p-[10px] rounded-full disabled:opacity-50 transition-all text-white"
-                        style={{ backgroundColor: '#1E3A5F' }}
+                        style={{ backgroundColor: '#000000' }}
                     >
                         <Send size={15} fill="white" stroke="white" />
                     </button>

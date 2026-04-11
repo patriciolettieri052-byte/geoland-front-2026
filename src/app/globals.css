@@ -3,13 +3,13 @@
 @theme {
   --font-sans: var(--font-inter);
 
-  --color-background: #EAECF0;
+  --color-background: #D1D5DB;
   --color-foreground: #0F1117;
 
   --color-card: #FFFFFF;
   --color-card-border: #E5E7EB;
 
-  --color-primary: #1E3A5F;
+  --color-primary: #000000;
   --color-primary-foreground: #ffffff;
 
   --color-secondary: #F3F4F6;
@@ -25,11 +25,12 @@
 
 @layer base {
   :root {
-    --background: #EAECF0;
+    --background: #D1D5DB;
     --foreground: #0F1117;
   }
 
   body {
+    font-family: var(--font-sans);
     background-color: var(--background);
     color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1, "tnum" 1;

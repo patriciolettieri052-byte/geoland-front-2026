@@ -53,7 +53,7 @@ function BigMetric({ label, value, color, sub, showBar, barWidth }: {
       )}
       {showBar && barWidth !== undefined && (
         <div style={{ height: 3, background: "#F3F4F6", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${barWidth}%`, background: color || "rgba(30,58,95,0.65)", borderRadius: 2 }} />
+          <div style={{ height: "100%", width: `${barWidth}%`, background: color || "rgba(0,0,0,0.65)", borderRadius: 2 }} />
         </div>
       )}
     </div>
@@ -144,7 +144,7 @@ function GalleryModule({ photos }: { photos?: string[] }) {
           <div key={i} onClick={() => setCurrent(i)} style={{
             width: i === current ? 14 : 6, height: 6,
             borderRadius: i === current ? 3 : "50%",
-            background: i === current ? "#1E3A5F" : "#E5E7EB",
+            background: i === current ? "#000000" : "#E5E7EB",
             cursor: "pointer", transition: "all 0.2s",
           }} />
         ))}
@@ -190,7 +190,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <span style={{ backgroundColor: "#EFF6FF", border: "1px solid #BFDBFE", color: "#1E3A5F", fontWeight: 700, fontSize: 10, padding: "3px 10px", borderRadius: 20 }}>
+          <span style={{ backgroundColor: "#EFF6FF", border: "1px solid #BFDBFE", color: "#000000", fontWeight: 700, fontSize: 10, padding: "3px 10px", borderRadius: 20 }}>
             {stratLabel}
           </span>
           <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 500 }}>
@@ -278,7 +278,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
       {/* ── Footer ── */}
       <div style={{ padding: "8px 20px 14px", fontSize: 11, color: "#9CA3AF", fontWeight: 400, borderTop: "1px solid #E5E7EB" }}>
         {asset.descripcion || `Activo en ${asset.ciudad} — estrategia ${stratLabel}.`}
-        <span style={{ marginLeft: 8, color: "#1E3A5F", fontWeight: 600 }}>
+        <span style={{ marginLeft: 8, color: "#000000", fontWeight: 600 }}>
           Confianza {confidence}%
         </span>
       </div>

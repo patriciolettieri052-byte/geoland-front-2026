@@ -53,7 +53,7 @@ export function DynamicIsvRadar() {
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(30,58,95,0.07) 0%, rgba(37,99,235,0.04) 40%, transparent 70%)'
+              background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,0,0,0.07) 0%, rgba(37,99,235,0.04) 40%, transparent 70%)'
             }}
           />
 
@@ -75,12 +75,12 @@ export function DynamicIsvRadar() {
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
                         <defs>
                           <radialGradient id="isvGradient" cx="50%" cy="50%" r="50%">
-                            <stop offset="0%" stopColor="#1E3A5F" stopOpacity="0.8" />
+                            <stop offset="0%" stopColor="#000000" stopOpacity="0.8" />
                             <stop offset="50%" stopColor="#2563EB" stopOpacity="0.4" />
                             <stop offset="100%" stopColor="#93C5FD" stopOpacity="0.1" />
                           </radialGradient>
                         </defs>
-                        <PolarGrid stroke="rgba(30,58,95,0.12)" />
+                        <PolarGrid stroke="rgba(0,0,0,0.12)" />
                         <PolarAngleAxis
                             dataKey="subject"
                             tick={{ fill: '#6B7280', fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', fontFamily: 'Inter, sans-serif' }}
@@ -94,8 +94,7 @@ export function DynamicIsvRadar() {
                         <Radar
                             name="ISV"
                             dataKey="A"
-                            stroke="#1E3A5F"
-                            strokeWidth={2}
+                            stroke="none"
                             fill="url(#isvGradient)"
                             fillOpacity={0.35}
                             animationDuration={800}
@@ -115,7 +114,7 @@ export function DynamicIsvRadar() {
             {/* Tags */}
             <div className="flex flex-wrap gap-1.5 px-6 mt-3 justify-center">
                 {isvV6.main_strategy && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#EFF6FF', color: '#1E3A5F', border: '1px solid #BFDBFE' }}>
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#EFF6FF', color: '#000000', border: '1px solid #BFDBFE' }}>
                         {isvV6.main_strategy.replace(/_/g, ' ')}
                     </span>
                 )}
