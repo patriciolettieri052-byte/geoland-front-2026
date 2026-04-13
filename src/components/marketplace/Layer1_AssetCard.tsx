@@ -176,10 +176,10 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
             {/* ── CENTRO 38% ───────────────────────────────────────── */}
             <div className="flex flex-col justify-center px-4 shrink-0" style={{ width: '38%', borderRight: '1px solid #F3F4F6' }}>
-                <p style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9CA3AF', marginBottom: '2px' }}>
+                <p style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#000000', marginBottom: '2px' }}>
                     {asset.location}
                 </p>
-                <p style={{ fontSize: '13px', fontWeight: 500, color: '#0F1117', lineHeight: 1.3, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontSize: '13px', fontWeight: 500, color: '#6B7280', lineHeight: 1.3, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
                 {(asset as any).assetType && (

@@ -351,18 +351,9 @@ export default function GeolandOS() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.5 }}
-                  className="absolute inset-0 flex flex-col py-8 px-6 overflow-y-auto scrollbar-hide"
+                  className="absolute inset-0 flex flex-col pt-2 pb-8 px-6 overflow-y-auto scrollbar-hide"
                   style={{ scrollbarWidth: 'none' }}
                 >
-                  <div className="text-center mb-8 shrink-0">
-                    <p className="mb-0.5 font-bold text-[10.5px] tracking-wider uppercase" style={{ color: '#000000' }}>
-                      {t.header.matchedOpportunities}
-                    </p>
-                    <p className="text-[8px]" style={{ color: '#9CA3AF' }}>
-                      {t.header.assetsMatching.replace('{{count}}', filteredAssets.length.toString())}
-                    </p>
-                  </div>
-
                   <div className="flex-1">
                     {error ? (
                       <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-8">
