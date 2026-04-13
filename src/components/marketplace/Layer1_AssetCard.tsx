@@ -103,13 +103,14 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     const circ = 2 * Math.PI * r;
     const dash = confVal !== null ? (confVal / 100) * circ : 0;
 
-    // Estilo compartido para los 3 grupos de métricas
+    // Estilo compartido para los 3 grupos de métricas — labels alineados desde el tope
     const metricGroup: React.CSSProperties = {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+        paddingTop: '20px',
         gap: '4px',
     };
 
@@ -123,7 +124,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     };
 
     const numStyle = (color: string): React.CSSProperties => ({
-        fontSize: '32px',
+        fontSize: '27px',
         fontWeight: 300,
         lineHeight: 1,
         letterSpacing: '-0.03em',
@@ -141,7 +142,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     return (
         <motion.div
             className="flex flex-row items-stretch h-[128px] rounded-xl overflow-hidden cursor-pointer"
-            style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+            style={{ backgroundColor: '#FFFFFF', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
             whileHover={{ scale: 1.008, y: -1, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}
             onClick={() => onClick(asset.id)}
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
@@ -175,10 +176,10 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
             {/* ── CENTRO 38% ───────────────────────────────────────── */}
             <div className="flex flex-col justify-center px-4 shrink-0" style={{ width: '38%', borderRight: '1px solid #F3F4F6' }}>
-                <p style={{ fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9CA3AF', marginBottom: '2px' }}>
+                <p style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#9CA3AF', marginBottom: '2px' }}>
                     {asset.location}
                 </p>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: '#0F1117', lineHeight: 1.3, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontSize: '13px', fontWeight: 500, color: '#0F1117', lineHeight: 1.3, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {asset.etiqueta_operacion ?? asset.location}
                 </p>
                 {(asset as any).assetType && (
@@ -240,6 +241,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
 
                 {/* CONFIDENCE RING */}
                 <div style={metricGroup}>
+                    {/* Label en la misma posición vertical que los otros nametags */}
                     <span style={labelStyle}>Confidence</span>
                     {confVal !== null ? (
                         <div style={{ position: 'relative', width: `${RING}px`, height: `${RING}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

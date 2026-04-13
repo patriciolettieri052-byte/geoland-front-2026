@@ -187,7 +187,7 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Prop
           Generar reporte completo (Layer 3) →
         </button>
         <div style={{ fontSize: 9, color: "#9CA3AF", marginTop: 8 }}>
-          Investment Memo · Risk Report · Financial Deep Dive · ~20s
+          Análisis completo generado por IA — Geoland Pipeline
         </div>
       </div>
     </>

@@ -37,8 +37,11 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
         {vars.map((v, i) => {
           const rawVal = data[v.field];
           const numVal = Number(rawVal);
-          const barPct = v.showBar && v.barMax ? Math.min(100, (numVal / v.barMax) * 100) : 0;
-          const isPos = v.positive === "high" ? numVal > 0 : v.positive === "low" ? numVal < (v.barMax || 999999) : false;
+          const barPct = v.showBar && v.barMax ? Math.max(0, Math.min(100, (numVal / v.barMax) * 100)) : 0;
+          // positive:"low" sin barMax no tiene referencia → color neutro (no verde falso)
+          const isPos = v.positive === "high" ? numVal > 0
+                      : v.positive === "low" && v.barMax ? numVal < v.barMax
+                      : false;
           const valColor = v.positive
             ? (isPos ? "#16A34A" : "#DC2626")
             : "#0F1117";
@@ -63,7 +66,7 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
                     initial={{ width: 0 }}
                     animate={{ width: `${barPct}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.1 * i }}
-                    style={{ height: "100%", background: "rgba(0,0,0,0.55)", borderRadius: 2 }} 
+                    style={{ height: "100%", background: v.positive ? valColor : "rgba(0,0,0,0.55)", borderRadius: 2 }} 
                   />
                 </div>
               )}

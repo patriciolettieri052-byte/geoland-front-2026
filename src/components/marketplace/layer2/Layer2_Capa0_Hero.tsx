@@ -9,7 +9,8 @@ import { HERO_METRICS_CONFIG, STRATEGY_COLORS, STRATEGY_LABELS } from "./layer2.
 function formatValue(value: number | undefined | null, format: string): string {
   if (value === undefined || value === null) return "—";
   switch (format) {
-    case "percent":  return `${(value * (value < 1 ? 100 : 1)).toFixed(1)}%`;
+    // value < 1 → decimal (0.185 → 18.5%); value >= 1 pero != 100 → ya en pct; edge-case value===1.0 → 100%
+    case "percent":  return `${(value <= 1 ? value * 100 : value).toFixed(1)}%`;
     case "currency": return value > 1000
       ? `€${(value / 1000).toFixed(0)}k`
       : `€${value.toFixed(0)}`;
@@ -199,10 +200,10 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
 
   const getVal = (field: string) => (asset as Record<string, unknown>)[field] as number | undefined;
 
-  const tirValue = getVal(config.topLeft.field) || 0.185;
+  const tirValue = getVal(config.topLeft.field) ?? 0.185;
   const tirFormatted = formatValue(tirValue, config.topLeft.format);
-  const gScore = asset.g_score || 82;
-  const confidence = Math.round((asset.confidence_final || 0.85) * 100);
+  const gScore = asset.g_score ?? 82;
+  const confidence = Math.round((asset.confidence_final ?? 0.85) * 100);
 
   return (
     <div style={{ background: "#FFFFFF", minHeight: "calc(100vh - 140px)", display: "flex", flexDirection: "column" }}>
@@ -229,9 +230,11 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
           <span style={{ backgroundColor: "#EFF6FF", border: "1px solid #BFDBFE", color: "#000000", fontWeight: 700, fontSize: 10, padding: "3px 10px", borderRadius: 20 }}>
             {stratLabel}
           </span>
-          <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 500 }}>
-            {confidence}% fidelidad
-          </span>
+          {asset.precio_usd && (
+            <span style={{ fontSize: 11, color: "#0F1117", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+              {formatValue(asset.precio_usd, "currency")}
+            </span>
+          )}
         </div>
       </div>
 
@@ -300,12 +303,22 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
         <div style={{ fontSize: 13, color: "#374151", lineHeight: 1.7, fontWeight: 400 }}>
           <p style={{ marginBottom: 6 }}>
             Activo identificado mediante algoritmos de ISV como oportunidad de {stratLabel}.
-            Ubicación en zona de alta demanda con ratio de absorción acelerado.
+            {asset.ciudad || asset.pais
+              ? ` Ubicado en ${[asset.ciudad, asset.pais].filter(Boolean).join(", ")}.`
+              : ""}
           </p>
-          <p>
-            Estructura financiera optimizada: Precio de adquisición {formatValue(asset.precio_usd || 165000, "currency")} con CapEx proyectado de {formatValue(asset.capex_estimado || 48000, "currency")}.
-            Retorno a la inversión (ROI) del {formatValue(asset.roiTotal || 0.38, "percent")} en un horizonte de salida de {asset.payback_meses || 9} meses.
-          </p>
+          {asset.precio_usd ? (
+            <p>
+              Precio de adquisición {formatValue(asset.precio_usd, "currency")}
+              {asset.capex_estimado ? ` · CapEx proyectado ${formatValue(asset.capex_estimado, "currency")}` : ""}
+              {asset.roiTotal ? ` · ROI ${formatValue(asset.roiTotal, "percent")}` : ""}
+              {asset.payback_meses ? ` · Horizonte ${asset.payback_meses} meses` : ""}.
+            </p>
+          ) : (
+            <p style={{ fontSize: 11, color: "#9CA3AF", fontStyle: "italic" }}>
+              Los datos financieros detallados estarán disponibles próximamente.
+            </p>
+          )}
           {asset.descripcion && (
             <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #E5E7EB", color: "#6B7280" }}>
               {asset.descripcion}
@@ -314,13 +327,6 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
         </div>
       </div>
 
-      {/* ── Footer ── */}
-      <div style={{ padding: "8px 20px 14px", fontSize: 11, color: "#9CA3AF", fontWeight: 400, borderTop: "1px solid #E5E7EB" }}>
-        {asset.descripcion || `Activo en ${asset.ciudad} — estrategia ${stratLabel}.`}
-        <span style={{ marginLeft: 8, color: "#000000", fontWeight: 600 }}>
-          Confianza {confidence}%
-        </span>
-      </div>
 
     </div>
   );

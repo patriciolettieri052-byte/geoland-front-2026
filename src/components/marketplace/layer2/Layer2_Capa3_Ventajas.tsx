@@ -43,7 +43,8 @@ function getMockAdvantages(asset: AssetMatchItem) {
   const irr = (asset.irr_equivalente || 0.1) * 100;
   const conf = (asset.confidence_final || 0.7) * 100;
   return [
-    { title: "Retorno financiero", value: `${irr.toFixed(1)}%`, description: "IRR equivalente",              barPercent: Math.min(irr * 2.5, 100), color: "green"  as const },
+    // barMax de referencia: 40% IRR => 100% barra (escala real, no multiplicador arbitrario)
+    { title: "Retorno financiero", value: `${irr.toFixed(1)}%`, description: "IRR equivalente",              barPercent: Math.min((irr / 40) * 100, 100), color: "green"  as const },
     { title: "Calidad del activo", value: `${Math.round(conf)}%`, description: "Confidence del pipeline",    barPercent: conf,                      color: "purple" as const },
     { title: "Match con perfil",   value: `${asset.g_score || 75}`, description: "G-Score personalizado",    barPercent: asset.g_score || 75,       color: "purple" as const },
     { title: "Riesgo relativo",    value: (asset.risk_score || 50) < 40 ? "Bajo" : (asset.risk_score || 50) < 65 ? "Medio" : "Alto",
@@ -58,7 +59,7 @@ export default function Layer2Capa3Ventajas({ asset }: { asset: AssetMatchItem }
       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
         <div style={{ width: 2, height: 9, borderRadius: 1, background: "#D97706" }} />
         <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
-          Ventajas estructurales
+          Perfil de riesgo-retorno
         </span>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
