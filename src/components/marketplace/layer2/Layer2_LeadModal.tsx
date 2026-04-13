@@ -49,7 +49,7 @@ export default function Layer2LeadModal({ isOpen, onClose, onSuccess, assetName 
     <AnimatePresence>
       {isOpen && (
         <div style={{
-          position: "fixed",
+          position: "absolute",
           inset: 0,
           zIndex: 9999,
           display: "flex",
