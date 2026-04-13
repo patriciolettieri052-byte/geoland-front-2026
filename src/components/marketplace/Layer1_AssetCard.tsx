@@ -221,7 +221,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             }}>
 
                 {/* G-SCORE */}
-                <div style={metricGroup}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                         <span style={labelStyle}>G-Score</span>
                         <HelpCircle size={8} color="#D1D5DB" />
@@ -232,7 +232,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div style={divider} />
 
                 {/* ROI EST. */}
-                <div style={metricGroup}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                     <span style={labelStyle}>ROI EST.</span>
                     <span style={numStyle(roiColor)}>{roiPct.toFixed(1)}%</span>
                 </div>
@@ -240,24 +240,23 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div style={divider} />
 
                 {/* CONFIDENCE RING */}
-                <div style={metricGroup}>
-                    {/* Label en la misma posición vertical que los otros nametags */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                     <span style={labelStyle}>Confidence</span>
                     {confVal !== null ? (
-                        <div style={{ position: 'relative', width: `${RING}px`, height: `${RING}px`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <svg width={RING} height={RING} viewBox={`0 0 ${RING} ${RING}`} style={{ position: 'absolute', top: 0, left: 0 }}>
-                                <circle cx={RING/2} cy={RING/2} r={r} fill="none" stroke="#F3F4F6" strokeWidth="3" />
+                        <div style={{ position: 'relative', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg width={44} height={44} viewBox="0 0 44 44" style={{ position: 'absolute', top: 0, left: 0 }}>
+                                <circle cx={22} cy={22} r={18} fill="none" stroke="#F3F4F6" strokeWidth="3" />
                                 <circle
-                                    cx={RING/2} cy={RING/2} r={r}
+                                    cx={22} cy={22} r={18}
                                     fill="none"
                                     stroke={confColor}
                                     strokeWidth="3"
-                                    strokeDasharray={`${dash} ${circ}`}
-                                    strokeDashoffset={circ * 0.25}
+                                    strokeDasharray={`${(confVal / 100) * (2 * Math.PI * 18)} ${2 * Math.PI * 18}`}
+                                    strokeDashoffset={(2 * Math.PI * 18) * 0.25}
                                     strokeLinecap="round"
                                 />
                             </svg>
-                            <span style={{ fontSize: '13px', fontWeight: 500, fontVariantNumeric: 'tabular-nums', color: confColor, position: 'relative', zIndex: 1 }}>
+                            <span style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums', color: confColor, position: 'relative', zIndex: 1 }}>
                                 {confVal.toFixed(0)}%
                             </span>
                         </div>
