@@ -110,7 +110,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        paddingTop: '20px',
+        height: '56px', // Align everything to the height of the largest metric (Conf. Ring)
         gap: '4px',
     };
 
@@ -215,13 +215,13 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 flexShrink: 0,
                 display: 'flex',
                 flexDirection: 'row',
-                alignItems: 'stretch',
+                alignItems: 'center',
                 justifyContent: 'space-evenly',
                 padding: '0 16px',
             }}>
 
                 {/* G-SCORE */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '20px', gap: '4px' }}>
+                <div style={metricGroup}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                         <span style={labelStyle}>G-Score</span>
                         <HelpCircle size={8} color="#D1D5DB" />
@@ -232,7 +232,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div style={divider} />
 
                 {/* ROI EST. */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '20px', gap: '4px' }}>
+                <div style={metricGroup}>
                     <span style={labelStyle}>ROI EST.</span>
                     <span style={numStyle(roiColor)}>{roiPct.toFixed(1)}%</span>
                 </div>
@@ -240,7 +240,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div style={divider} />
 
                 {/* CONFIDENCE RING */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', paddingTop: '20px', gap: '4px' }}>
+                <div style={metricGroup}>
                     <span style={labelStyle}>Confidence</span>
                     {confVal !== null ? (
                         <div style={{ position: 'relative', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
