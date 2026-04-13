@@ -172,7 +172,7 @@ export default function GeolandOS() {
           {/* Izquierda: logo + tagline alineados al centro */}
           <div className="flex items-end gap-4">
             <img src="/logo Geoland OS.svg" alt="GEOLAND OS" style={{ height: '32px', width: 'auto' }} />
-            <span style={{ fontSize: "11px", fontWeight: 400, letterSpacing: "0.04em", color: "#9CA3AF", paddingBottom: "1px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 400, letterSpacing: "0.04em", color: "#9CA3AF", paddingBottom: "5px" }}>
               {t.header.infraText}
             </span>
           </div>
