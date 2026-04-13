@@ -208,36 +208,6 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
   return (
     <div style={{ background: "#FFFFFF", minHeight: "calc(100vh - 140px)", display: "flex", flexDirection: "column" }}>
 
-      {/* ── Header ── */}
-      <div style={{
-        padding: "12px 20px 10px",
-        borderBottom: "1px solid #E5E7EB",
-        background: "#F9FAFB",
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: 12,
-      }}>
-        <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "#0F1117", marginBottom: 2 }}>
-            {asset.nombre || asset.ciudad || "Activo sin nombre"}
-          </div>
-          <div style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 500 }}>
-            {asset.ciudad}{asset.pais ? ` · ${asset.pais}` : ""} · ID: {asset.id?.slice(0, 8)}
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <span style={{ backgroundColor: "#EFF6FF", border: "1px solid #BFDBFE", color: "#000000", fontWeight: 700, fontSize: 10, padding: "3px 10px", borderRadius: 20 }}>
-            {stratLabel}
-          </span>
-          {asset.precio_usd && (
-            <span style={{ fontSize: 11, color: "#0F1117", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
-              {formatValue(asset.precio_usd, "currency")}
-            </span>
-          )}
-        </div>
-      </div>
-
       {/* ── Grid principal: col-izq | galería | col-der ── */}
       <div style={{
         display: "grid",

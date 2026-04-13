@@ -81,10 +81,10 @@ export default function Layer2LeadModal({ isOpen, onClose, onSuccess, assetName 
               position: "relative",
               background: "#FFFFFF",
               width: "100%",
-              maxWidth: 320,
-              borderRadius: 16,
-              padding: "24px 20px",
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              maxWidth: 520,
+              borderRadius: 20,
+              padding: "36px 32px",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.18), 0 12px 16px -6px rgba(0, 0, 0, 0.08)",
               overflow: "hidden"
             }}
           >
@@ -111,86 +111,86 @@ export default function Layer2LeadModal({ isOpen, onClose, onSuccess, assetName 
 
             {!isSent ? (
               <>
-                <div style={{ marginBottom: 16 }}>
-                  <h3 style={{ fontSize: 13, fontWeight: 700, color: "#0F1117", marginBottom: 4 }}>
+                <div style={{ marginBottom: 24 }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0F1117", marginBottom: 6 }}>
                     Me interesa este activo
                   </h3>
-                  <p style={{ fontSize: 10, color: "#6B7280" }}>
+                  <p style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.5 }}>
                     {assetName}
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <label style={{ fontSize: 10, fontWeight: 600, color: "#374151" }}>Nombre</label>
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, color: "#374151" }}>Nombre</label>
                       <input
                         required
                         name="nombre"
                         value={formData.nombre}
                         onChange={handleChange}
-                        style={{ fontSize: 12, padding: "8px 10px", borderRadius: 8, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
+                        style={{ fontSize: 13, padding: "11px 14px", borderRadius: 10, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
                         placeholder="Ej: Juan"
                       />
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <label style={{ fontSize: 10, fontWeight: 600, color: "#374151" }}>Apellido</label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, color: "#374151" }}>Apellido</label>
                       <input
                         required
                         name="apellido"
                         value={formData.apellido}
                         onChange={handleChange}
-                        style={{ fontSize: 12, padding: "8px 10px", borderRadius: 8, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
+                        style={{ fontSize: 13, padding: "11px 14px", borderRadius: 10, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
                         placeholder="Ej: Pérez"
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <label style={{ fontSize: 10, fontWeight: 600, color: "#374151" }}>País</label>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, color: "#374151" }}>País</label>
                       <input
                         required
                         name="pais"
                         value={formData.pais}
                         onChange={handleChange}
-                        style={{ fontSize: 12, padding: "8px 10px", borderRadius: 8, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
+                        style={{ fontSize: 13, padding: "11px 14px", borderRadius: 10, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
                       />
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <label style={{ fontSize: 10, fontWeight: 600, color: "#374151" }}>Ciudad</label>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <label style={{ fontSize: 11, fontWeight: 600, color: "#374151" }}>Ciudad</label>
                       <input
                         required
                         name="ciudad"
                         value={formData.ciudad}
                         onChange={handleChange}
-                        style={{ fontSize: 12, padding: "8px 10px", borderRadius: 8, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
+                        style={{ fontSize: 13, padding: "11px 14px", borderRadius: 10, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <label style={{ fontSize: 10, fontWeight: 600, color: "#374151" }}>Email</label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <label style={{ fontSize: 11, fontWeight: 600, color: "#374151" }}>Email</label>
                     <input
                       required
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      style={{ fontSize: 12, padding: "8px 10px", borderRadius: 8, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
+                      style={{ fontSize: 13, padding: "11px 14px", borderRadius: 10, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
                       placeholder="email@ejemplo.com"
                     />
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                    <label style={{ fontSize: 10, fontWeight: 600, color: "#374151" }}>Teléfono</label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <label style={{ fontSize: 11, fontWeight: 600, color: "#374151" }}>Teléfono</label>
                     <input
                       required
                       type="tel"
                       name="telefono"
                       value={formData.telefono}
                       onChange={handleChange}
-                      style={{ fontSize: 12, padding: "8px 10px", borderRadius: 8, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
+                      style={{ fontSize: 13, padding: "11px 14px", borderRadius: 10, border: "1px solid #E5E7EB", outline: "none", background: "#F9FAFB" }}
                     />
                   </div>
 
@@ -198,17 +198,18 @@ export default function Layer2LeadModal({ isOpen, onClose, onSuccess, assetName 
                     type="submit"
                     disabled={isSending}
                     style={{
-                      marginTop: 10,
+                      marginTop: 6,
                       background: "#000000",
                       color: "#FFFFFF",
                       border: "none",
-                      padding: "12px",
-                      borderRadius: 8,
-                      fontSize: 12,
-                      fontWeight: 600,
+                      padding: "16px",
+                      borderRadius: 10,
+                      fontSize: 14,
+                      fontWeight: 700,
                       cursor: isSending ? "not-allowed" : "pointer",
                       opacity: isSending ? 0.7 : 1,
-                      transition: "all 0.2s"
+                      transition: "all 0.2s",
+                      letterSpacing: "0.01em"
                     }}
                   >
                     {isSending ? "Enviando..." : "Enviar interés"}
