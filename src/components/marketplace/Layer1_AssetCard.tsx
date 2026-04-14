@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { Bell, Heart, HelpCircle } from 'lucide-react';
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { translations } from '@/lib/translations';
+import { useAuth } from '@/hooks/useAuth';
+
 
 const STRATEGY_LABELS: Record<string, string> = {
     'FIX_AND_FLIP':             'Fix & Flip',
@@ -72,8 +74,12 @@ interface Layer1AssetCardProps {
 export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) {
     const { language } = useGeolandStore();
     const t = translations[language];
+    const { user } = useAuth();
+    const setAuthModalOpen = useGeolandStore((state) => state.setAuthModalOpen);
+    const setAuthModalView = useGeolandStore((state) => state.setAuthModalView);
 
     const layer1 = asset?.layer1 || {};
+
     const layer2 = asset?.layer2 || { metrics: { baseCapex: 0 } };
 
     const gScore             = layer1.gScore ?? (asset as any).aqs_score ?? 0;
@@ -144,8 +150,16 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
             className="flex flex-row items-stretch h-[128px] rounded-xl overflow-hidden cursor-pointer"
             style={{ backgroundColor: '#FFFFFF', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
             whileHover={{ scale: 1.008, y: -1, boxShadow: '0 4px 16px rgba(0,0,0,0.10)' }}
-            onClick={() => onClick(asset.id)}
+            onClick={() => {
+                if (!user) {
+                    setAuthModalView('register');
+                    setAuthModalOpen(true);
+                    return;
+                }
+                onClick(asset.id);
+            }}
             transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+
         >
 
             {/* ── FOTO 22% ─────────────────────────────────────────── */}
