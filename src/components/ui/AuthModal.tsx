@@ -262,7 +262,7 @@ export const AuthModal = () => {
                       </button>
                     </div>
                   </form>
-                )}
+
               </motion.div>
             )}
 
