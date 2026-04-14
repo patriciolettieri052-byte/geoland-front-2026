@@ -368,7 +368,7 @@ export default function GeolandOS() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.5 }}
-                  className="absolute inset-0 flex flex-col pt-2 pb-8 px-6 overflow-y-auto scrollbar-hide"
+                  className="absolute inset-0 flex flex-col pt-[15px] pb-8 px-6 overflow-y-auto scrollbar-hide"
                   style={{ scrollbarWidth: 'none' }}
                 >
                   <div className="flex-1">

@@ -65,7 +65,10 @@ export const AuthModal = () => {
     if (error) {
       setError(error.message);
     } else {
-      setMessage('Verifica tu email para confirmar tu cuenta.');
+      setMessage('¡Cuenta creada! Ya podés ingresar.');
+      setAuthModalView('login');
+      // Limpiar campos de registro
+      setFullName('');
     }
     setLoading(false);
   };
@@ -150,6 +153,8 @@ export const AuthModal = () => {
                   </div>
 
                   {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-100">{error}</p>}
+                  {message && <p className="text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-100">{message}</p>}
+
 
                   <button 
                     type="submit" 
@@ -190,19 +195,8 @@ export const AuthModal = () => {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Crear Cuenta</h2>
                 <p className="text-gray-500 mb-6 font-medium">Únete a la red Geoland</p>
 
-                {message ? (
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-100 text-green-800">
-                    <p className="font-semibold mb-2">Registro exitoso</p>
-                    <p className="text-sm">{message}</p>
-                    <button 
-                      onClick={() => setAuthModalView('login')}
-                      className="mt-4 text-sm font-bold underline"
-                    >
-                      Volver al login
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleRegister} className="space-y-4">
+                <form onSubmit={handleRegister} className="space-y-4">
+
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nombre Completo</label>
                       <div className="relative">
