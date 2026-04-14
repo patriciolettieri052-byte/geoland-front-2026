@@ -217,7 +217,14 @@ export interface GeolandState {
     // 7. Internationalization
     language: 'es' | 'en' | 'pt';
     setLanguage: (lang: 'es' | 'en' | 'pt') => void;
+
+    // 8. Auth Modal (AUTH-01)
+    authModalOpen: boolean;
+    setAuthModalOpen: (val: boolean) => void;
+    authModalView: 'login' | 'register' | 'reset';
+    setAuthModalView: (view: 'login' | 'register' | 'reset') => void;
 }
+
 
 const initialFiltrosDuros: FiltrosDuros = {
     ubicacion: null,
@@ -410,4 +417,11 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     // 7. Internationalization
     language: 'es',
     setLanguage: (language) => set({ language }),
+
+    // 8. Auth Modal
+    authModalOpen: false,
+    setAuthModalOpen: (val) => set({ authModalOpen: val }),
+    authModalView: 'login',
+    setAuthModalView: (view) => set({ authModalView: view }),
 }));
+

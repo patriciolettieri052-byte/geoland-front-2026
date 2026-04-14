@@ -13,6 +13,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Typography } from '@/components/ui/Typography';
 import { Settings, HelpCircle, Info, User, Star, Bell, BarChart3, CreditCard, LogOut, ChevronRight } from 'lucide-react';
 import { translations } from '@/lib/translations';
+import { AuthModal } from '@/components/ui/AuthModal';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+
 
 const inter = Inter({
   subsets: ['latin'],
@@ -40,8 +43,8 @@ export default function GeolandOS() {
   const t = translations[language];
 
   const [error, setError] = useState<string | null>(null);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showGearMenu, setShowGearMenu] = useState(false);
+
 
   useEffect(() => {
     if (!perfilCompletado || assets.length > 0) return;
@@ -200,8 +203,9 @@ export default function GeolandOS() {
             {/* Gear */}
             <div className="relative">
               <button
-                onClick={() => { setShowGearMenu(!showGearMenu); setShowProfileMenu(false); }}
+                onClick={() => { setShowGearMenu(!showGearMenu); }}
                 className="flex items-center justify-center rounded-full border transition-all hover:shadow-sm cursor-pointer"
+
                 style={{
                   width: '36px',
                   height: '36px',
@@ -239,55 +243,8 @@ export default function GeolandOS() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-
-            {/* Avatar */}
-            <div className="relative">
-              <div
-                onClick={() => { setShowProfileMenu(!showProfileMenu); setShowGearMenu(false); }}
-                className={`flex items-center justify-center rounded-full text-white font-bold text-sm cursor-pointer hover:opacity-90 transition-all ${showProfileMenu ? 'ring-2 ring-offset-1 ring-black' : ''}`}
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  backgroundColor: '#000000',
-                }}
-              >
-                P
-              </div>
-
-              <AnimatePresence>
-                {showProfileMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 5, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-2 w-56 rounded-2xl shadow-lg overflow-hidden z-50 p-1.5 border"
-                    style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}
-                  >
-                    {[
-                      { icon: BarChart3, label: t.menus.profile.myBureau },
-                      { icon: Star,     label: t.menus.profile.myFavorites },
-                      { icon: Bell,     label: t.menus.profile.myAlerts },
-                      { icon: Info,     label: t.menus.profile.usage },
-                      { icon: CreditCard, label: t.menus.profile.subscription },
-                      { icon: LogOut,   label: t.menus.profile.logout, danger: true }
-                    ].map((item, i) => (
-                      <button
-                        key={i}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all cursor-pointer ${(item as any).danger ? 'hover:bg-red-50' : 'hover:bg-gray-50'}`}
-                        style={{ color: (item as any).danger ? '#DC2626' : '#374151' }}
-                        onClick={() => setShowProfileMenu(false)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <item.icon size={14} />
-                          <span className="font-medium">{item.label}</span>
-                        </div>
-                        <ChevronRight size={12} className="opacity-0 group-hover:opacity-40 transition-opacity" />
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* User Avatar & Auth (Integrated component) */}
+            <UserAvatar />
             </div>
 
           </div>
@@ -389,6 +346,8 @@ export default function GeolandOS() {
 
       </motion.div>
 
+      <AuthModal />
     </main>
+
   );
 }
