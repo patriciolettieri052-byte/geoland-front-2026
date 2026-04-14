@@ -15,6 +15,9 @@ import { Settings, HelpCircle, Info, User, Star, Bell, BarChart3, CreditCard, Lo
 import { translations } from '@/lib/translations';
 import { AuthModal } from '@/components/ui/AuthModal';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
+import { trackAction, checkLimit } from '@/lib/usage';
+import { LimitModal } from '@/components/usage/LimitModal';
 
 function avatarColor(email: string): string {
   const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#3b82f6'];
@@ -49,49 +52,86 @@ export default function GeolandOS() {
   const [error, setError] = useState<string | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showGearMenu, setShowGearMenu] = useState(false);
+  const [limitModalOpen, setLimitModalOpen] = useState(false);
   const { user, signOut } = useAuth();
 
 
+  // EFECTO COMBINADO: Límite + Tracking + Persistencia + Búsqueda
   useEffect(() => {
     if (!perfilCompletado || assets.length > 0) return;
+    
     let cancelled = false;
-    const timeoutId = setTimeout(() => {
-        if (!cancelled) {
-            setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
-            setIsRefining(false);
+    let timeoutId: NodeJS.Timeout;
+
+    const runSequence = async () => {
+      // 1. Verificar límites si hay usuario
+      if (user) {
+        const canSearch = await checkLimit(user.id, 'search');
+        if (!canSearch) {
+          if (!cancelled) setLimitModalOpen(true);
+          return;
         }
-    }, 30000);
-    setIsRefining(true);
-    (async () => {
+
+        // 2. Tracking (no bloqueante)
+        trackAction(user.id, 'search');
+
+        // 3. Persistencia de ISV (no bloqueante)
         try {
-            const { fetchMatch, buildMatchPayloadFromV6 } = await import('@/lib/api/geolandService');
-            const store = useGeolandStore.getState();
-            const payload = buildMatchPayloadFromV6(store.isvV6);
-            const data = await fetchMatch(payload);
-            if (!cancelled) {
-                clearTimeout(timeoutId);
-                setAssets(data);
-            }
-        } catch (err: any) {
-            if (!cancelled) {
-                clearTimeout(timeoutId);
-                console.error('[page.tsx] fetchMatch falló:', err);
-                if (err.message === 'NO_ASSETS_MATCH') {
-                    setAssets([]);
-                    setError(null);
-                } else {
-                    setError('No se pudieron cargar los resultados. Intentá de nuevo.');
-                }
-            }
-        } finally {
-            if (!cancelled) setIsRefining(false);
+          const currentISV = useGeolandStore.getState().isvV6;
+          await supabase
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              email: user.email ?? '',
+              isv_v6: currentISV
+            }, { onConflict: 'id' });
+        } catch (err) {
+          console.error('Error persistiendo ISV:', err);
         }
-    })();
-    return () => {
-        cancelled = true;
-        clearTimeout(timeoutId);
+      }
+
+      // 4. Ejecutar búsqueda (Lógica original)
+      timeoutId = setTimeout(() => {
+        if (!cancelled) {
+          setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
+          setIsRefining(false);
+        }
+      }, 30000);
+
+      setIsRefining(true);
+      try {
+        const { fetchMatch, buildMatchPayloadFromV6 } = await import('@/lib/api/geolandService');
+        const store = useGeolandStore.getState();
+        const payload = buildMatchPayloadFromV6(store.isvV6);
+        const data = await fetchMatch(payload);
+        if (!cancelled) {
+          clearTimeout(timeoutId);
+          setAssets(data);
+        }
+      } catch (err: any) {
+        if (!cancelled) {
+          clearTimeout(timeoutId);
+          console.error('[page.tsx] fetchMatch falló:', err);
+          if (err.message === 'NO_ASSETS_MATCH') {
+            setAssets([]);
+            setError(null);
+          } else {
+            setError('No se pudieron cargar los resultados. Intentá de nuevo.');
+          }
+        }
+      } finally {
+        if (!cancelled) setIsRefining(false);
+      }
     };
-  }, [perfilCompletado]);
+
+    runSequence();
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [perfilCompletado, user]);
+
 
   const handleLoaderComplete = () => {
     if (assets.length > 0 || error) {
@@ -407,7 +447,13 @@ export default function GeolandOS() {
       </motion.div>
 
       <AuthModal />
-    </main>
 
+      <LimitModal 
+        isOpen={limitModalOpen} 
+        onClose={() => setLimitModalOpen(false)} 
+        actionLabel="búsquedas"
+      />
+    </main>
   );
 }
+
