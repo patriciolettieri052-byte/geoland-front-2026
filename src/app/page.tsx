@@ -19,10 +19,6 @@ import { supabase } from '@/lib/supabase';
 import { trackAction, checkLimit } from '@/lib/usage';
 import { LimitModal } from '@/components/usage/LimitModal';
 
-function avatarColor(email: string): string {
-  const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#3b82f6'];
-  return colors[email.charCodeAt(0) % colors.length];
-}
 
 const inter = Inter({
   subsets: ['latin'],
@@ -50,7 +46,7 @@ export default function GeolandOS() {
   const t = translations[language];
 
   const [error, setError] = useState<string | null>(null);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isUserMenuOpen, setUserMenuOpen] = useState(false);
   const [showGearMenu, setShowGearMenu] = useState(false);
   const [limitModalOpen, setLimitModalOpen] = useState(false);
   const { user, signOut } = useAuth();
@@ -249,7 +245,8 @@ export default function GeolandOS() {
             {/* Gear */}
             <div className="relative">
               <button
-                onClick={() => { setShowGearMenu(!showGearMenu); }}
+                onClick={() => { setShowGearMenu(!showGearMenu); setUserMenuOpen(false); }}
+
                 className="flex items-center justify-center rounded-full border transition-all hover:shadow-sm cursor-pointer"
                 style={{
                   width: '36px',
@@ -293,13 +290,14 @@ export default function GeolandOS() {
             {/* Avatar */}
             <div className="relative">
               <div
-                onClick={() => { setShowProfileMenu(!showProfileMenu); setShowGearMenu(false); }}
-                className={`flex items-center justify-center rounded-full text-white font-bold text-sm cursor-pointer hover:opacity-90 transition-all ${showProfileMenu ? 'ring-2 ring-offset-1 ring-black' : ''}`}
+                onClick={() => { setUserMenuOpen(!isUserMenuOpen); setShowGearMenu(false); }}
+                className={`flex items-center justify-center rounded-full text-white font-bold text-sm cursor-pointer hover:opacity-90 transition-all ${isUserMenuOpen ? 'ring-2 ring-offset-1 ring-black' : ''}`}
                 style={{
                   width: '36px',
                   height: '36px',
-                  backgroundColor: user && user.email ? avatarColor(user.email) : '#000000',
+                  backgroundColor: '#000000',
                 }}
+
               >
                 {user
                   ? (user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()
@@ -308,7 +306,7 @@ export default function GeolandOS() {
               </div>
 
               <AnimatePresence>
-                {showProfileMenu && (
+                {isUserMenuOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 5, scale: 1 }}
@@ -329,10 +327,8 @@ export default function GeolandOS() {
                         className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all cursor-pointer ${(item as any).danger ? 'hover:bg-red-50' : 'hover:bg-gray-50'}`}
                         style={{ color: (item as any).danger ? '#DC2626' : '#374151' }}
                         onClick={async () => {
-                          setShowProfileMenu(false);
-                          if ((item as any).isLogout && user) {
-                            await signOut();
-                          }
+                          await signOut();
+                          setUserMenuOpen(false);
                         }}
                       >
                         <div className="flex items-center gap-3">

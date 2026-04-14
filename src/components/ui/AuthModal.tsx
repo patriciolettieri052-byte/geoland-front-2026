@@ -29,6 +29,14 @@ export const AuthModal = () => {
     setMessage(null);
   };
 
+  const translateError = (msg: string) => {
+    if (msg.includes('Invalid login credentials')) return 'Email o contraseña incorrectos.';
+    if (msg.includes('User already registered')) return 'Este usuario ya está registrado.';
+    if (msg.includes('Email not confirmed')) return 'Por favor, confirma tu correo electrónico.';
+    if (msg.includes('Password should be at least 6 characters')) return 'La contraseña debe tener al menos 6 caracteres.';
+    return msg;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -40,12 +48,13 @@ export const AuthModal = () => {
     });
 
     if (error) {
-      setError(error.message);
+      setError(translateError(error.message));
     } else {
       handleClose();
     }
     setLoading(false);
   };
+
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +72,7 @@ export const AuthModal = () => {
     });
 
     if (error) {
-      setError(error.message);
+      setError(translateError(error.message));
     } else {
       setMessage('¡Cuenta creada! Ya podés ingresar.');
       setAuthModalView('login');
@@ -81,12 +90,13 @@ export const AuthModal = () => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
 
     if (error) {
-      setError(error.message);
+      setError(translateError(error.message));
     } else {
       setMessage('Se ha enviado un correo para restablecer tu contraseña.');
     }
     setLoading(false);
   };
+
 
   const viewVariants = {
     initial: { opacity: 0, x: 20 },
