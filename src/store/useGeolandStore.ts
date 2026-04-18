@@ -223,7 +223,18 @@ export interface GeolandState {
     setAuthModalOpen: (val: boolean) => void;
     authModalView: 'login' | 'register' | 'reset';
     setAuthModalView: (view: 'login' | 'register' | 'reset') => void;
+    
+    // 9. Vista del panel derecho (FASE3-01)
+    rightPanelView: RightPanelView;
+    setRightPanelView: (view: RightPanelView) => void;
 }
+
+export type RightPanelView = 
+  | null           // comportamiento actual (marketplace/Layer2)
+  | 'ayuda'
+  | 'que-es-geoland'
+  | 'suscripcion'
+  | 'favoritos';
 
 
 const initialFiltrosDuros: FiltrosDuros = {
@@ -423,5 +434,9 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     setAuthModalOpen: (val) => set({ authModalOpen: val }),
     authModalView: 'login',
     setAuthModalView: (view) => set({ authModalView: view }),
+
+    // 9. Vista del panel derecho
+    rightPanelView: null,
+    setRightPanelView: (view) => set({ rightPanelView: view }),
 }));
 

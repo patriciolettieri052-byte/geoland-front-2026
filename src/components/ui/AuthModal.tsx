@@ -6,7 +6,7 @@ import { X, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useGeolandStore } from '@/store/useGeolandStore';
 
-export const AuthModal = () => {
+export const AuthModal = ({ onClose }: { onClose?: () => void }) => {
   const { 
     authModalOpen, 
     setAuthModalOpen, 
@@ -27,6 +27,7 @@ export const AuthModal = () => {
     setAuthModalOpen(false);
     setError(null);
     setMessage(null);
+    onClose?.();
   };
 
   const translateError = (msg: string) => {
@@ -74,10 +75,9 @@ export const AuthModal = () => {
     if (error) {
       setError(translateError(error.message));
     } else {
-      setMessage('¡Cuenta creada! Ya podés ingresar.');
-      setAuthModalView('login');
-      // Limpiar campos de registro
-      setFullName('');
+      // Registro exitoso -> Supabase inicia sesión automáticamente.
+      // Simplemente cerramos el modal.
+      handleClose();
     }
     setLoading(false);
   };

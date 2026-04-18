@@ -15,6 +15,8 @@ import { Settings, HelpCircle, Info, User, Star, Bell, BarChart3, CreditCard, Lo
 import { translations } from '@/lib/translations';
 import { AuthModal } from '@/components/ui/AuthModal';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import { InnerPageRouter } from '@/components/inner-pages/InnerPageRouter';
 import { supabase } from '@/lib/supabase';
 import { trackAction, checkLimit } from '@/lib/usage';
 import { LimitModal } from '@/components/usage/LimitModal';
@@ -40,8 +42,15 @@ export default function GeolandOS() {
     setIsRefining,
     chatHistory,
     language,
-    setLanguage
+    setLanguage,
+    setAuthModalOpen,
+    setAuthModalView,
+    rightPanelView,
+    setRightPanelView
   } = useGeolandStore();
+
+  const router = useRouter();
+
 
   const t = translations[language];
 
@@ -128,6 +137,13 @@ export default function GeolandOS() {
     };
   }, [perfilCompletado, user]);
 
+
+  const handleAuthModalClose = () => {
+    setAuthModalOpen(false);
+    if (!user) {
+      setActiveAsset(null);
+    }
+  };
 
   const handleLoaderComplete = () => {
     if (assets.length > 0 || error) {
@@ -269,17 +285,20 @@ export default function GeolandOS() {
                     style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}
                   >
                     {[
-                      { icon: HelpCircle, label: t.menus.gear.help },
-                      { icon: Info, label: t.menus.gear.whatIsGeoland }
-                    ].map((item, i) => (
+                      { label: '¿Qué es Geoland?', view: 'que-es-geoland' },
+                      { label: 'Ayuda', view: 'ayuda' },
+                    ].map(({ label, view }, i) => (
                       <button
                         key={i}
                         className="w-full flex items-center gap-3 px-3 py-2 text-xs rounded-xl transition-all hover:bg-gray-50 cursor-pointer"
                         style={{ color: '#6B7280' }}
-                        onClick={() => setShowGearMenu(false)}
+                        onClick={() => {
+                          setRightPanelView(view as any);
+                          setShowGearMenu(false);
+                        }}
                       >
-                        <item.icon size={14} />
-                        <span className="font-medium">{item.label}</span>
+                        {view === 'ayuda' ? <HelpCircle size={14} /> : <Info size={14} />}
+                        <span className="font-medium">{label}</span>
                       </button>
                     ))}
                   </motion.div>
@@ -290,7 +309,15 @@ export default function GeolandOS() {
             {/* Avatar */}
             <div className="relative">
               <div
-                onClick={() => { setUserMenuOpen(!isUserMenuOpen); setShowGearMenu(false); }}
+                onClick={() => { 
+                  if (!user) {
+                    setAuthModalView('login');
+                    setAuthModalOpen(true);
+                  } else {
+                    setUserMenuOpen(!isUserMenuOpen); 
+                    setShowGearMenu(false); 
+                  }
+                }}
                 className={`flex items-center justify-center rounded-full text-white font-bold text-sm cursor-pointer hover:opacity-90 transition-all ${isUserMenuOpen ? 'ring-2 ring-offset-1 ring-black' : ''}`}
                 style={{
                   width: '36px',
@@ -315,29 +342,44 @@ export default function GeolandOS() {
                     style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E7EB' }}
                   >
                     {[
-                      { icon: BarChart3, label: t.menus.profile.myBureau },
-                      { icon: Star,     label: t.menus.profile.myFavorites },
-                      { icon: Bell,     label: t.menus.profile.myAlerts },
-                      { icon: Info,     label: t.menus.profile.usage },
-                      { icon: CreditCard, label: t.menus.profile.subscription },
-                      { icon: LogOut,   label: t.menus.profile.logout, danger: true, isLogout: true }
-                    ].map((item, i) => (
+                      { icon: User,        label: 'Mi perfil inversor', view: null, href: '/perfil' },
+                      { icon: BarChart3,   label: t.menus.profile.myBureau, view: 'suscripcion' },
+                      { icon: Star,        label: t.menus.profile.myFavorites, view: 'favoritos' },
+                      { icon: Info,        label: t.menus.profile.usage, view: null, href: '/uso' },
+                      { icon: CreditCard,  label: t.menus.profile.subscription, view: 'suscripcion' },
+                    ].map(({ icon: Icon, label, view, href }, i) => (
                       <button
                         key={i}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all cursor-pointer ${(item as any).danger ? 'hover:bg-red-50' : 'hover:bg-gray-50'}`}
-                        style={{ color: (item as any).danger ? '#DC2626' : '#374151' }}
-                        onClick={async () => {
-                          await signOut();
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-xs rounded-xl transition-all cursor-pointer hover:bg-gray-50"
+                        style={{ color: '#374151' }}
+                        onClick={() => {
+                          if (href) {
+                            router.push(href);
+                          } else {
+                            setRightPanelView(view as any);
+                          }
                           setUserMenuOpen(false);
                         }}
                       >
                         <div className="flex items-center gap-3">
-                          <item.icon size={14} />
-                          <span className="font-medium">{item.label}</span>
+                          <Icon size={14} />
+                          <span className="font-medium">{label}</span>
                         </div>
                         <ChevronRight size={12} className="opacity-0 group-hover:opacity-40 transition-opacity" />
                       </button>
                     ))}
+                    <div style={{ borderTop: '1px solid #F3F4F6', margin: '4px 8px' }} />
+                    <button
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-xs rounded-xl transition-all cursor-pointer hover:bg-red-50"
+                      style={{ color: '#DC2626' }}
+                      onClick={async () => {
+                        await signOut();
+                        setUserMenuOpen(false);
+                      }}
+                    >
+                      <LogOut size={14} />
+                      <span className="font-medium">{t.menus.profile.logout}</span>
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -365,7 +407,21 @@ export default function GeolandOS() {
           {/* Right: Radar/Grid/Layer2 (67%) */}
           <div className="w-full md:w-[67%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
             <AnimatePresence mode="wait">
-              {activeAsset ? (
+              {rightPanelView ? (
+                <motion.div
+                  key="inner-page"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 z-50"
+                >
+                  <InnerPageRouter
+                    view={rightPanelView}
+                    onBack={() => setRightPanelView(null)}
+                  />
+                </motion.div>
+              ) : activeAsset && user ? (
                 <motion.div
                   key="layer2"
                   initial={{ opacity: 0, x: 20 }}
@@ -442,7 +498,7 @@ export default function GeolandOS() {
 
       </motion.div>
 
-      <AuthModal />
+      <AuthModal onClose={handleAuthModalClose} />
 
       <LimitModal 
         isOpen={limitModalOpen} 
