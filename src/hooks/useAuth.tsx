@@ -65,12 +65,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
 
-      // Limpiar ISV al cerrar sesión
+      // Limpiar todo el estado al cerrar sesión — FIX-FRONT-P1-04
       if (event === 'SIGNED_OUT') {
-        const { resetIsvV6, setPerfilCompletado, setAssets } = useGeolandStore.getState();
-        resetIsvV6();
-        setPerfilCompletado(false);
-        setAssets([]);
+        const store = useGeolandStore.getState();
+        store.resetIsvV6();
+        store.setPerfilCompletado(false);
+        store.setAssets([]);
+        // Limpiar historiales de chat
+        store.setChatHistory(() => []);
+        store.setAecHistory(() => []);
+        // Limpiar estado AEC
+        store.setAecPendingActions([]);
+        store.setAecProactiveAlert(null);
+        store.setSimulationPreview(null);
+        store.setCompareAssetIds(null);
       }
 
     });

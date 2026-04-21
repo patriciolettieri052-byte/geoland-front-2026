@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { AssetMatchItem } from "@/types/geoland";
-import { FINANCIAL_VARS_CONFIG } from "./layer2.config";
+import { FINANCIAL_VARS_CONFIG, normalizeStrategyKey } from "./layer2.config";
 
 function fmt(value: unknown, format: string): string {
   if (value === undefined || value === null) return "—";
@@ -18,7 +18,8 @@ function fmt(value: unknown, format: string): string {
 }
 
 export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem }) {
-  const estrategia = (asset.estrategia as string) || "FIX_FLIP";
+  const rawEstrategia = (asset.strategy || asset.estrategia || 'RENTAL_LONG_TERM') as string;
+  const estrategia = normalizeStrategyKey(rawEstrategia);
   const vars = FINANCIAL_VARS_CONFIG[estrategia] || FINANCIAL_VARS_CONFIG.FIX_FLIP;
   const data = asset as Record<string, unknown>;
 

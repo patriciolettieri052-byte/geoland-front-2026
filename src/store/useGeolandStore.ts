@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { mockDatabase } from '@/lib/mockEngine';
+import { AecAction } from '@/types/aec';
 
 export interface FiltrosDuros {
     ubicacion: string | null;
@@ -148,6 +149,11 @@ export interface Message {
     content: string;
 }
 
+export interface SimulationPreview {
+    changes: Record<string, unknown>;
+    resultCount?: number;
+}
+
 export interface GeolandState {
     // 1. Onboarding (AI Profiler & Filters)
     chatHistory: Message[];
@@ -169,7 +175,9 @@ export interface GeolandState {
 
     // 2. Layer 1 & 2 (Marketplace)
     assets: any[]; // Asset typing implicitly handled or from mockEngine
+    originalAssets: any[]; // FIX-FRONT-P1-06: Unfiltered snapshot
     setAssets: (assets: any[]) => void;
+    setOriginalAssets: (assets: any[]) => void;
 
     isRefining: boolean;
     setIsRefining: (val: boolean) => void;
@@ -227,6 +235,19 @@ export interface GeolandState {
     // 9. Vista del panel derecho (FASE3-01)
     rightPanelView: RightPanelView;
     setRightPanelView: (view: RightPanelView) => void;
+
+    // 10. AEC — Asesor Ejecutivo de Capital (FASE 8)
+    aecHistory: Message[];
+    setAecHistory: (updater: (prev: Message[]) => Message[]) => void;
+    aecPendingActions: AecAction[];
+    setAecPendingActions: (actions: AecAction[]) => void;
+    aecProactiveAlert: string | null;
+    setAecProactiveAlert: (alert: string | null) => void;
+    simulationPreview: SimulationPreview | null;
+    setSimulationPreview: (preview: SimulationPreview | null) => void;
+    setActiveAssetId: (id: string | null) => void;
+    compareAssetIds: [string, string] | null;
+    setCompareAssetIds: (ids: [string, string] | null) => void;
 }
 
 export type RightPanelView = 
@@ -338,13 +359,16 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         iterandoResultados: false,
         activeAssetId: null,
         assets: [],
+        originalAssets: [],
         isRefining: false,
         isvV4: initialIsvV4,
         isvV6: initialIsvV6,
     }),
 
     assets: [],
+    originalAssets: [],
     setAssets: (assets) => set({ assets }),
+    setOriginalAssets: (originalAssets) => set({ originalAssets }),
 
     isRefining: false,
     setIsRefining: (isRefining) => set({ isRefining }),
@@ -438,5 +462,18 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     // 9. Vista del panel derecho
     rightPanelView: null,
     setRightPanelView: (view) => set({ rightPanelView: view }),
+
+    // 10. AEC — Asesor Ejecutivo de Capital (FASE 8)
+    aecHistory: [],
+    setAecHistory: (updater) => set((state) => ({ aecHistory: updater(state.aecHistory) })),
+    aecPendingActions: [],
+    setAecPendingActions: (actions) => set({ aecPendingActions: actions }),
+    aecProactiveAlert: null,
+    setAecProactiveAlert: (alert) => set({ aecProactiveAlert: alert }),
+    simulationPreview: null,
+    setSimulationPreview: (preview) => set({ simulationPreview: preview }),
+    setActiveAssetId: (id) => set({ activeAssetId: id }),
+    compareAssetIds: null,
+    setCompareAssetIds: (ids) => set({ compareAssetIds: ids }),
 }));
 

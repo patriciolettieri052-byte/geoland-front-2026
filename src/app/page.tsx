@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { Inter } from 'next/font/google';
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { AiChatProfiler } from '@/components/onboarding/AiChatProfiler';
+import { AecChatAdvisor } from '@/components/advisor/AecChatAdvisor';
+import { AecCompareView } from '@/components/advisor/AecCompareView';
 import { DynamicIsvRadar } from '@/components/onboarding/DynamicIsvRadar';
 import { TheOracleLoader } from '@/components/orchestrator/TheOracleLoader';
 import { Layer1GlassGrid } from '@/components/marketplace/Layer1_GlassGrid';
@@ -20,6 +22,7 @@ import { InnerPageRouter } from '@/components/inner-pages/InnerPageRouter';
 import { supabase } from '@/lib/supabase';
 import { trackAction, checkLimit } from '@/lib/usage';
 import { LimitModal } from '@/components/usage/LimitModal';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 
 const inter = Inter({
@@ -46,7 +49,9 @@ export default function GeolandOS() {
     setAuthModalOpen,
     setAuthModalView,
     rightPanelView,
-    setRightPanelView
+    setRightPanelView,
+    compareAssetIds,
+    setCompareAssetIds
   } = useGeolandStore();
 
   const router = useRouter();
@@ -59,6 +64,7 @@ export default function GeolandOS() {
   const [showGearMenu, setShowGearMenu] = useState(false);
   const [limitModalOpen, setLimitModalOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const isMobile = useIsMobile();
 
 
   // EFECTO COMBINADO: Límite + Tracking + Persistencia + Búsqueda
@@ -77,10 +83,7 @@ export default function GeolandOS() {
           return;
         }
 
-        // 2. Tracking (no bloqueante)
-        trackAction(user.id, 'search');
-
-        // 3. Persistencia de ISV (no bloqueante)
+        // 2. Persistencia de ISV (no bloqueante)
         try {
           const currentISV = useGeolandStore.getState().isvV6;
           await supabase
@@ -112,6 +115,9 @@ export default function GeolandOS() {
         if (!cancelled) {
           clearTimeout(timeoutId);
           setAssets(data);
+          useGeolandStore.getState().setOriginalAssets(data);
+          // Track after success — FIX-FRONT-P1-04
+          if (user) trackAction(user.id, 'search');
         }
       } catch (err: any) {
         if (!cancelled) {
@@ -156,62 +162,58 @@ export default function GeolandOS() {
     let result = [...assets];
     return result.map(a => {
       const id = a.id || a.asset_id || "unknown";
-      const seed = id.length + (filtrosBlandosIsv.estrategiaObjetivo?.length || 0) + (iterandoResultados ? 1 : 0);
-      const mockGScore = 80 + (seed % 18);
-      const aqs = a.layer1?.gScore || a.aqs_score || mockGScore;
-      
-      const localPrice = a.precio_usd || 165000;
-      const localIrr = a.irr_equivalente || 0.242;
-      const localGScore = a.g_score || 84;
+
+      // FIX-FRONT-P1-03: Use real data or null — no fabricated financial values
+      const realPrice = a.precio_usd || null;
+      const realIrr = a.layer1?.expectedIrr ?? a.irr_equivalente ?? null;
+      const realGScore = a.layer1?.gScore ?? a.g_score ?? a.aqs_score ?? null;
+      const hasFallbackData = !realPrice || realIrr === null || realGScore === null;
+
       const localPhotos = (a.photo_urls && a.photo_urls.length > 0) ? a.photo_urls : [
         "/renovation_5.png",
-        "/renovation_1.png",
-        "/renovation_2.png",
-        "/renovation_3.png",
-        "/renovation_4.png"
       ];
 
       return {
         ...a,
         id,
-        estrategia: a.estrategia || a.strategy || "FIX_FLIP",
-        nombre: a.nombre || "Palacio Alcalá - Reforma Integral",
-        ciudad: a.ciudad || "Buenos Aires",
-        location: a.location || "Recoleta, Buenos Aires",
-        precio_usd: localPrice,
-        capex_estimado: a.capex_estimado || 48000,
-        arv_estimado: a.arv_estimado || 295000,
-        roiTotal: a.roiTotal || 0.385,
-        irr_equivalente: localIrr,
-        risk_score: a.risk_score || 28,
-        confidence_final: a.confidence_final || 0.89,
-        g_score: localGScore,
-        ingreso_neto_anual: a.ingreso_neto_anual || 0,
-        descuento_pct: a.descuento_pct || 0.12,
-        payback_meses: a.payback_meses || 9,
-        precio_m2: a.precio_m2 || 1850,
-        precio_m2_zona: a.precio_m2_zona || 2100,
-        etiqueta_operacion: a.etiqueta_operacion || "Oportunidad High-Yield",
+        estrategia: a.estrategia || a.strategy || 'RENTAL_LONG_TERM',
+        nombre: a.nombre || a.etiqueta_operacion || 'Activo sin nombre',
+        ciudad: a.ciudad || a.mercado || '',
+        location: a.location || a.mercado || '',
+        precio_usd: realPrice,
+        irr_equivalente: realIrr,
+        g_score: realGScore,
+        // Flag for incomplete data
+        datos_estimados: hasFallbackData || a.datos_estimados || false,
+        capex_estimado: a.capex_estimado ?? null,
+        arv_estimado: a.arv_estimado ?? null,
+        roiTotal: a.roiTotal ?? null,
+        risk_score: a.risk_score ?? null,
+        confidence_final: a.confidence_final ?? null,
+        ingreso_neto_anual: a.ingreso_neto_anual ?? null,
+        descuento_pct: a.descuento_pct ?? null,
+        payback_meses: a.payback_meses ?? null,
+        precio_m2: a.precio_m2 ?? null,
+        precio_m2_zona: a.precio_m2_zona ?? null,
+        etiqueta_operacion: a.etiqueta_operacion || a.nombre || 'Oportunidad',
         photo_urls: localPhotos,
         layer1: { 
           ...(a.layer1 || {}), 
-          gScore: localGScore,
-          expectedIrr: localIrr,
+          gScore: realGScore ?? 0,
+          expectedIrr: realIrr ?? 0,
           backgroundImageUrl: (a.layer1?.backgroundImageUrl) || localPhotos[0]
         },
         layer2: {
           ...(a.layer2 || {}),
           metrics: {
             ...(a.layer2?.metrics || {}),
-            baseCapex: (a.layer2?.metrics?.baseCapex && a.layer2?.metrics?.baseCapex > 0) ? a.layer2.metrics.baseCapex : localPrice,
-            renovationEstimate: a.capex_estimado || 48000,
-            projectDuration: a.payback_meses || 9
+            baseCapex: a.layer2?.metrics?.baseCapex ?? realPrice ?? 0,
           },
-          sensitivityConfig: a.layer2?.sensitivityConfig || { capexRange: [localPrice * 0.8, localPrice * 1.2], exitRateRange: [4.0, 6.0] }
+          sensitivityConfig: a.layer2?.sensitivityConfig || { capexRange: [0, 0], exitRateRange: [0.04, 0.07] }
         }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
-  }, [assets, perfilCompletado, isRefining, iterandoResultados, filtrosBlandosIsv]);
+  }, [assets, perfilCompletado, isRefining]);
 
   const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
 
@@ -221,14 +223,34 @@ export default function GeolandOS() {
       <motion.div
         key="stable-container"
         className="min-h-screen w-full flex flex-col items-center justify-center p-4 md:p-8" 
-        style={{ backgroundColor: "#FFFFFF", minWidth: "1024px" }}
+        style={{ backgroundColor: "#FFFFFF" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
 
-        {/* ── HEADER ── */}
-        <div className="w-full max-w-[1664px] mx-auto px-0 mb-6 flex items-center justify-between relative z-50">
+        {/* ── MOBILE HEADER (Compact) ── */}
+        <div
+          className="flex md:hidden items-center justify-between px-4 py-3 w-full mb-4"
+          style={{ borderBottom: '1px solid #E5E7EB', backgroundColor: '#FFFFFF' }}
+        >
+          <img src="/logo Geoland OS.svg" alt="GEOLAND OS" style={{ height: '24px', width: 'auto' }} />
+          <div className="flex items-center gap-2">
+            <div
+              onClick={() => {
+                if (!user) { setAuthModalView('login'); setAuthModalOpen(true); }
+                else setUserMenuOpen(!isUserMenuOpen);
+              }}
+              className="flex items-center justify-center rounded-full text-white font-bold text-xs cursor-pointer"
+              style={{ width: '32px', height: '32px', backgroundColor: '#000000' }}
+            >
+              {user ? (user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase() : 'P'}
+            </div>
+          </div>
+        </div>
+
+        {/* ── DESKTOP HEADER ── */}
+        <div className="hidden md:flex w-full max-w-[1664px] mx-auto px-0 mb-6 items-center justify-between relative z-50">
 
           {/* Izquierda: logo + tagline alineados al baseline de GEOLAND */}
           <div className="flex items-end gap-4">
@@ -390,22 +412,42 @@ export default function GeolandOS() {
 
         {/* ── CONTENEDOR PRINCIPAL ── */}
         <div
-          className="flex flex-row w-full max-w-[1664px] h-[85vh] overflow-hidden rounded-[2rem] relative z-10"
+          className="flex flex-col md:flex-row w-full max-w-[1664px] md:h-[85vh] overflow-hidden md:rounded-[2rem] relative z-10"
           style={{
             backgroundColor: '#FFFFFF',
             border: '1px solid #E5E7EB',
             boxShadow: '0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
-            minWidth: '900px',
+            height: isMobile ? 'undefined' : undefined, // help TS/Next if needed, but following ticket
           }}
         >
 
-          {/* Left: Chat Profiler (33%) */}
-          <div className="w-full md:w-[33%] h-full flex items-center justify-center p-8 relative z-10" style={{ borderRight: '1px solid #E5E7EB', backgroundColor: '#f0f0f0' }}>
-            <AiChatProfiler />
+          {/* Left: Chat Profiler / AEC Advisor (33%) */}
+          <div 
+            className="w-full md:w-[33%] flex items-center justify-center relative z-10" 
+            style={{ 
+              height: isMobile ? '35vh' : '100%',
+              minHeight: isMobile ? '180px' : 'auto',
+              borderRight: isMobile ? 'none' : '1px solid #E5E7EB', 
+              borderBottom: isMobile ? '1px solid #E5E7EB' : 'none',
+              backgroundColor: '#f0f0f0',
+              padding: isMobile ? '16px' : '32px',
+              flexShrink: 0,
+              overflow: 'hidden'
+            }}
+          >
+            {perfilCompletado ? <AecChatAdvisor /> : <AiChatProfiler />}
           </div>
 
           {/* Right: Radar/Grid/Layer2 (67%) */}
-          <div className="w-full md:w-[67%] h-full relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+          <div 
+            className="w-full md:w-[67%] relative" 
+            style={{ 
+              backgroundColor: '#FFFFFF',
+              height: isMobile ? '65vh' : '100%',
+              overflow: 'hidden',
+              flexShrink: 0
+            }}
+          >
             <AnimatePresence mode="wait">
               {rightPanelView ? (
                 <motion.div
@@ -419,6 +461,21 @@ export default function GeolandOS() {
                   <InnerPageRouter
                     view={rightPanelView}
                     onBack={() => setRightPanelView(null)}
+                  />
+                </motion.div>
+              ) : compareAssetIds ? (
+                <motion.div
+                  key="compare-view"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 z-40"
+                >
+                  <AecCompareView
+                    assetA={filteredAssets.find(a => (a.id ?? a.asset_id) === compareAssetIds[0])}
+                    assetB={filteredAssets.find(a => (a.id ?? a.asset_id) === compareAssetIds[1])}
+                    onClose={() => setCompareAssetIds(null)}
                   />
                 </motion.div>
               ) : activeAsset && user ? (

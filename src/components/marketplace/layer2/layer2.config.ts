@@ -254,3 +254,34 @@ export const FINANCIAL_VARS_CONFIG: Record<string, Array<{
     { label: "Confidence",      field: "confidence_final",   format: "percent",  showBar: true, barMax: 1 },
   ],
 };
+
+// FIX-FRONT-P1-05: Strategy key normalizer
+// Maps any strategy key variant → config key used in HERO_METRICS_CONFIG / FINANCIAL_VARS_CONFIG
+export const STRATEGY_NORMALIZER: Record<string, string> = {
+  // Backend S11 keys → config keys
+  'FIX_AND_FLIP':              'FIX_FLIP',
+  'RENTAL_SHORT_TERM':         'SHORT_TERM_RENTAL',
+  'COMMERCIAL':                'NNN_COMERCIAL',
+  'DEVELOPMENT':               'GREENFIELD',
+  'BUY_AND_HOLD_APPRECIATION': 'BUY_AND_HOLD',
+  'AGRICULTURE':               'FARMLAND',
+  // Pass-through (already match config)
+  'FIX_FLIP':            'FIX_FLIP',
+  'VALUE_ADD':           'VALUE_ADD',
+  'RENTAL_LONG_TERM':    'RENTAL_LONG_TERM',
+  'SHORT_TERM_RENTAL':   'SHORT_TERM_RENTAL',
+  'NNN_COMERCIAL':       'NNN_COMERCIAL',
+  'GREENFIELD':          'GREENFIELD',
+  'DISTRESSED':          'DISTRESSED',
+  'LAND_BANKING':        'LAND_BANKING',
+  'FARMLAND':            'FARMLAND',
+  'LIVESTOCK':           'LIVESTOCK',
+  'MIXED_FARMLAND':      'MIXED_FARMLAND',
+  'FORESTRY':            'FORESTRY',
+  'SUBDIVISION':         'SUBDIVISION',
+  'BUY_AND_HOLD':        'BUY_AND_HOLD',
+};
+
+export function normalizeStrategyKey(raw: string): string {
+  return STRATEGY_NORMALIZER[raw?.toUpperCase()] ?? raw ?? 'RENTAL_LONG_TERM';
+}

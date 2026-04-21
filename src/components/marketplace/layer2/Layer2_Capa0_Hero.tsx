@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { AssetMatchItem } from "@/types/geoland";
-import { HERO_METRICS_CONFIG, STRATEGY_COLORS, STRATEGY_LABELS } from "./layer2.config";
+import { HERO_METRICS_CONFIG, STRATEGY_COLORS, STRATEGY_LABELS, normalizeStrategyKey } from "./layer2.config";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatValue(value: number | undefined | null, format: string): string {
@@ -193,7 +193,8 @@ function GalleryModule({ photos }: { photos?: string[] }) {
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
-  const estrategia = (asset.estrategia as string) || "FIX_FLIP";
+  const rawEstrategia = (asset.strategy || asset.estrategia || 'RENTAL_LONG_TERM') as string;
+  const estrategia = normalizeStrategyKey(rawEstrategia);
   const config = HERO_METRICS_CONFIG[estrategia] || HERO_METRICS_CONFIG.FIX_FLIP;
   const stratLabel = STRATEGY_LABELS[estrategia] || estrategia;
   const risk = getRiskLabel(asset.risk_score || 50);

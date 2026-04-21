@@ -1,5 +1,6 @@
 "use client";
 import { AssetMatchItem } from "@/types/geoland";
+import { normalizeStrategyKey } from "./layer2.config";
 
 const SEVERITY_STYLES = {
   alto:  { bg: "#FEF2F2",  color: "#DC2626", border: "#FCA5A5",  label: "Alto"  },
@@ -8,7 +9,8 @@ const SEVERITY_STYLES = {
 
 // Mock de riesgos por estrategia — se reemplaza con datos reales del pipeline
 function getMockRisks(asset: AssetMatchItem): Array<{ label: string; severity: "alto" | "medio" }> {
-  const estrategia = (asset.estrategia as string) || "FIX_FLIP";
+  const rawEstrategia = (asset.strategy || asset.estrategia || 'RENTAL_LONG_TERM') as string;
+  const estrategia = normalizeStrategyKey(rawEstrategia);
   const RISK_TEMPLATES: Record<string, Array<{ label: string; severity: "alto" | "medio" }>> = {
     FIX_FLIP: [
       { label: "ARV optimista sin comparables recientes",    severity: "alto"  },

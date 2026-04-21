@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { ONBOARDING_SYSTEM_PROMPT, REFINAMIENTO_SYSTEM_PROMPT } from '@/lib/ai/prompts';
+import { checkRateLimit } from '@/lib/rateLimiter';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
@@ -190,6 +191,16 @@ function getFirstMissingField(isv: Record<string, any>): string | null {
 
 
 export async function POST(req: NextRequest) {
+    // Rate limiting — FIX-FRONT-P1-02
+    const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous'
+    const { allowed, remaining } = checkRateLimit(`chat:${ip}`, 20)
+    if (!allowed) {
+        return NextResponse.json(
+            { error: 'Demasiadas solicitudes. Por favor espera un momento.' },
+            { status: 429, headers: { 'X-RateLimit-Remaining': '0' } }
+        )
+    }
+
     try {
         const { history, message, perfilCompletado, currentState } = await req.json();
 

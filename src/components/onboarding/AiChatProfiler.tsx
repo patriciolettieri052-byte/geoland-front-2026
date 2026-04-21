@@ -99,7 +99,8 @@ export function AiChatProfiler() {
         }
 
         setIsLoading(true);
-        const currentHistoryForApi = [...messages, { role: 'user' as const, content: userMessage }];
+        const MAX_HISTORY = 20;
+        const currentHistoryForApi = [...messages, { role: 'user' as const, content: userMessage }].slice(-MAX_HISTORY);
 
         try {
             const response = await fetch('/api/chat', {
@@ -212,7 +213,7 @@ export function AiChatProfiler() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-[620px] px-6 relative">
+        <div className="flex flex-col h-full w-full max-w-[620px] px-3 md:px-6 relative">
 
             {/* ── ACTIVE_SUPPORT badge (FRONT-ISV-EXP-04) ──────────────── */}
             {currentState === 'ACTIVE_SUPPORT' && (
@@ -223,7 +224,7 @@ export function AiChatProfiler() {
                 </div>
             )}
 
-            <div className="flex-1 overflow-y-auto space-y-4 scrollbar-hide pt-10 pb-8" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex-1 overflow-y-auto space-y-4 scrollbar-hide pt-2 pb-4 md:pt-10 md:pb-8" style={{ scrollbarWidth: 'none' }}>
                 <AnimatePresence initial={false}>
                     {messages.map((msg, i) => (
                         <motion.div

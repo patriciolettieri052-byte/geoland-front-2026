@@ -181,10 +181,15 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                         <Heart size={10} style={{ color: '#374151' }} />
                     </button>
                 </div>
-                <div className="absolute bottom-2 left-2">
+                <div className="absolute bottom-2 left-2 flex gap-1">
                     <span className="text-[9px] px-1.5 py-0.5 rounded text-white/90" style={{ backgroundColor: 'rgba(0,0,0,0.55)' }}>
                         {strategyLabel}
                     </span>
+                    {(asset as any).datos_estimados && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#FFFBEB', color: '#92400E', border: '1px solid #FDE68A', fontWeight: 600 }}>
+                            Datos parciales
+                        </span>
+                    )}
                 </div>
             </div>
 

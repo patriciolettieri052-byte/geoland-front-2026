@@ -8,6 +8,13 @@ const LIMITS: Record<ActionType, keyof LimitFields> = {
   layer3_generate: 'limits_layer3',
 }
 
+// FIX-FRONT-P1-04: Default limits to prevent permanent blocks
+const DEFAULT_LIMITS: Record<ActionType, number> = {
+  search: 20,
+  layer2_view: 50,
+  layer3_generate: 5,
+}
+
 interface LimitFields {
   limits_searches: number
   limits_layer2: number
@@ -53,7 +60,9 @@ export async function checkLimit(
     if (!profile) return true // Si no hay perfil, dejar pasar
 
     const limitField = LIMITS[action]
-    const limit = profile[limitField as keyof typeof profile] as number
+    const limit = (profile[limitField as keyof typeof profile] as number)
+      ?? DEFAULT_LIMITS[action]
+      ?? 20  // absolute fallback
 
     // Contar usos del mes actual
     const startOfMonth = new Date()

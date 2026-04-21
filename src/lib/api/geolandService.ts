@@ -6,15 +6,15 @@ import { FiltrosDuros, FiltrosBlandosIsv, PreferenciasAgro } from "@/store/useGe
 import { Asset } from "@/lib/mockEngine";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://geoland-backend-final.onrender.com';
-const API_KEY = process.env.NEXT_PUBLIC_GEOLAND_API_KEY || 'geoland-dev-key';
 
+// Headers for server-side only calls (health check)
 function getHeaders(): HeadersInit {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (API_KEY) {
-        headers['x-api-key'] = API_KEY;
-    } else {
-        console.warn('[GeolandService] NEXT_PUBLIC_GEOLAND_API_KEY no configurada');
-    }
+    // API key is now server-side only via /api/match proxy (FIX-FRONT-P1-01)
+    const apiKey = typeof window === 'undefined'
+        ? (process.env.GEOLAND_API_KEY || process.env.NEXT_PUBLIC_GEOLAND_API_KEY)
+        : undefined;
+    if (apiKey) headers['x-api-key'] = apiKey;
     return headers;
 }
 
@@ -194,7 +194,10 @@ export function buildMatchPayloadFromV6(
     return payload;
 }
 
-export async function fetchMatch(payload: MatchPayload): Promise<Asset[]> {
+export async function fetchMatch(
+    payload: MatchPayload,
+    signal?: AbortSignal
+): Promise<Asset[]> {
     const params = new URLSearchParams();
 
     const mercado = payload.filtrosDuros.ubicacion;
@@ -206,17 +209,21 @@ export async function fetchMatch(payload: MatchPayload): Promise<Asset[]> {
     if (estrategia && estrategia !== 'todas') {
         params.append('strategy', estrategia);
     }
+    params.append('min_aqs', '45');
 
-    const url = `${API_URL}/api/v1/match/search?${params.toString()}&min_aqs=45`;
+    // Call server-side proxy (API key stays server-side) — FIX-FRONT-P1-01
+    const url = `/api/match?${params.toString()}`;
 
-    console.log(`[GeolandService] Buscando en: ${url}`);
+    console.log(`[GeolandService] Buscando via proxy: ${url}`);
 
     const res = await fetch(url, {
         method: 'GET',
-        headers: getHeaders(),
+        headers: { 'Content-Type': 'application/json' },
+        signal,
     });
 
     if (res.status === 404) throw new Error('NO_ASSETS_MATCH');
+    if (res.status === 503) throw new Error('BACKEND_WARMING_UP');
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || 'Backend error');
