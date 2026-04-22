@@ -426,14 +426,26 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         set({ isRefining: true });
         try {
             const { fetchMatch } = await import('@/lib/api/geolandService');
-            // Búsqueda sin filtros para traer todo (Internal Beta Mode)
-            // min_aqs: 0 para cargar todos los assets sin importar su score (REQUERIDO POR USER)
-            const allAssets = await fetchMatch({
+            
+            const payloadBase = {
                 filtrosDuros: { ubicacion: 'todos', tipoActivo: 'todos', presupuestoMaximo: 0, moneda: 'USD' },
                 filtrosBlandosIsv: { estrategiaObjetivo: 'todas', horizonteAnos: 'todos', involucramiento: 'todos', riesgoTolerancia: 'todos', financiacion: 'todos', mercadoPreferencia: 'todos' },
-                min_aqs: 0
-            });
+            };
+
+            // Intento 1: min_aqs: 0
+            console.log('[TestMode] Intentando fetch con min_aqs: 0...');
+            let allAssets = await fetchMatch({ ...payloadBase, min_aqs: 0 });
+
+            // Intento 2 (Fallback): min_aqs: null (omitir parámetro)
+            if (allAssets.length === 0) {
+                console.log('[TestMode] Intento 1 devolvió 0. Intentando fetch sin min_aqs (null)...');
+                allAssets = await fetchMatch({ ...payloadBase, min_aqs: null });
+            }
             
+            const successMsg = allAssets.length > 0 
+                ? `BETA MODE ACTIVATED. Se han cargado ${allAssets.length} activos reales de Supabase.`
+                : `BETA MODE: La base de datos no devolvió activos con los filtros 'todos'. Se encontraron 0 registros.`;
+
             set((state) => ({
                 isvV6: {
                     ...initialIsvV6,
@@ -443,21 +455,24 @@ export const useGeolandStore = create<GeolandState>((set) => ({
                     confirmed_by_user: true
                 },
                 assets: allAssets,
-                originalAssets: allAssets, // FIX: Mantener snapshot original para filtros y sorting
+                originalAssets: allAssets,
                 perfilCompletado: true,
                 isRefining: false,
                 chatHistory: [
                     ...state.chatHistory,
-                    { role: 'assistant', content: `BETA MODE ACTIVATED. Se han cargado ${allAssets.length} activos reales de Supabase.` }
+                    { role: 'assistant', content: successMsg }
+                ],
+                aecHistory: [
+                    { role: 'assistant', content: successMsg }
                 ]
             }));
-        } catch (err) {
+        } catch (err: any) {
             console.error('Test Mode Fetch failed:', err);
             set((state) => ({ 
                 isRefining: false,
                 chatHistory: [
                     ...state.chatHistory,
-                    { role: 'assistant', content: 'ERROR: No se pudieron cargar los activos de Supabase en Test Mode. Verificá la consola.' }
+                    { role: 'assistant', content: `ERROR CRÍTICO: ${err.message || 'Error desconocido'}. Verificá si el backend está online.` }
                 ]
             }));
         }

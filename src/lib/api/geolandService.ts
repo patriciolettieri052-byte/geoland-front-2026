@@ -31,7 +31,7 @@ export interface MatchPayload {
     // ISV V6 extras
     use_potential?:    string[];
     market_proxy?:     string;
-    min_aqs?:          number;
+    min_aqs?:          number | null;
 }
 
 export interface RecalculatePayload {
@@ -210,7 +210,9 @@ export async function fetchMatch(
     if (estrategia && estrategia !== 'todas') {
         params.append('strategy', estrategia);
     }
-    if (payload.min_aqs !== undefined) {
+    if (payload.min_aqs === null) {
+        // Skip min_aqs param entirely
+    } else if (payload.min_aqs !== undefined) {
         params.append('min_aqs', payload.min_aqs.toString());
     } else {
         params.append('min_aqs', '45');
@@ -235,7 +237,7 @@ export async function fetchMatch(
     }
 
     const data = await res.json();
-    return data.results ?? [];  // ← clave correcta es "results"
+    return data.results ?? data.assets ?? data.matches ?? [];
 }
 
 // ── POST /api/v1/core/recalculate ─────────────────────────────────
