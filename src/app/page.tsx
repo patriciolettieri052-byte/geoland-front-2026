@@ -160,56 +160,81 @@ export default function GeolandOS() {
   const filteredAssets = useMemo(() => {
     if (!perfilCompletado || isRefining) return [];
     let result = [...assets];
+
+    // Helper para extraer fotos de forma robusta
+    const extractPhotos = (a: any): string[] => {
+      const raw = a.photo_urls || a.image_url || a.images || a.foto || a.fotos || a.backgroundImageUrl;
+      if (!raw) return ["/renovation_5.png"];
+      if (Array.isArray(raw)) return raw.length > 0 ? raw : ["/renovation_5.png"];
+      if (typeof raw === 'string') {
+        const trimmed = raw.trim();
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          try { 
+            const parsed = JSON.parse(trimmed); 
+            return Array.isArray(parsed) ? parsed : [trimmed];
+          } catch(e) { return [trimmed]; }
+        }
+        if (trimmed.includes(',')) return trimmed.split(',').map(s => s.trim());
+        return [trimmed];
+      }
+      return ["/renovation_5.png"];
+    };
+
+    // Helper para extraer ROI/Yield
+    const extractRoi = (a: any): number | null => {
+      const val = a.layer1?.expectedIrr ?? a.irr_equivalente ?? a.roi ?? a.roi_total ?? a.yield ?? a.yield_pct ?? a.expected_irr;
+      if (val === undefined || val === null) return null;
+      const n = Number(val);
+      return isNaN(n) ? null : n;
+    };
+
+    // Helper para extraer Confidence (0-100)
+    const extractConfidence = (a: any): number | null => {
+      const val = a.confidence ?? a.confidence_score ?? a.confianza ?? a.confidenceScore;
+      if (val === undefined || val === null) return null;
+      let n = Number(val);
+      if (isNaN(n)) return null;
+      // Si está en escala 0.0-1.0 (como 0.85), convertir a 0-100
+      if (n > 0 && n <= 1) n = n * 100;
+      return n;
+    };
+
     return result.map(a => {
       const id = a.id || a.asset_id || "unknown";
-
-      // FIX-FRONT-P1-03: Use real data or null — no fabricated financial values
-      const realPrice = a.precio_usd || null;
-      const realIrr = a.layer1?.expectedIrr ?? a.irr_equivalente ?? null;
+      
+      const realPrice = a.precio_usd || a.precio || null;
+      const realIrr = extractRoi(a);
       const realGScore = a.layer1?.gScore ?? a.g_score ?? a.aqs_score ?? null;
+      const realConfidence = extractConfidence(a);
+      const photos = extractPhotos(a);
       const hasFallbackData = !realPrice || realIrr === null || realGScore === null;
-
-      const localPhotos = (a.photo_urls && a.photo_urls.length > 0) ? a.photo_urls : [
-        "/renovation_5.png",
-      ];
 
       return {
         ...a,
         id,
+        asset_id: id,
         estrategia: a.estrategia || a.strategy || 'RENTAL_LONG_TERM',
         nombre: a.nombre || a.etiqueta_operacion || 'Activo sin nombre',
-        ciudad: a.ciudad || a.mercado || '',
-        location: a.location || a.mercado || '',
+        location: a.ubicacion || a.mercado || a.location || "Global",
         precio_usd: realPrice,
         irr_equivalente: realIrr,
         g_score: realGScore,
-        // Flag for incomplete data
         datos_estimados: hasFallbackData || a.datos_estimados || false,
-        capex_estimado: a.capex_estimado ?? null,
-        arv_estimado: a.arv_estimado ?? null,
-        roiTotal: a.roiTotal ?? null,
-        risk_score: a.risk_score ?? null,
-        confidence_final: a.confidence_final ?? null,
-        ingreso_neto_anual: a.ingreso_neto_anual ?? null,
-        descuento_pct: a.descuento_pct ?? null,
-        payback_meses: a.payback_meses ?? null,
-        precio_m2: a.precio_m2 ?? null,
-        precio_m2_zona: a.precio_m2_zona ?? null,
-        etiqueta_operacion: a.etiqueta_operacion || a.nombre || 'Oportunidad',
-        photo_urls: localPhotos,
+        photo_urls: photos,
+        confidenceScore: realConfidence,
         layer1: { 
           ...(a.layer1 || {}), 
           gScore: realGScore ?? 0,
           expectedIrr: realIrr ?? 0,
-          backgroundImageUrl: (a.layer1?.backgroundImageUrl) || localPhotos[0]
+          backgroundImageUrl: photos[0]
         },
         layer2: {
           ...(a.layer2 || {}),
           metrics: {
             ...(a.layer2?.metrics || {}),
             baseCapex: a.layer2?.metrics?.baseCapex ?? realPrice ?? 0,
-          },
-          sensitivityConfig: a.layer2?.sensitivityConfig || { capexRange: [0, 0], exitRateRange: [0.04, 0.07] }
+            roiTotal: realIrr ?? 0,
+          }
         }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));

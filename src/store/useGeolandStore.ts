@@ -452,7 +452,9 @@ export const useGeolandStore = create<GeolandState>((set) => ({
                 if (dbError) {
                     trace.push(`❌ Error Supabase: ${dbError.message}`);
                 } else if (dbAssets && dbAssets.length > 0) {
+                    const keys = Object.keys(dbAssets[0]);
                     trace.push(`✅ Supabase Directo encontró ${dbAssets.length} activos! Usando bypass.`);
+                    trace.push(`🔑 Columnas detectadas: ${keys.slice(0, 15).join(', ')}${keys.length > 15 ? '...' : ''}`);
                     allAssets = dbAssets as any;
                 } else {
                     trace.push('🗄️ Supabase Directo también devolvió 0.');

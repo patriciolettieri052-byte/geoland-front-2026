@@ -87,7 +87,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     const backgroundImageUrl = layer1.backgroundImageUrl ?? '';
     const precio             = layer2.metrics?.baseCapex ?? 0;
     const strategyLabel      = STRATEGY_LABELS[asset.strategy] ?? asset.strategy;
-    const roiPct             = expectedIrr * 100;
+    const roiPct             = expectedIrr ? expectedIrr * 100 : null;
 
     const formatPrecio = (n: number) => {
         if (!n || n === 0) return '—';
@@ -97,7 +97,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     const badge = rank && rank <= 3 ? RANK_BADGES[rank] : null;
 
     const gScoreColor = metricColor(gScore, 75, 50);
-    const roiColor    = metricColor(roiPct, 15, 8);
+    const roiColor    = roiPct !== null ? metricColor(roiPct, 15, 8) : '#9CA3AF';
 
     const confRaw = (asset as any).confidenceScore ?? (asset.confidence ? asset.confidence * 100 : null);
     const confVal = confRaw !== null ? Number(confRaw) : null;
@@ -253,7 +253,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 {/* ROI EST. */}
                 <div style={metricGroup}>
                     <span style={labelStyle}>ROI EST.</span>
-                    <span style={numStyle(roiColor)}>{roiPct.toFixed(1)}%</span>
+                    <span style={numStyle(roiColor)}>{roiPct !== null ? `${roiPct.toFixed(1)}%` : '—'}</span>
                 </div>
 
                 <div style={divider} />
