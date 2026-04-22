@@ -237,7 +237,9 @@ export async function fetchMatch(
     }
 
     const data = await res.json();
-    return data.results ?? data.assets ?? data.matches ?? [];
+    console.log('[GeolandService] API Response Keys:', Object.keys(data));
+    const assets = data.results ?? data.assets ?? data.matches ?? data.data ?? [];
+    return assets;
 }
 
 // ── POST /api/v1/core/recalculate ─────────────────────────────────

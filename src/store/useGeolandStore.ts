@@ -424,27 +424,58 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     setContradictionDetected: (contradictionDetected) => set({ contradictionDetected }),
     triggerTestMode: async () => {
         set({ isRefining: true });
+        const trace: string[] = ['Iniciando diagnóstico de Test Mode...'];
+        
         try {
             const { fetchMatch } = await import('@/lib/api/geolandService');
+            const { supabase } = await import('@/lib/supabase');
             
             const payloadBase = {
                 filtrosDuros: { ubicacion: 'todos', tipoActivo: 'todos', presupuestoMaximo: 0, moneda: 'USD' },
                 filtrosBlandosIsv: { estrategiaObjetivo: 'todas', horizonteAnos: 'todos', involucramiento: 'todos', riesgoTolerancia: 'todos', financiacion: 'todos', mercadoPreferencia: 'todos' },
             };
 
-            // Intento 1: min_aqs: 0
-            console.log('[TestMode] Intentando fetch con min_aqs: 0...');
+            // 1. Intento via API (Normal)
+            trace.push('📡 Intentando fetch via API (min_aqs: 0)...');
             let allAssets = await fetchMatch({ ...payloadBase, min_aqs: 0 });
-
-            // Intento 2 (Fallback): min_aqs: null (omitir parámetro)
+            
             if (allAssets.length === 0) {
-                console.log('[TestMode] Intento 1 devolvió 0. Intentando fetch sin min_aqs (null)...');
+                trace.push('📡 API devolvió 0. Intentando sin min_aqs...');
                 allAssets = await fetchMatch({ ...payloadBase, min_aqs: null });
+            }
+
+            // 2. Intento via Supabase Directo (Bypass)
+            if (allAssets.length === 0) {
+                trace.push('🗄️ API falló. Intentando consulta directa a Supabase (tabla "assets")...');
+                const { data: dbAssets, error: dbError } = await supabase.from('assets' as any).select('*').limit(50);
+                
+                if (dbError) {
+                    trace.push(`❌ Error Supabase: ${dbError.message}`);
+                } else if (dbAssets && dbAssets.length > 0) {
+                    trace.push(`✅ Supabase Directo encontró ${dbAssets.length} activos! Usando bypass.`);
+                    allAssets = dbAssets as any;
+                } else {
+                    trace.push('🗄️ Supabase Directo también devolvió 0.');
+                }
+            }
+
+            // 3. Intento via mercados conocidos (Probe)
+            if (allAssets.length === 0) {
+                const knownMarkets = ['Madrid', 'Miami', 'Uruguay', 'España'];
+                trace.push(`🔍 Probando mercados conocidos: ${knownMarkets.join(', ')}...`);
+                for (const m of knownMarkets) {
+                    const probe = await fetchMatch({ ...payloadBase, filtrosDuros: { ...payloadBase.filtrosDuros, ubicacion: m }, min_aqs: 0 });
+                    if (probe.length > 0) {
+                        trace.push(`✅ Encontrados ${probe.length} activos en mercado: ${m}`);
+                        allAssets = probe;
+                        break;
+                    }
+                }
             }
             
             const successMsg = allAssets.length > 0 
-                ? `BETA MODE ACTIVATED. Se han cargado ${allAssets.length} activos reales de Supabase.`
-                : `BETA MODE: La base de datos no devolvió activos con los filtros 'todos'. Se encontraron 0 registros.`;
+                ? `BETA MODE ACTIVATED. Se han cargado ${allAssets.length} activos reales.`
+                : `BETA MODE: No se encontraron activos tras todos los intentos.`;
 
             set((state) => ({
                 isvV6: {
@@ -460,10 +491,10 @@ export const useGeolandStore = create<GeolandState>((set) => ({
                 isRefining: false,
                 chatHistory: [
                     ...state.chatHistory,
-                    { role: 'assistant', content: successMsg }
+                    { role: 'assistant', content: `${successMsg}\n\nTrace:\n${trace.join('\n')}` }
                 ],
                 aecHistory: [
-                    { role: 'assistant', content: successMsg }
+                    { role: 'assistant', content: `${successMsg}\n\nTrace:\n${trace.join('\n')}` }
                 ]
             }));
         } catch (err: any) {
@@ -472,7 +503,10 @@ export const useGeolandStore = create<GeolandState>((set) => ({
                 isRefining: false,
                 chatHistory: [
                     ...state.chatHistory,
-                    { role: 'assistant', content: `ERROR CRÍTICO: ${err.message || 'Error desconocido'}. Verificá si el backend está online.` }
+                    { role: 'assistant', content: `ERROR CRÍTICO: ${err.message || 'Error desconocido'}.\n\nTrace:\n${trace.join('\n')}` }
+                ],
+                aecHistory: [
+                    { role: 'assistant', content: `ERROR CRÍTICO: ${err.message || 'Error desconocido'}.\n\nTrace:\n${trace.join('\n')}` }
                 ]
             }));
         }
