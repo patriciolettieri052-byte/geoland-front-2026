@@ -422,23 +422,37 @@ export const useGeolandStore = create<GeolandState>((set) => ({
     resetIsvV6: () => set({ isvV6: initialIsvV6 }),
     contradictionDetected: false,
     setContradictionDetected: (contradictionDetected) => set({ contradictionDetected }),
-    triggerTestMode: () => set((state) => ({
-        isvV6: {
-            ...initialIsvV6,
-            strategy_primary: 'rental_long_term',
-            preferred_markets: ['Madrid'],
-            budget: { amount_raw: '500000', amount_min: 100000, amount_max: 500000, currency: 'USD' },
-            isv_sufficient: true,
-            confirmed_by_user: true
-        },
-        assets: mockDatabase.assets,
-        perfilCompletado: true,
-        isRefining: true,
-        chatHistory: [
-            ...state.chatHistory,
-            { role: 'assistant', content: 'MOCK MODE ACTIVATED. Visualizando assets de prueba para feedback estético...' }
-        ]
-    })),
+    triggerTestMode: async () => {
+        set({ isRefining: true });
+        try {
+            const { fetchMatch } = await import('@/lib/api/geolandService');
+            // Búsqueda sin filtros para traer todo (Internal Beta Mode)
+            const allAssets = await fetchMatch({
+                filtrosDuros: { ubicacion: 'todos', tipoActivo: 'todos', presupuestoMaximo: 0, moneda: 'USD' },
+                filtrosBlandosIsv: { estrategiaObjetivo: 'todas', horizonteAnos: 'todos', involucramiento: 'todos', riesgoTolerancia: 'todos', financiacion: 'todos', mercadoPreferencia: 'todos' }
+            });
+            
+            set((state) => ({
+                isvV6: {
+                    ...initialIsvV6,
+                    strategy_primary: 'rental_long_term',
+                    preferred_markets: ['BETA_ALL'],
+                    isv_sufficient: true,
+                    confirmed_by_user: true
+                },
+                assets: allAssets,
+                perfilCompletado: true,
+                isRefining: false,
+                chatHistory: [
+                    ...state.chatHistory,
+                    { role: 'assistant', content: `BETA MODE ACTIVATED. Se han cargado ${allAssets.length} activos reales de Supabase.` }
+                ]
+            }));
+        } catch (err) {
+            console.error('Test Mode Fetch failed:', err);
+            set({ isRefining: false });
+        }
+    },
     
     // 6. Layer 2 Scroll Persistence
     scrollPosition: {},
