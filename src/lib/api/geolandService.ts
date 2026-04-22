@@ -31,6 +31,7 @@ export interface MatchPayload {
     // ISV V6 extras
     use_potential?:    string[];
     market_proxy?:     string;
+    min_aqs?:          number;
 }
 
 export interface RecalculatePayload {
@@ -209,7 +210,11 @@ export async function fetchMatch(
     if (estrategia && estrategia !== 'todas') {
         params.append('strategy', estrategia);
     }
-    params.append('min_aqs', '45');
+    if (payload.min_aqs !== undefined) {
+        params.append('min_aqs', payload.min_aqs.toString());
+    } else {
+        params.append('min_aqs', '45');
+    }
 
     // Call server-side proxy (API key stays server-side) — FIX-FRONT-P1-01
     const url = `/api/match?${params.toString()}`;

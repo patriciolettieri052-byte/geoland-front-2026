@@ -427,9 +427,11 @@ export const useGeolandStore = create<GeolandState>((set) => ({
         try {
             const { fetchMatch } = await import('@/lib/api/geolandService');
             // Búsqueda sin filtros para traer todo (Internal Beta Mode)
+            // min_aqs: 0 para cargar todos los assets sin importar su score (REQUERIDO POR USER)
             const allAssets = await fetchMatch({
                 filtrosDuros: { ubicacion: 'todos', tipoActivo: 'todos', presupuestoMaximo: 0, moneda: 'USD' },
-                filtrosBlandosIsv: { estrategiaObjetivo: 'todas', horizonteAnos: 'todos', involucramiento: 'todos', riesgoTolerancia: 'todos', financiacion: 'todos', mercadoPreferencia: 'todos' }
+                filtrosBlandosIsv: { estrategiaObjetivo: 'todas', horizonteAnos: 'todos', involucramiento: 'todos', riesgoTolerancia: 'todos', financiacion: 'todos', mercadoPreferencia: 'todos' },
+                min_aqs: 0
             });
             
             set((state) => ({
@@ -441,6 +443,7 @@ export const useGeolandStore = create<GeolandState>((set) => ({
                     confirmed_by_user: true
                 },
                 assets: allAssets,
+                originalAssets: allAssets, // FIX: Mantener snapshot original para filtros y sorting
                 perfilCompletado: true,
                 isRefining: false,
                 chatHistory: [
@@ -450,7 +453,13 @@ export const useGeolandStore = create<GeolandState>((set) => ({
             }));
         } catch (err) {
             console.error('Test Mode Fetch failed:', err);
-            set({ isRefining: false });
+            set((state) => ({ 
+                isRefining: false,
+                chatHistory: [
+                    ...state.chatHistory,
+                    { role: 'assistant', content: 'ERROR: No se pudieron cargar los activos de Supabase en Test Mode. Verificá la consola.' }
+                ]
+            }));
         }
     },
     
