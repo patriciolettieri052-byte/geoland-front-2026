@@ -63,6 +63,42 @@ export function AecChatAdvisor() {
     }))
   }
 
+  // Mapa de alias para facilitar el test mode al PM
+  const STRATEGY_ALIASES: Record<string, string> = {
+    'flip': 'fix_and_flip',
+    'fix and flip': 'fix_and_flip',
+    'reforma': 'fix_and_flip',
+    'value add': 'value_add',
+    'mejora': 'value_add',
+    'renta': 'rental_long_term',
+    'long term': 'rental_long_term',
+    'short term': 'rental_short_term',
+    'airbnb': 'rental_short_term',
+    'comercial': 'commercial',
+    'nnn': 'commercial',
+    'buy and hold': 'buy_and_hold',
+    'buy & hold': 'buy_and_hold',
+    'ahorro': 'buy_and_hold',
+    'desarrollo': 'development',
+    'greenfield': 'development',
+    'obra nueva': 'development',
+    'loteo': 'subdivision',
+    'subdivision': 'subdivision',
+    'distressed': 'distressed',
+    'oportunidad': 'distressed',
+    'remate': 'distressed',
+    'land banking': 'land_banking',
+    'tierra': 'land_banking',
+    'agro': 'agriculture',
+    'agriculture': 'agriculture',
+    'ganaderia': 'livestock',
+    'livestock': 'livestock',
+    'mixto': 'mixed_farmland',
+    'mixed': 'mixed_farmland',
+    'forestal': 'forestry',
+    'forestry': 'forestry'
+  }
+
   const sendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault()
     if (!input.trim() || isLoading) return
@@ -72,9 +108,22 @@ export function AecChatAdvisor() {
     setAecHistory(prev => [...prev, { role: 'user', content: userMessage }])
     setIsLoading(true)
 
-    // Cerrar alerta proactiva si la hay
-    setAecProactiveAlert(null)
-    setSimulationPreview(null)
+    // INTERCEPTOR PARA TEST MODE DEL PM
+    const lowerMsg = userMessage.toLowerCase()
+    const foundStrategy = STRATEGY_ALIASES[lowerMsg] || 
+                         (Object.values(STRATEGY_ALIASES).includes(lowerMsg) ? lowerMsg : null)
+
+    if (foundStrategy) {
+      setTimeout(async () => {
+        setAecHistory(prev => [...prev, { 
+          role: 'assistant', 
+          content: `Perfecto. Aplicando filtro para la estrategia: **${foundStrategy.toUpperCase()}**. Mostrando solo activos reales con este contrato.` 
+        }])
+        await executeAecActions([{ type: 'filter_assets', estrategia: foundStrategy }])
+        setIsLoading(false)
+      }, 600)
+      return
+    }
 
     try {
       const response = await fetch('/api/aec-chat', {

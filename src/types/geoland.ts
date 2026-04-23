@@ -24,10 +24,12 @@ export interface AssetMatchItem {
     backgroundImageUrl: string;
   };
   layer2?: {
+    strategy_key?: string;
     metrics: {
       roiTotal: number;
       netMargin: number;
       baseCapex: number;
+      [key: string]: any;
     };
     sensitivityConfig?: {
       capexRange: [number, number];

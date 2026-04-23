@@ -5,7 +5,25 @@ import { motion } from "framer-motion";
 import { AssetMatchItem } from "@/types/geoland";
 import { HERO_METRICS_CONFIG, STRATEGY_COLORS, STRATEGY_LABELS, normalizeStrategyKey } from "./layer2.config";
 
+// ─── Constants ──────────────────────────────────────────────────────────────
+const PLACEHOLDER = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800';
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+const parsePhotos = (raw: unknown): string[] => {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.filter((item): item is string => typeof item === 'string' && Boolean(item));
+  if (typeof raw === 'string') {
+    // Supabase a veces devuelve el array como string JSON
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.filter((item): item is string => typeof item === 'string' && Boolean(item));
+      return [raw].filter(url => url.startsWith('http'));
+    } catch {
+      return raw.startsWith('http') ? [raw] : [];
+    }
+  }
+  return [];
+};
 function formatValue(value: number | undefined | null, format: string): string {
   if (value === undefined || value === null) return "—";
   switch (format) {
@@ -156,8 +174,10 @@ function RingMetric({ label, value, percent }: {
 
 // ─── Galería ──────────────────────────────────────────────────────────────────
 function GalleryModule({ photos }: { photos?: string[] }) {
+  const displayPhotos = photos && photos.length > 0 ? photos : [PLACEHOLDER];
   const [current, setCurrent] = useState(0);
-  const total = photos?.length || 4;
+  const total = displayPhotos.length;
+
   return (
     <div style={{
       background: "#FFFFFF",
@@ -169,24 +189,67 @@ function GalleryModule({ photos }: { photos?: string[] }) {
       height: "100%",
       boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
     }}>
-      <div style={{ flex: 1, background: "#F3F4F6", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", minHeight: 90 }}>
-        {photos?.[current]
-          ? <img src={photos[current]} alt={`foto ${current + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          : <span style={{ fontSize: 10, color: "#9CA3AF" }}>foto {current + 1} / {total}</span>
-        }
+      <div style={{ 
+        flex: 1, 
+        background: "#F3F4F6", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        position: "relative", 
+        minHeight: 120 
+      }}>
+        <img 
+          src={displayPhotos[current]} 
+          alt={`foto ${current + 1} de ${total}`} 
+          loading="lazy"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = PLACEHOLDER;
+          }}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+        />
       </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: 8, borderTop: "1px solid #F3F4F6" }}>
-        <button onClick={() => setCurrent(Math.max(0, current - 1))} style={{ background: "none", border: "none", color: "#6B7280", cursor: "pointer", fontSize: 13, fontWeight: 700, padding: "0 4px" }}>{"<"}</button>
-        {Array.from({ length: total }).map((_, i) => (
-          <div key={i} onClick={() => setCurrent(i)} style={{
-            width: i === current ? 14 : 6, height: 6,
-            borderRadius: i === current ? 3 : "50%",
-            background: i === current ? "#000000" : "#E5E7EB",
-            cursor: "pointer", transition: "all 0.2s",
-          }} />
-        ))}
-        <button onClick={() => setCurrent(Math.min(total - 1, current + 1))} style={{ background: "none", border: "none", color: "#6B7280", cursor: "pointer", fontSize: 13, fontWeight: 700, padding: "0 4px" }}>{">"}</button>
-      </div>
+
+      {total > 1 && (
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          gap: 5, 
+          padding: "8px 12px", 
+          borderTop: "1px solid #F3F4F6" 
+        }}>
+          <button 
+            onClick={() => setCurrent(Math.max(0, current - 1))} 
+            style={{ background: "none", border: "none", color: "#6B7280", cursor: "pointer", fontSize: 13, fontWeight: 700, padding: "0 4px" }}
+          >
+            {"<"}
+          </button>
+          
+          <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+            {displayPhotos.map((_, i) => (
+              <div 
+                key={i} 
+                onClick={() => setCurrent(i)} 
+                style={{
+                  width: i === current ? 14 : 6, 
+                  height: 6,
+                  borderRadius: i === current ? 3 : "50%",
+                  background: i === current ? "#000000" : "#E5E7EB",
+                  cursor: "pointer", 
+                  transition: "all 0.2s",
+                }} 
+              />
+            ))}
+          </div>
+
+          <button 
+            onClick={() => setCurrent(Math.min(total - 1, current + 1))} 
+            style={{ background: "none", border: "none", color: "#6B7280", cursor: "pointer", fontSize: 13, fontWeight: 700, padding: "0 4px" }}
+          >
+            {">"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -239,7 +302,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
 
         {/* Galería central */}
         <div style={{ display: "flex" }}>
-          <GalleryModule photos={asset.photo_urls} />
+          <GalleryModule photos={parsePhotos(asset.fotos || asset.fotos_urls || asset.photo_urls)} />
         </div>
 
         {/* Columna derecha — 2 módulos */}
