@@ -58,10 +58,10 @@ export const STRATEGY_CARD_METRICS: Record<string, [MetricDef, MetricDef, Metric
     { label: 'HOLDING COST',  field: 'holding_cost_anual', format: 'percent' },
     { label: 'AREA',          field: 'superficie_m2',     format: 'number', suffix: 'M²' },
   ],
-  FARMLAND: [
+    FARMLAND: [
     { label: 'AGRO YIELD',    field: 'yield_neto',     format: 'percent' },
-    { label: 'EXPECTED YIELD', field: 'yield_bruto',   format: 'percent' },
-    { label: 'AREA',          field: 'superficie_m2',  format: 'number', suffix: 'M²' },
+    { label: 'EXPECTED YIELD', field: 'expected_yield', format: 'number' },
+    { label: 'AREA',          field: 'superficie_ha_display', format: 'number', suffix: 'HA' },
   ],
   LIVESTOCK: [
     { label: 'LIVESTOCK YIELD', field: 'yield_neto',   format: 'percent' },
@@ -70,8 +70,8 @@ export const STRATEGY_CARD_METRICS: Record<string, [MetricDef, MetricDef, Metric
   ],
   MIXED_FARMLAND: [
     { label: 'MIXED YIELD',   field: 'yield_neto',     format: 'percent' },
-    { label: 'SPLIT RATIO',   field: 'split_ratio',    format: 'percent' },
-    { label: 'AREA',          field: 'superficie_m2',  format: 'number', suffix: 'M²' },
+    { label: 'EXPECTED YIELD', field: 'expected_yield', format: 'number' },
+    { label: 'AREA',          field: 'superficie_ha_display', format: 'number', suffix: 'HA' },
   ],
   FORESTRY: [
     { label: 'FORESTRY IRR',  field: 'roiTotal',       format: 'percent' },
@@ -111,6 +111,10 @@ export const STRATEGY_KEY_MAP: Record<string, string> = {
 
 export function formatMetric(value: unknown, format: MetricDef['format'], suffix?: string): string {
   if (value === null || value === undefined) return '—'
+  
+  // Si ya es un string con unidad (ej: "14 qq/ha"), lo devolvemos tal cual
+  if (typeof value === 'string' && isNaN(Number(value))) return value
+
   const num = Number(value)
   if (isNaN(num)) return '—'
 
