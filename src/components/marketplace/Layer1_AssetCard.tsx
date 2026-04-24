@@ -37,11 +37,17 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     
     // Visuales
     const foto = asset.photo_urls?.[0] || asset.fotos_urls?.[0] || asset.layer1?.backgroundImageUrl || '/placeholder.jpg';
-    const precio = asset.precio_usd 
-        ? `$${(asset.precio_usd / 1000).toFixed(0)}K USD` 
-        : (asset.layer2?.metrics?.precio_usd ? `$${(asset.layer2.metrics.precio_usd / 1000).toFixed(0)}K USD` : '—');
+    
+    // Formateo de precio y superficie estilo mockup
+    const precioRaw = asset.precio_usd || asset.layer2?.metrics?.precio_usd;
+    const precio = precioRaw
+        ? `$${(precioRaw / 1000).toFixed(0)}K USD` 
+        : '—';
     
     const superficie = asset.superficie_m2 || asset.layer2?.metrics?.superficie_m2;
+    const location = asset.barrio || asset.location || asset.mercado || 'MERCADO GLOBAL';
+    const title = asset.nombre || asset.descripcion?.substring(0, 60) || 'Sin descripción';
+    
     const barraWidth = `${Math.min(gScore, 99)}%`;
 
     const handleCardClick = () => {
@@ -66,10 +72,11 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                 border: '1px solid #F3F4F6',
                 cursor: 'pointer',
+                marginBottom: 16,
             }}
             whileHover={{ 
                 scale: 1.005, 
-                y: -2, 
+                translateY: -2, 
                 boxShadow: '0 10px 30px rgba(0,0,0,0.08)' 
             }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -83,7 +90,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 backgroundPosition: 'center',
                 flexShrink: 0,
             }}>
-                {/* Confidence badge */}
+                {/* Confidence indicator */}
                 <div style={{
                     position: 'absolute', top: 10, left: 10,
                     background: 'rgba(255,255,255,0.9)',
@@ -119,14 +126,14 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
                     letterSpacing: '0.15em', color: '#000000', marginBottom: 4,
                 }}>
-                    {asset.barrio || asset.location || asset.mercado || 'MERCADO GLOBAL'}
+                    {location}
                 </div>
                 <p style={{
                     fontSize: 14, fontWeight: 500, color: '#6B7280',
                     margin: '0 0 6px 0', whiteSpace: 'nowrap',
                     overflow: 'hidden', textOverflow: 'ellipsis',
                 }}>
-                    {asset.nombre || asset.descripcion?.substring(0, 60) || asset.etiqueta_operacion || 'Sin descripción'}
+                    {title}
                 </p>
                 <div style={{
                     fontSize: 13, fontWeight: 700, color: '#0F1117', marginBottom: 14,
@@ -134,7 +141,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     {precio}{superficie ? ` · ${superficie} m²` : ''}
                 </div>
 
-                {/* G-Score bar */}
+                {/* G-Score box */}
                 <div style={{ width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 5 }}>
                         <span style={{ fontSize: 9, fontWeight: 800, color: '#9CA3AF', letterSpacing: '0.1em' }}>
@@ -150,7 +157,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 </div>
             </div>
 
-            {/* COL 3 — MÉTRICAS 35% */}
+            {/* COL 3 — METRICS 35% */}
             <div style={{
                 width: '35%',
                 display: 'flex',

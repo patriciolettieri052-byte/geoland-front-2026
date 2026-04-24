@@ -9,76 +9,76 @@ export type MetricDef = {
 
 export const STRATEGY_CARD_METRICS: Record<string, [MetricDef, MetricDef, MetricDef]> = {
   FIX_FLIP: [
-    { label: 'IRR EST.',    field: 'roiTotal',       format: 'percent' },
-    { label: 'MARGEN',      field: 'margen_bruto',   format: 'percent' },
-    { label: 'DESCUENTO',   field: 'descuento_pct',  format: 'percent' },
+    { label: 'EST. IRR',    field: 'roiTotal',       format: 'percent' },
+    { label: 'NET MARGIN',  field: 'margen_bruto',   format: 'percent' },
+    { label: 'ARV',         field: 'arv',            format: 'currency' },
   ],
   VALUE_ADD: [
-    { label: 'IRR EST.',    field: 'roiTotal',        format: 'percent' },
-    { label: 'YIELD POST',  field: 'yield_post',      format: 'percent' },
-    { label: 'APRECIACIÓN', field: 'apreciacion_anual', format: 'percent' },
+    { label: 'EST. IRR',      field: 'roiTotal',     format: 'percent' },
+    { label: 'YIELD-ON-COST', field: 'yield_neto',   format: 'percent' },
+    { label: 'POST-NOI',      field: 'noi_anual',    format: 'currency' },
   ],
   RENTAL_LONG_TERM: [
-    { label: 'CAP RATE',    field: 'cap_rate',        format: 'percent' },
-    { label: 'RENTA/MES',   field: 'renta_mensual',   format: 'currency', suffix: '/mes' },
-    { label: 'VACANCIA',    field: 'vacancia_avg',    format: 'percent' },
+    { label: 'NET YIELD',    field: 'yield_neto',    format: 'percent' },
+    { label: 'MONTHLY NOI',  field: 'noi_mensual',   format: 'currency' },
+    { label: 'VACANCY',      field: 'vacancia',      format: 'percent' },
   ],
   SHORT_TERM_RENTAL: [
-    { label: 'CAP RATE',    field: 'cap_rate',        format: 'percent' },
-    { label: 'REVPAR',      field: 'revpar',          format: 'currency', suffix: '/día' },
-    { label: 'OCUPACIÓN',   field: 'ocupacion_pct',   format: 'percent' },
+    { label: 'NET YIELD STR', field: 'yield_neto',   format: 'percent' },
+    { label: 'ADR',           field: 'adr',          format: 'currency' },
+    { label: 'OCCUPANCY',     field: 'ocupacion_airbnb', format: 'percent' },
   ],
   BUY_AND_HOLD: [
-    { label: 'IRR EST.',    field: 'roiTotal',        format: 'percent' },
-    { label: 'APRECIACIÓN', field: 'apreciacion_anual', format: 'percent' },
-    { label: 'CAP RATE',    field: 'cap_rate',        format: 'percent' },
+    { label: 'APPRECIATION',  field: 'apreciacion_anual', format: 'percent' },
+    { label: 'EST. IRR',      field: 'roiTotal',          format: 'percent' },
+    { label: 'HOLDING COST',  field: 'holding_cost_anual', format: 'percent' },
   ],
   NNN_COMERCIAL: [
-    { label: 'CAP RATE',    field: 'cap_rate',        format: 'percent' },
-    { label: 'NOI ANUAL',   field: 'noi_anual',       format: 'currency' },
-    { label: 'SUPERFICIE',  field: 'precio_m2',       format: 'currency', suffix: '/m²' },
+    { label: 'NET YIELD',     field: 'yield_neto',   format: 'percent' },
+    { label: 'ANNUAL NOI',    field: 'noi_anual',    format: 'currency' },
+    { label: 'WALT',          field: 'walt_anos',    format: 'number', suffix: 'YRS' },
   ],
   GREENFIELD: [
-    { label: 'IRR PROY.',   field: 'roiTotal',        format: 'percent' },
-    { label: 'PRECIO/M²',   field: 'precio_m2',       format: 'currency' },
-    { label: 'M² EDIF.',    field: 'm2_edificables',  format: 'area', suffix: 'm²' },
+    { label: 'PROJ. IRR',     field: 'roiTotal',       format: 'percent' },
+    { label: 'PROFIT ON COST', field: 'profit_on_cost', format: 'percent' },
+    { label: 'M² BUILTABLE',  field: 'm2_edificables', format: 'number', suffix: 'M²' },
   ],
   SUBDIVISION: [
-    { label: 'APREC. PROY.',field: 'apreciacion_anual', format: 'percent' },
-    { label: 'PRECIO/M²',   field: 'precio_m2',       format: 'currency' },
-    { label: 'SUPERFICIE',  field: 'precio_m2',       format: 'area', suffix: 'm²' },
+    { label: 'MARGIN/LOT',    field: 'margen_lote',    format: 'percent' },
+    { label: 'EST. IRR',      field: 'roiTotal',       format: 'percent' },
+    { label: 'ABSORPTION',    field: 'meses_absorcion', format: 'number', suffix: 'MO' },
   ],
   DISTRESSED: [
-    { label: 'DESCUENTO',   field: 'descuento_pct',   format: 'percent' },
-    { label: 'IRR EST.',    field: 'roiTotal',        format: 'percent' },
-    { label: 'SANEAMIENTO', field: 'meses_saneamiento', format: 'months', suffix: 'meses' },
+    { label: 'DISCOUNT',      field: 'descuento_pct',  format: 'percent' },
+    { label: 'EST. IRR',      field: 'roiTotal',       format: 'percent' },
+    { label: 'RESOLUTION',    field: 'meses_saneamiento', format: 'number', suffix: 'MO' },
   ],
   LAND_BANKING: [
-    { label: 'APREC. PROY.',field: 'apreciacion_anual', format: 'percent' },
-    { label: 'PRECIO/M²',   field: 'precio_m2',       format: 'currency' },
-    { label: 'SUPERFICIE',  field: 'precio_m2',       format: 'area', suffix: 'm²' },
+    { label: 'UPSIDE',        field: 'apreciacion_anual', format: 'percent' },
+    { label: 'HOLDING COST',  field: 'holding_cost_anual', format: 'percent' },
+    { label: 'AREA',          field: 'superficie_m2',     format: 'number', suffix: 'M²' },
   ],
   FARMLAND: [
-    { label: 'YIELD AGRO',  field: 'cap_rate',        format: 'percent' },
-    { label: 'PRECIO/HA',   field: 'precio_ha',       format: 'currency' },
-    { label: 'SUPERFICIE',  field: 'superficie_ha',   format: 'area', suffix: 'ha' },
+    { label: 'AGRO YIELD',    field: 'yield_neto',     format: 'percent' },
+    { label: 'EXPECTED YIELD', field: 'yield_bruto',   format: 'percent' },
+    { label: 'AREA',          field: 'superficie_m2',  format: 'number', suffix: 'M²' },
   ],
   LIVESTOCK: [
-    { label: 'YIELD GANAD.',field: 'cap_rate',        format: 'percent' },
-    { label: 'CARGA ANIM.', field: 'carga_animal',    format: 'number', suffix: 'cab/ha' },
-    { label: 'SUPERFICIE',  field: 'superficie_ha',   format: 'area', suffix: 'ha' },
+    { label: 'LIVESTOCK YIELD', field: 'yield_neto',   format: 'percent' },
+    { label: 'STOCKING RATE', field: 'carga_animal',   format: 'number', suffix: 'CAB/HA' },
+    { label: 'AREA',          field: 'superficie_m2',  format: 'number', suffix: 'M²' },
   ],
   MIXED_FARMLAND: [
-    { label: 'YIELD MIXTO', field: 'cap_rate',        format: 'percent' },
-    { label: 'PRECIO/HA',   field: 'precio_ha',       format: 'currency' },
-    { label: 'SUPERFICIE',  field: 'superficie_ha',   format: 'area', suffix: 'ha' },
+    { label: 'MIXED YIELD',   field: 'yield_neto',     format: 'percent' },
+    { label: 'SPLIT RATIO',   field: 'split_ratio',    format: 'percent' },
+    { label: 'AREA',          field: 'superficie_m2',  format: 'number', suffix: 'M²' },
   ],
   FORESTRY: [
-    { label: 'YIELD FOREST.',field: 'cap_rate',       format: 'percent' },
-    { label: 'PRECIO/HA',   field: 'precio_ha',       format: 'currency' },
-    { label: 'SUPERFICIE',  field: 'superficie_ha',   format: 'area', suffix: 'ha' },
+    { label: 'FORESTRY IRR',  field: 'roiTotal',       format: 'percent' },
+    { label: 'WOOD VALUE',    field: 'wood_value',     format: 'currency' },
+    { label: 'AREA',          field: 'superficie_m2',  format: 'number', suffix: 'M²' },
   ],
-}
+};
 
 // Normalizer para keys del backend
 export const STRATEGY_KEY_MAP: Record<string, string> = {
@@ -94,6 +94,10 @@ export const STRATEGY_KEY_MAP: Record<string, string> = {
   'agriculture':                'FARMLAND',
   'AGRICULTURE':                'FARMLAND',
   'buy_and_hold_appreciation':  'BUY_AND_HOLD',
+  'livestock':                  'LIVESTOCK',
+  'mixed_farmland':             'MIXED_FARMLAND',
+  'forestry':                   'FORESTRY',
+  'subdivision':                'SUBDIVISION',
   // Pass-through
   'VALUE_ADD':                  'VALUE_ADD',
   'BUY_AND_HOLD':               'BUY_AND_HOLD',
@@ -112,7 +116,6 @@ export function formatMetric(value: unknown, format: MetricDef['format'], suffix
 
   switch (format) {
     case 'percent':
-      // Backend envía decimales (0.163) o porcentajes (16.3)
       const pct = num <= 1 && num > -1 ? num * 100 : num
       return `${pct.toFixed(1)}%`
     case 'currency':
