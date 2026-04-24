@@ -24,25 +24,33 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
   const data = asset as Record<string, unknown>;
 
   return (
-    <div style={{ padding: "12px 12px 10px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
+    <div style={{ padding: "24px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
       {/* Header de sección */}
-      <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-        <div style={{ width: 2, height: 9, borderRadius: 1, background: "#000000" }} />
-        <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
-          Lógica financiera · {estrategia.replace(/_/g, " ")}
-        </span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 3, height: 12, background: "#000000", borderRadius: 2 }} />
+          <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 800 }}>
+            Validación Financiera · Unit Economics
+          </span>
+        </div>
+        <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 700 }}>VALORES ESTIMADOS €</span>
       </div>
 
-      {/* Grid 2×4 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+      {/* Grid 4 Columnas */}
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: "repeat(4, 1fr)", 
+        gap: 12 
+      }}>
         {vars.map((v, i) => {
           const rawVal = data[v.field];
           const numVal = Number(rawVal);
           const barPct = v.showBar && v.barMax ? Math.max(0, Math.min(100, (numVal / v.barMax) * 100)) : 0;
-          // positive:"low" sin barMax no tiene referencia → color neutro (no verde falso)
+          
           const isPos = v.positive === "high" ? numVal > 0
                       : v.positive === "low" && v.barMax ? numVal < v.barMax
                       : false;
+          
           const valColor = v.positive
             ? (isPos ? "#16A34A" : "#DC2626")
             : "#0F1117";
@@ -51,14 +59,17 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
             <div key={i} style={{
               background: "#FFFFFF",
               border: "1px solid #E5E7EB",
-              borderRadius: 8,
-              padding: "8px 10px",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+              borderRadius: 12,
+              padding: "14px",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 4
             }}>
-              <div style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700 }}>
+              <div style={{ fontSize: 9, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 800 }}>
                 {v.label}
               </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: valColor, marginTop: 1 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: valColor }}>
                 {fmt(rawVal, v.format)}
               </div>
               {v.showBar && (

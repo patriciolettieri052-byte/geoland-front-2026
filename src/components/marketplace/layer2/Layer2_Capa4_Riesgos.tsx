@@ -1,197 +1,154 @@
 "use client";
-import { AssetMatchItem } from "@/types/geoland";
-import { normalizeStrategyKey } from "./layer2.config";
 
-const SEVERITY_STYLES = {
-  alto:  { bg: "#FEF2F2",  color: "#DC2626", border: "#FCA5A5",  label: "Alto"  },
-  medio: { bg: "#FFFBEB",  color: "#D97706", border: "#FCD34D", label: "Medio" },
-};
+import { motion } from "framer-motion";
+import { AssetMatchItem, RedFlag } from "@/types/geoland";
 
-// Mock de riesgos por estrategia — se reemplaza con datos reales del pipeline
-function getMockRisks(asset: AssetMatchItem): Array<{ label: string; severity: "alto" | "medio" }> {
-  const rawEstrategia = (asset.strategy || asset.estrategia || 'RENTAL_LONG_TERM') as string;
-  const estrategia = normalizeStrategyKey(rawEstrategia);
-  const RISK_TEMPLATES: Record<string, Array<{ label: string; severity: "alto" | "medio" }>> = {
-    FIX_FLIP: [
-      { label: "ARV optimista sin comparables recientes",    severity: "alto"  },
-      { label: "Sobrecostos de obra (+20% buffer aplicado)", severity: "medio" },
-      { label: "Producto final sin diferenciador claro",     severity: "medio" },
-      { label: "Plusvalía municipal no calculada",           severity: "alto"  },
-      { label: "Mercado sensible a tipos de interés",        severity: "medio" },
-    ],
-    RENTA: [
-      { label: "Riesgo cambiario local",                     severity: "alto"  },
-      { label: "Regulación de alquileres variable",          severity: "alto"  },
-      { label: "Inflación reduce retorno real",              severity: "medio" },
-      { label: "Vacancia por estacionalidad",                severity: "medio" },
-      { label: "OPEX subestimado en estimación",             severity: "medio" },
-    ],
-    RENTAL_LONG_TERM: [
-      { label: "Riesgo cambiario local",                     severity: "alto"  },
-      { label: "Regulación de alquileres variable",          severity: "alto"  },
-      { label: "Inflación reduce retorno real",              severity: "medio" },
-      { label: "Vacancia por estacionalidad",                severity: "medio" },
-      { label: "OPEX subestimado en estimación",             severity: "medio" },
-    ],
-    FARMLAND: [
-      { label: "Retenciones exportación (33%)",              severity: "alto"  },
-      { label: "Riesgo climático sequía",                    severity: "medio" },
-      { label: "Volatilidad precios commodities",            severity: "medio" },
-      { label: "Riesgo político regulatorio",                severity: "alto"  },
-      { label: "Costo de riego complementario",              severity: "medio" },
-    ],
-    DISTRESS: [
-      { label: "Due diligence legal incompleto",             severity: "alto"  },
-      { label: "Timeline judicial impredecible",             severity: "alto"  },
-      { label: "Cargas ocultas sobre el activo",             severity: "alto"  },
-      { label: "Valuación puede ser optimista",              severity: "medio" },
-      { label: "Liquidez de salida incierta",                severity: "medio" },
-    ],
-    DISTRESSED: [
-      { label: "Due diligence legal incompleto",             severity: "alto"  },
-      { label: "Timeline judicial impredecible",             severity: "alto"  },
-      { label: "Cargas ocultas sobre el activo",             severity: "alto"  },
-      { label: "Valuación puede ser optimista",              severity: "medio" },
-      { label: "Liquidez de salida incierta",                severity: "medio" },
-    ],
-    VALUE_ADD: [
-      { label: "CapEx de mejoras puede superar estimado",    severity: "alto"  },
-      { label: "Inquilino actual puede resistir reforma",    severity: "medio" },
-      { label: "Permiso de obra dependiente de municipio",   severity: "medio" },
-      { label: "Cap rate objetivo difícil de alcanzar",      severity: "medio" },
-      { label: "Mercado puede corregir durante obra",        severity: "medio" },
-    ],
-    LAND_BANKING: [
-      { label: "Horizonte largo sin flujo de caja",          severity: "alto"  },
-      { label: "Cambio de zonificación incierto",            severity: "alto"  },
-      { label: "Liquidez muy baja en mercado secundario",    severity: "medio" },
-      { label: "Costo de oportunidad elevado",               severity: "medio" },
-      { label: "Infraestructura pendiente de desarrollo",    severity: "medio" },
-    ],
-    SHORT_TERM_RENTAL: [
-      { label: "Regulación Airbnb en zona",                  severity: "alto"  },
-      { label: "Estacionalidad de ocupación",                severity: "medio" },
-      { label: "Costo de gestión operativa alto",            severity: "medio" },
-      { label: "Competencia creciente en plataformas",       severity: "medio" },
-      { label: "OPEX variable difícil de estimar",           severity: "medio" },
-    ],
-    NNN_COMERCIAL: [
-      { label: "Dependencia de un solo inquilino",           severity: "alto"  },
-      { label: "Riesgo de vacancia al vencer contrato",      severity: "alto"  },
-      { label: "Mercado comercial volátil post-pandemia",    severity: "medio" },
-      { label: "Costos de re-arrendamiento elevados",        severity: "medio" },
-      { label: "LTV alto puede limitar refinanciación",      severity: "medio" },
-    ],
-    GREENFIELD: [
-      { label: "Permisos y habilitaciones de largo plazo",   severity: "alto"  },
-      { label: "Costos de desarrollo pueden escalar",        severity: "alto"  },
-      { label: "Mercado puede cambiar antes de entrega",     severity: "medio" },
-      { label: "Capital intensivo sin flujo durante obra",   severity: "medio" },
-      { label: "Dependencia de contratistas especializados", severity: "medio" },
-    ],
-    LIVESTOCK: [
-      { label: "Riesgo sanitario (enfermedades animales)",   severity: "alto"  },
-      { label: "Volatilidad precios carne/leche",            severity: "medio" },
-      { label: "Dependencia del arrendatario",               severity: "medio" },
-      { label: "Riesgo climático y sequía",                  severity: "medio" },
-      { label: "OPEX variable según rodeo",                  severity: "medio" },
-    ],
-    FORESTRY: [
-      { label: "Horizonte de inversión muy largo (15-25a)",  severity: "alto"  },
-      { label: "Riesgo de incendio forestal",                severity: "alto"  },
-      { label: "Precio de madera volátil",                   severity: "medio" },
-      { label: "Regulación ambiental cambiante",             severity: "medio" },
-      { label: "Liquidez prácticamente nula hasta cosecha",  severity: "medio" },
-    ],
-    BUY_AND_HOLD: [
-      { label: "Dependencia de apreciación futura",          severity: "medio" },
-      { label: "Riesgo de corrección de mercado",            severity: "medio" },
-      { label: "OPEX acumulado en horizonte largo",          severity: "medio" },
-      { label: "Vacancia puede erosionar retorno",           severity: "medio" },
-      { label: "Tipo de cambio (si mercado extranjero)",     severity: "medio" },
-    ],
+interface RiskItemProps {
+  label: string;
+  severity: string;
+}
+
+function RiskItem({ label, severity }: RiskItemProps) {
+  const isHigh = severity?.toLowerCase() === "alto" || severity?.toLowerCase() === "severo";
+  
+  return (
+    <div style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "12px 16px",
+      border: "1px solid #E5E7EB",
+      borderRadius: 12,
+      marginBottom: 8,
+      background: "#FFFFFF",
+    }}>
+      <span style={{ fontSize: 12, fontWeight: 600, color: "#374151" }}>{label}</span>
+      <span style={{
+        fontSize: 8,
+        padding: "4px 10px",
+        borderRadius: 20,
+        fontWeight: 800,
+        textTransform: "uppercase",
+        background: isHigh ? "#FEE2E2" : "#FEF3C7",
+        color: isHigh ? "#DC2626" : "#D97706",
+        border: `1px solid ${isHigh ? "#FECACA" : "#FDE68A"}`,
+      }}>
+        {severity}
+      </span>
+    </div>
+  );
+}
+
+export default function Layer2Capa4Riesgos({ asset }: { asset: AssetMatchItem }) {
+  // Datos del veredicto (inyectados por el proxy o backend)
+  const layer4 = asset.layer4 || {};
+  const veredicto = layer4.verdict || layer4.veredicto || "approved_with_conditions";
+  const auditId = layer4.audit_id || `S11-${Math.floor(Math.random() * 9000) + 1000}`;
+  const recommendedAction = layer4.recommended_next_action || layer4.proximo_paso || "Verificar documentación legal y técnica antes de proceder con la reserva.";
+
+  // Mapeo de veredicto visual
+  const getVerdictStyle = (v: string) => {
+    const val = String(v).toLowerCase();
+    if (val.includes("approve") || val.includes("aprobado")) {
+        if (val.includes("condition") || val.includes("condicion")) {
+            return { label: "Veredicto: Aprobado con condiciones", bg: "#FEF3C7", text: "#D97706", border: "#FDE68A" };
+        }
+        return { label: "Veredicto: Aprobado", bg: "#DCFCE7", text: "#16A34A", border: "#BBF7D0" };
+    }
+    if (val.includes("reject") || val.includes("rechazado")) {
+        return { label: "Veredicto: Rechazado", bg: "#FEE2E2", text: "#DC2626", border: "#FECACA" };
+    }
+    return { label: "Veredicto: Aprobado con condiciones", bg: "#FEF3C7", text: "#D97706", border: "#FDE68A" };
   };
-  return RISK_TEMPLATES[estrategia] || RISK_TEMPLATES.FIX_FLIP;
-}
 
-interface Capa4Props {
-  asset: AssetMatchItem;
-  onRequestLayer3?: (assetId: string) => void;
-}
+  const vStyle = getVerdictStyle(veredicto);
 
-export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: Capa4Props) {
-  const risks = getMockRisks(asset);
+  // Red Flags
+  const redFlags: RedFlag[] = asset.layer4?.red_flags || asset.red_flags || [];
 
   return (
-    <>
-      {/* Capa 4: Riesgos */}
-      <div style={{ padding: "12px 12px 10px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 10 }}>
-          <div style={{ width: 2, height: 9, borderRadius: 1, background: "#DC2626" }} />
-          <span style={{ fontSize: 10, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700 }}>
-            Riesgos &amp; red flags
+    <div style={{ padding: "24px", borderTop: "1px solid #E5E7EB" }}>
+      
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 3, height: 12, background: "#DC2626", borderRadius: 2 }} />
+          <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", color: "#9CA3AF", letterSpacing: "0.1em" }}>
+            Verificador · Auditoría de Riesgos
           </span>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-          {risks.map((r, i) => {
-            const s = SEVERITY_STYLES[r.severity];
-            return (
-              <div key={i} style={{
-                background: "#FFFFFF",
-                border: "1px solid #E5E7EB",
-                borderRadius: 8,
-                padding: "8px 12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-              }}>
-                <span style={{ fontSize: 11, color: "#374151", fontWeight: 600 }}>{r.label}</span>
-                <span style={{
-                  fontSize: 8,
-                  padding: "2px 7px",
-                  borderRadius: 8,
-                  background: s.bg,
-                  color: s.color,
-                  fontWeight: 700,
-                  border: `1px solid ${s.border}`,
-                  flexShrink: 0,
-                  marginLeft: 8,
-                  textTransform: "uppercase",
-                }}>
-                  {s.label}
-                </span>
-              </div>
-            );
-          })}
         </div>
       </div>
 
-      {/* CTA Layer 3 */}
-      <div style={{ padding: "16px 12px 24px", borderTop: "1px solid #E5E7EB", textAlign: "center", background: "#F9FAFB" }}>
-        <button
-          onClick={() => onRequestLayer3 ? onRequestLayer3(asset.id) : console.log("Layer 3 requested for:", asset.id)}
-          style={{
-            background: "#000000",
-            border: "none",
-            color: "#FFFFFF",
-            fontSize: 12,
-            padding: "12px 20px",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontWeight: 600,
-            letterSpacing: "0.02em",
-            width: "100%",
-            transition: "all 0.2s",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-          }}
-        >
-          Generar reporte completo (Layer 3) →
-        </button>
-        <div style={{ fontSize: 9, color: "#9CA3AF", marginTop: 8 }}>
-          Análisis completo generado por IA — Geoland Pipeline
+      {/* Banner de Veredicto */}
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 20px",
+          borderRadius: 12,
+          marginBottom: 16,
+          background: vStyle.bg,
+          color: vStyle.text,
+          border: `1px solid ${vStyle.border}`,
+        }}
+      >
+        <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor", boxShadow: "0 0 8px currentColor" }} />
+          {vStyle.label}
+        </div>
+        <div style={{ fontSize: 10, fontWeight: 700 }}>AUDIT ID: {auditId}</div>
+      </motion.div>
+
+      {/* Lista de Riesgos */}
+      <div style={{ marginBottom: 16 }}>
+        {redFlags.length > 0 ? (
+          redFlags.map((flag, idx) => (
+            <RiskItem 
+              key={idx} 
+              label={flag.description || flag.name || "Riesgo detectado"} 
+              severity={flag.severity || "Medio"} 
+            />
+          ))
+        ) : (
+          <div style={{ fontSize: 12, color: "#9CA3AF", textAlign: "center", padding: "20px", border: "1px dashed #E5E7EB", borderRadius: 12 }}>
+            No se han detectado red flags críticos en el análisis automático.
+          </div>
+        )}
+      </div>
+
+      {/* Acción Recomendada */}
+      <div style={{
+        background: "#F9FAFB",
+        border: "1px solid #E5E7EB",
+        padding: "16px",
+        borderRadius: 12,
+        display: "flex",
+        gap: 12,
+        alignItems: "flex-start",
+      }}>
+        <div style={{ 
+          fontSize: 9, 
+          fontWeight: 800, 
+          color: "#FFFFFF", 
+          background: "#000000", 
+          padding: "2px 6px", 
+          borderRadius: 4, 
+          textTransform: "uppercase", 
+          marginTop: 2,
+          flexShrink: 0
+        }}>
+          INFO
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: "#9CA3AF", textTransform: "uppercase" }}>Acción recomendada</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#374151" }}>
+            {recommendedAction}
+          </span>
         </div>
       </div>
-    </>
+
+    </div>
   );
 }

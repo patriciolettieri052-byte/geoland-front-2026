@@ -21,33 +21,40 @@ export default function Layer2Container({ asset, onClose }: Layer2ContainerProps
       <div className="h-full overflow-y-auto">
         {/* Sticky header */}
         <div
-          className="sticky top-0 z-20 flex items-center justify-between px-3 py-2"
+          className="sticky top-0 z-20 flex items-center justify-between px-5 py-3"
           style={{
             background: "#FFFFFF",
             borderBottom: "1px solid #E5E7EB",
           }}
         >
-          <div className="flex items-center gap-2 overflow-hidden mr-4">
+          <div className="flex items-center gap-3 overflow-hidden mr-4">
             <button
               onClick={onClose}
               style={{
                 background: "none",
                 border: "none",
                 color: "#000000",
+                fontSize: "11px",
                 fontWeight: 600,
-                fontSize: 11,
                 cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-                flexShrink: 0,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
               }}
             >
-              ← Volver
+              VOLVER
             </button>
-            <span style={{ color: "#E5E7EB", fontSize: 11, flexShrink: 0 }}>|</span>
-            <span style={{ fontSize: 11, color: "#374151", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {asset.nombre || asset.location}
+            <div style={{ color: "#E5E7EB", fontSize: "12px" }}>|</div>
+            <span 
+              className="truncate"
+              style={{ 
+                fontSize: "11px", 
+                fontWeight: 700, 
+                color: "#374151",
+                textTransform: "uppercase",
+                letterSpacing: "0.02em"
+              }}
+            >
+              {asset.id || "ASSET-DETAILS"} · {asset.microzona || asset.ciudad || "GEOLAND OS"}
             </span>
           </div>
 

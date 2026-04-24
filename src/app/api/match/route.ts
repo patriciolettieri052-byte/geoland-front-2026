@@ -42,6 +42,35 @@ export async function GET(req: NextRequest) {
     }
 
     const data = await res.json()
+    
+    // Transform data to align with frontend requirements (PLAN-ALINEACION-01)
+    if (data.results && Array.isArray(data.results)) {
+      data.results = data.results.map((asset: any) => {
+        const metrics = asset.layer2?.metrics || {}
+        const riskLevel = asset.layer1?.riskLevel || ''
+        
+        return {
+          ...asset,
+          ...metrics, // Flatten metrics to root
+          // Map backend field names to frontend expected names
+          capex_estimado: metrics.capex_total ?? metrics.capex_estimado ?? 0,
+          arv_estimado: metrics.arv ?? metrics.arv_estimado ?? 0,
+          vacancia_pct: metrics.vacancia ?? metrics.vacancia_pct ?? 0,
+          precio_m2_zona: metrics.precio_m2_zona ?? 0,
+          // Normalize risk score from Spanish labels
+          risk_score: riskLevel === 'Muy Bajo' ? 20
+                    : riskLevel === 'Bajo'     ? 35
+                    : riskLevel === 'Medio'    ? 55
+                    : riskLevel === 'Medio-Alto' ? 70
+                    : riskLevel === 'Alto'     ? 85
+                    : 50,
+          payback_meses: metrics.payback_meses ?? 0,
+          // Ensure core identification fields are always at root
+          asset_id: asset.id || asset.asset_id,
+        }
+      })
+    }
+
     return NextResponse.json(data)
   } catch (error) {
     console.error('[/api/match] Error:', error)
