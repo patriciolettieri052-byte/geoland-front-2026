@@ -230,15 +230,15 @@ export async function POST(req: NextRequest) {
             console.log('[ISV] currentIsv keys:', Object.keys(currentIsv).filter(k => (currentIsv as any)[k]));
 
             const response = await openai.chat.completions.create({
-                model: 'gpt-5.4',
+                model: 'gpt-4o',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     {
                         role: 'user',
-                        content: `HISTORIAL:\n${conversationHistory}\n\nMENSAJE DEL USUARIO: ${message}\n\nESTADO ACTUAL DEL ISV (no resetear campos ya resueltos, copiar y solo actualizar los nuevos):\n${isvActual}\n\nResponde SOLO con el JSON indicado.`
+                        content: `HISTORIAL:\n${conversationHistory}\n\nMENSAJE DEL USUARIO: ${message}\n\nESTADO ACTUAL DEL ISV (No borres campos ya resueltos):\n${isvActual}\n\nResponde SOLO con el JSON indicado.`
                     }
                 ],
-                temperature: 0.3,
+                temperature: 0.2,
                 max_completion_tokens: 1500,
                 response_format: { type: 'json_object' },
             });
@@ -256,38 +256,20 @@ export async function POST(req: NextRequest) {
             }
 
             jsonOutput = applyIsvV6SufficiencyGuard(jsonOutput);
-            console.log('[ISV-JSON]', JSON.stringify(jsonOutput?.isv_v6));
-
-            // Mergear con ISV anterior para no perder campos ya resueltos
-            // El LLM a veces resetea campos que ya tenía — esto lo previene
+            
+            // Mergear con ISV anterior de forma inteligente
             const prevIsv = currentState ?? {};
-            if (jsonOutput.isv_v6 && prevIsv) {
-                const merged = jsonOutput.isv_v6;
-                // Solo mergear campos que el LLM dejó null pero el ISV anterior tenía valor
-                for (const key of Object.keys(prevIsv)) {
-                    if (key === 'budget') {
-                        const prevBudget = (prevIsv as any).budget ?? {};
-                        merged.budget = merged.budget ?? {};
-                        for (const bk of ['amount_raw','amount_min','amount_max','currency']) {
-                            if (merged.budget[bk] === null && prevBudget[bk] != null) {
-                                merged.budget[bk] = prevBudget[bk];
-                            }
-                        }
-                    } else if (key === 'preferred_markets' || key === 'preferred_submarkets' || key === 'strategy_cluster') {
-                        if ((!merged[key] || merged[key].length === 0) && (prevIsv as any)[key]?.length > 0) {
-                            merged[key] = (prevIsv as any)[key];
-                        }
-                    } else {
-                        if ((merged[key] === null || merged[key] === undefined) && (prevIsv as any)[key] != null) {
-                            merged[key] = (prevIsv as any)[key];
-                        }
-                    }
+            if (jsonOutput.isv_v6) {
+                const merged = { ...prevIsv, ...jsonOutput.isv_v6 };
+                // Garantizar que budget no se pierda parcialmente
+                if (jsonOutput.isv_v6.budget) {
+                    merged.budget = { ...(prevIsv.budget ?? {}), ...jsonOutput.isv_v6.budget };
                 }
                 jsonOutput.isv_v6 = merged;
             }
 
             const isvV6Mapeado = mapGeminiToIsvV6(jsonOutput.isv_v6);
-            const isvSufficient = isvV6Mapeado?.isv_sufficient && isvV6Mapeado?.confirmed_by_user ? true : false;
+            const isvSufficient = isvV6Mapeado?.isv_sufficient && isvV6Mapeado?.confirmed_by_user;
 
             if (isvSufficient) trackEvent('isv_v6_complete');
 
