@@ -36,6 +36,9 @@ async function executeSingleAction(action: AecAction): Promise<void> {
           (a.layer1?.expectedIrr ?? a.irr_equivalente ?? 0) >= action.min_irr!
         )
       }
+      if (action.min_precio !== undefined) {
+        filtered = filtered.filter(a => (a.precio_usd ?? 0) >= action.min_precio!)
+      }
       if (action.max_precio !== undefined) {
         filtered = filtered.filter(a => (a.precio_usd ?? 0) <= action.max_precio!)
       }

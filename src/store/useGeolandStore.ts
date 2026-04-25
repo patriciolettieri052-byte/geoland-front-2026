@@ -5,6 +5,7 @@ import { AecAction } from '@/types/aec';
 export interface FiltrosDuros {
     ubicacion: string | null;
     tipoActivo: string | null;
+    presupuestoMinimo: number | null;
     presupuestoMaximo: number | null;
     moneda: string | null;
 }
@@ -261,6 +262,7 @@ export type RightPanelView =
 const initialFiltrosDuros: FiltrosDuros = {
     ubicacion: null,
     tipoActivo: null,
+    presupuestoMinimo: null,
     presupuestoMaximo: null,
     moneda: null,
 };

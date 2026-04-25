@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Inter } from 'next/font/google';
 import { useGeolandStore } from '@/store/useGeolandStore';
 import { AiChatProfiler } from '@/components/onboarding/AiChatProfiler';
@@ -114,10 +114,26 @@ export default function GeolandOS() {
         const data = await fetchMatch(payload);
         if (!cancelled) {
           clearTimeout(timeoutId);
-          setAssets(data);
-          useGeolandStore.getState().setOriginalAssets(data);
-          // Track after success — FIX-FRONT-P1-04
-          if (user) trackAction(user.id, 'search');
+          
+          if (data.length === 0) {
+            // ── ZERO RESULTS: revertir transición y dejar al profiler activo ──
+            setAssets([]);
+            useGeolandStore.getState().setOriginalAssets([]);
+            // Revertir perfilCompletado para que AiChatProfiler siga activo
+            useGeolandStore.getState().setPerfilCompletado(false);
+            // Inyectar mensaje en el historial del profiler
+            useGeolandStore.getState().setChatHistory((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: 'Analicé el mercado pero no encontré activos que coincidan exactamente con tu perfil actual. Podemos ajustar la búsqueda: ¿querés ampliar el mercado, cambiar la estrategia, o revisar el presupuesto?'
+              }
+            ]);
+          } else {
+            setAssets(data);
+            useGeolandStore.getState().setOriginalAssets(data);
+            if (user) trackAction(user.id, 'search');
+          }
         }
       } catch (err: any) {
         if (!cancelled) {
@@ -125,6 +141,15 @@ export default function GeolandOS() {
           console.error('[page.tsx] fetchMatch falló:', err);
           if (err.message === 'NO_ASSETS_MATCH') {
             setAssets([]);
+            useGeolandStore.getState().setOriginalAssets([]);
+            useGeolandStore.getState().setPerfilCompletado(false);
+            useGeolandStore.getState().setChatHistory((prev) => [
+              ...prev,
+              {
+                role: 'assistant',
+                content: 'No encontré activos que coincidan con esos criterios. ¿Ajustamos algo? Podés cambiar el mercado, la estrategia o el rango de presupuesto.'
+              }
+            ]);
             setError(null);
           } else {
             setError('No se pudieron cargar los resultados. Intentá de nuevo.');
@@ -151,11 +176,13 @@ export default function GeolandOS() {
     }
   };
 
-  const handleLoaderComplete = () => {
-    if (assets.length > 0 || error) {
-        setIsRefining(false);
-    }
-  };
+  const handleLoaderComplete = useCallback(() => {
+    // FIX: Always allow the loader to finish to avoid infinite loops
+    // especially when assets.length is 0. The finally block in the fetch 
+    // also handles this, but this ensures the 6s minimum duration 
+    // doesn't block the UI if the fetch is already done with 0 results.
+    setIsRefining(false);
+  }, [setIsRefining]);
 
   const filteredAssets = useMemo(() => {
     if (!perfilCompletado || isRefining) return [];

@@ -138,12 +138,33 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
     ];
 
     if (!checks.every(Boolean)) {
-        const missing = [
+        const FIELD_LABELS: Record<string, string> = {
+            'investment_mode':      'modo de inversión',
+            'effort_level':         'nivel de involucramiento',
+            'budget+currency':      'presupuesto y moneda',
+            'decision_tradeoff':    'tolerancia al riesgo',
+            'time_horizon':         'horizonte de inversión',
+            'market':               'mercado o ciudad',
+            'asset_class+strategy': 'tipo de activo y estrategia',
+            'confirmed_by_user':    'confirmación del resumen',
+        };
+        const fieldKeys = [
             'investment_mode','effort_level','budget+currency','decision_tradeoff',
             'time_horizon','market','asset_class+strategy','confirmed_by_user'
-        ].filter((_,i) => !checks[i]);
+        ];
+        const missing = fieldKeys.filter((_,i) => !checks[i]);
+        const missingLabels = missing.map(k => FIELD_LABELS[k] ?? k).join(', ');
+        
         console.warn('[ISV-V6] isv_sufficient bloqueado — faltan:', missing);
-        return { ...jsonOutput, isv_v6: { ...v6, isv_sufficient: false } };
+        
+        // Inyectar en dialogo_ui para que el LLM retome con contexto
+        const feedbackMsg = `[GUARDRAIL] Perfil incompleto. Aún falta capturar: ${missingLabels}. Por favor continuá la conversación para completar estos campos.`;
+        
+        return {
+            ...jsonOutput,
+            dialogo_ui: feedbackMsg,
+            isv_v6: { ...v6, isv_sufficient: false }
+        };
     }
     return jsonOutput;
 }
@@ -187,6 +208,44 @@ function getFirstMissingField(isv: Record<string, any>): string | null {
     if (!isv?.confirmed_by_user) return 'confirmation';
 
     return null; // todo resuelto
+}
+
+/**
+ * Merge seguro del ISV: solo sobreescribe un campo del prevIsv si el nuevo valor
+ * es no-null, no-undefined, y no-array-vacío.
+ * Los arrays se preservan del prev si el nuevo viene vacío.
+ * El objeto budget tiene merge especial: campo por campo, solo si el nuevo valor no es null.
+ */
+function mergeIsvSafe(prev: Record<string, any>, next: Record<string, any>): Record<string, any> {
+    const result = { ...prev };
+    
+    for (const key of Object.keys(next)) {
+        const newVal = next[key];
+        const prevVal = prev[key];
+        
+        // Arrays: preservar el prev si el nuevo viene vacío
+        if (Array.isArray(newVal)) {
+            if (newVal.length > 0) {
+                result[key] = newVal;
+            }
+            // Si newVal es [] y prevVal tenía datos, se preserva prevVal (no hacer nada)
+            continue;
+        }
+        
+        // Objetos (ej: budget): merge recursivo campo por campo
+        if (newVal && typeof newVal === 'object' && !Array.isArray(newVal)) {
+            result[key] = mergeIsvSafe(prevVal ?? {}, newVal);
+            continue;
+        }
+        
+        // Primitivos: solo sobreescribir si el nuevo valor no es null/undefined
+        if (newVal !== null && newVal !== undefined) {
+            result[key] = newVal;
+        }
+        // Si newVal es null/undefined, se preserva prevVal
+    }
+    
+    return result;
 }
 
 
@@ -257,15 +316,10 @@ export async function POST(req: NextRequest) {
 
             jsonOutput = applyIsvV6SufficiencyGuard(jsonOutput);
             
-            // Mergear con ISV anterior de forma inteligente
+            // Merge seguro: no sobreescribe campos ya resueltos con null
             const prevIsv = currentState ?? {};
             if (jsonOutput.isv_v6) {
-                const merged = { ...prevIsv, ...jsonOutput.isv_v6 };
-                // Garantizar que budget no se pierda parcialmente
-                if (jsonOutput.isv_v6.budget) {
-                    merged.budget = { ...(prevIsv.budget ?? {}), ...jsonOutput.isv_v6.budget };
-                }
-                jsonOutput.isv_v6 = merged;
+                jsonOutput.isv_v6 = mergeIsvSafe(prevIsv, jsonOutput.isv_v6);
             }
 
             const isvV6Mapeado = mapGeminiToIsvV6(jsonOutput.isv_v6);

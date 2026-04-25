@@ -32,6 +32,8 @@ export interface MatchPayload {
     use_potential?:    string[];
     market_proxy?:     string;
     min_aqs?:          number | null;
+    min_price?:        number | null;
+    max_price?:        number | null;
 }
 
 export interface RecalculatePayload {
@@ -172,7 +174,12 @@ export function buildMatchPayloadFromV6(
         mercadoPreferencia: mercado,
     };
 
-    const payload: MatchPayload = { filtrosDuros, filtrosBlandosIsv };
+    const payload: MatchPayload = { 
+        filtrosDuros, 
+        filtrosBlandosIsv,
+        min_price: isvV6.budget?.amount_min,
+        max_price: isvV6.budget?.amount_max
+    };
 
     // Farmland extras
     if (isvV6.asset_class === 'farmland' && isvV6.strategy_cluster?.length) {
@@ -216,6 +223,13 @@ export async function fetchMatch(
         params.append('min_aqs', payload.min_aqs.toString());
     } else {
         params.append('min_aqs', '45');
+    }
+
+    if (payload.min_price !== undefined && payload.min_price !== null) {
+        params.append('min_price', payload.min_price.toString());
+    }
+    if (payload.max_price !== undefined && payload.max_price !== null) {
+        params.append('max_price', payload.max_price.toString());
     }
 
     // Call server-side proxy (API key stays server-side) — FIX-FRONT-P1-01
