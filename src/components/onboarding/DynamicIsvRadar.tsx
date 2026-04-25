@@ -111,34 +111,6 @@ export function DynamicIsvRadar() {
                 </span>
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-1.5 px-6 mt-3 justify-center">
-                {isvV6.main_strategy && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#EFF6FF', color: '#000000', border: '1px solid #BFDBFE' }}>
-                        {isvV6.main_strategy.replace(/_/g, ' ')}
-                    </span>
-                )}
-                {isvV6.effort_level && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F3F4F6', color: '#374151', border: '1px solid #E5E7EB' }}>
-                        {isvV6.effort_level === 'low' ? t.radar.passive : isvV6.effort_level === 'medium' ? t.radar.semiActive : t.radar.active}
-                    </span>
-                )}
-                {isvV6.budget?.currency && isvV6.budget?.amount_max && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F3F4F6', color: '#374151', border: '1px solid #E5E7EB' }}>
-                        {isvV6.budget.currency} {isvV6.budget.amount_max.toLocaleString()}
-                    </span>
-                )}
-                {isvV6.time_horizon && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#F3F4F6', color: '#374151', border: '1px solid #E5E7EB' }}>
-                        {isvV6.time_horizon === 'short' ? t.radar.short : isvV6.time_horizon === 'medium' ? t.radar.medium : t.radar.long}
-                    </span>
-                )}
-                {isvV6.confirmed_by_user && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0' }}>
-                        {t.radar.confirmed}
-                    </span>
-                )}
-            </div>
         </div>
     );
 }

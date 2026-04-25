@@ -110,7 +110,7 @@ const STRATEGY_MAP: Record<string, string> = {
   // Flujo
   'buy_hold_income':           'RENTAL_LONG_TERM',
   'rental_long_term':          'RENTAL_LONG_TERM',
-  'buy_and_hold_appreciation': 'RENTAL_LONG_TERM',
+  'buy_and_hold_appreciation': 'BUY_AND_HOLD_APPRECIATION',
   'short_term_rental':         'RENTAL_SHORT_TERM',
   'rental_short_term':         'RENTAL_SHORT_TERM',
   'nnn_commercial':            'COMMERCIAL',
