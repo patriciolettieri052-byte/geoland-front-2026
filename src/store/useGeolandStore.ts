@@ -433,7 +433,7 @@ export const useGeolandStore = create<GeolandState>((set) => ({
             const { supabase } = await import('@/lib/supabase');
             
             const payloadBase = {
-                filtrosDuros: { ubicacion: 'todos', tipoActivo: 'todos', presupuestoMaximo: 0, moneda: 'USD' },
+                filtrosDuros: { ubicacion: 'todos', tipoActivo: 'todos', presupuestoMinimo: 0, presupuestoMaximo: 0, moneda: 'USD' },
                 filtrosBlandosIsv: { estrategiaObjetivo: 'todas', horizonteAnos: 'todos', involucramiento: 'todos', riesgoTolerancia: 'todos', financiacion: 'todos', mercadoPreferencia: 'todos' },
             };
 

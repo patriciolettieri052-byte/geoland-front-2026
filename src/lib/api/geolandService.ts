@@ -69,6 +69,7 @@ function sanitizeFiltrosDuros(f: FiltrosDuros): FiltrosDuros {
     return {
         ubicacion:         f?.ubicacion         ?? "todos",
         tipoActivo:        f?.tipoActivo        ?? "todos",
+        presupuestoMinimo: f?.presupuestoMinimo ?? 0,
         presupuestoMaximo: f?.presupuestoMaximo ?? 0,
         moneda:            f?.moneda            ?? "USD",
     };
@@ -161,6 +162,7 @@ export function buildMatchPayloadFromV6(
     const filtrosDuros: FiltrosDuros = {
         ubicacion:         mercado,
         tipoActivo:        tipoActivo,
+        presupuestoMinimo: isvV6.budget?.amount_min ?? 0,
         presupuestoMaximo: isvV6.budget?.amount_max ?? 0,
         moneda:            isvV6.budget?.currency   ?? 'USD',
     };
