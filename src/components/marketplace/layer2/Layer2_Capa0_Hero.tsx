@@ -326,7 +326,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
             {thesisTitle}
           </h2>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {thesisTags.map((tag, i) => (
+            {thesisTags.map((tag: string, i: number) => (
               <span key={i} style={{
                 fontSize: 9, fontWeight: 700, textTransform: "uppercase",
                 padding: "4px 10px", borderRadius: 6, background: "#F3F4F6", color: "#6B7280",
@@ -343,7 +343,7 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 4 }}>
-          {proofPoints.map((point, i) => (
+          {proofPoints.map((point: { label: string; value: string }, i: number) => (
             <div key={i} style={{
               display: "flex", alignItems: "center", gap: 10,
               background: "#F9FAFB", border: "1px solid #E5E7EB",

@@ -23,20 +23,33 @@ export interface AssetMatchItem {
     rationale: string;
     backgroundImageUrl: string;
   };
-  layer2?: {
-    strategy_key?: string;
-    metrics: {
-      roiTotal: number;
-      netMargin: number;
-      baseCapex: number;
-      [key: string]: any;
+    layer2?: {
+      strategy_key?: string;
+      metrics: {
+        roiTotal: number;
+        netMargin: number;
+        baseCapex: number;
+        [key: string]: any;
+      };
+      thesis?: {
+        title?: string;
+        paragraph?: string;
+        tags?: string[];
+        proof_points?: { label: string; value: string }[];
+      };
+      sensitivityConfig?: {
+        capexRange: [number, number];
+        exitRateRange: [number, number];
+      };
     };
-    sensitivityConfig?: {
-      capexRange: [number, number];
-      exitRateRange: [number, number];
-    };
-  };
   
   // Campos dinámicos adicionales del pipeline
   [key: string]: any;
+}
+
+export interface RedFlag {
+  description?: string;
+  name?: string;
+  severity?: string;
+  mitigation?: string;
 }

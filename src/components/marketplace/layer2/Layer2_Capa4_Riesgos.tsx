@@ -39,7 +39,10 @@ function RiskItem({ label, severity }: RiskItemProps) {
   );
 }
 
-export default function Layer2Capa4Riesgos({ asset }: { asset: AssetMatchItem }) {
+export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: { 
+  asset: AssetMatchItem;
+  onRequestLayer3?: (id: string) => void;
+}) {
   // Datos del veredicto (inyectados por el proxy o backend)
   const layer4 = asset.layer4 || {};
   const veredicto = layer4.verdict || layer4.veredicto || "approved_with_conditions";
