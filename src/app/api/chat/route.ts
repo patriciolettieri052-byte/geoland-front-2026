@@ -280,7 +280,7 @@ export async function POST(req: NextRequest) {
             ? REFINAMIENTO_SYSTEM_PROMPT
             : ONBOARDING_SYSTEM_PROMPT;
 
-        const conversationHistory = history.map((h: any) => `${h.role}: ${h.content}`).join('\n');
+        const conversationHistory = history.slice(-10).map((h: any) => `${h.role}: ${h.content}`).join('\n'); // limitar a últimos 10 turnos
 
         if (!perfilCompletado) {
             const currentIsv = currentState ?? {};
