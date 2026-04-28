@@ -24,13 +24,19 @@ const parsePhotos = (raw: unknown): string[] => {
   return [];
 };
 
-function formatValue(value: number | undefined | null, format: string): string {
+function formatValue(value: number | undefined | null, format: string, moneda?: string): string {
   if (value === undefined || value === null) return "—";
+  // V3-FIX: símbolo de moneda dinámico según mercado
+  const currencySymbol = moneda === 'AED' ? 'AED ' 
+    : moneda === 'ARS' ? 'ARS '
+    : moneda === 'USD' ? '$'
+    : '€'; // EUR por default (Madrid)
+
   switch (format) {
     case "percent":  return `${(value <= 1 ? value * 100 : value).toFixed(1)}%`;
     case "currency": return value > 1000
-      ? `€${(value / 1000).toFixed(0)}k`
-      : `€${value.toFixed(0)}`;
+      ? `${currencySymbol}${(value / 1000).toFixed(0)}k`
+      : `${currencySymbol}${value.toFixed(0)}`;
     case "score":    return `${Math.round(value)}`;
     case "number":   return `${Math.round(value)}`;
     default:         return String(value);
@@ -241,12 +247,22 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
   const estrategia = normalizeStrategyKey(rawEstrategia);
   const config = HERO_METRICS_CONFIG[estrategia] || HERO_METRICS_CONFIG.FIX_FLIP;
   const stratLabel = STRATEGY_LABELS[estrategia] || estrategia;
-  const risk = getRiskLabel(asset.risk_score || 50);
+  // F1-FIX: risk_score ya viene mapeado desde el proxy (riskLevel → número)
+  const riskScoreVal = (asset as any).risk_score ?? asset.layer1?.riskLevel ?? 50;
+  const riskScoreNum = typeof riskScoreVal === 'number' ? riskScoreVal : 50;
+  const risk = getRiskLabel(riskScoreNum);
+
+  // V3-FIX: determinar moneda según mercado
+  const mercado = (asset as any).mercado || '';
+  const moneda = mercado.toLowerCase().includes('dubai') ? 'AED'
+    : mercado.toLowerCase().includes('buenos') || mercado.toLowerCase().includes('ba') ? 'ARS'
+    : mercado.toLowerCase().includes('miami') ? 'USD'
+    : 'EUR'; // Madrid por default
 
   const getVal = (field: string) => (asset as Record<string, unknown>)[field] as number | undefined;
 
   const tirValue = getVal(config.topLeft.field) ?? 0.185;
-  const tirFormatted = formatValue(tirValue, config.topLeft.format);
+  const tirFormatted = formatValue(tirValue, config.topLeft.format, moneda);
   const gScore = asset.g_score ?? 82;
   const confidence = Math.round((asset.confidence_final ?? 0.85) * 100);
 
@@ -277,13 +293,13 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
             color="#16A34A"
             showChart
           />
-          <BigMetric
+        <BigMetric
             label="RISK SCORE"
-            value={formatValue(asset.risk_score, "score") || "50"}
+            value={formatValue(riskScoreNum, "score") || "50"}
             color={risk.color}
             sub={risk.label}
             showBar
-            barWidth={asset.risk_score || 50}
+            barWidth={riskScoreNum}
           />
         </div>
 
@@ -348,9 +364,18 @@ export default function Layer2Capa0Hero({ asset }: { asset: AssetMatchItem }) {
               display: "flex", alignItems: "center", gap: 10,
               background: "#F9FAFB", border: "1px solid #E5E7EB",
               padding: "10px 14px", borderRadius: 10,
+              justifyContent: "space-between",
             }}>
-              <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#16A34A", flexShrink: 0 }} />
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#374151" }}>{point.label}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, overflow: "hidden" }}>
+                <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#16A34A", flexShrink: 0 }} />
+                <span style={{ fontSize: 11, fontWeight: 600, color: "#374151", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{point.label}</span>
+              </div>
+              {/* V4-FIX: mostrar el value del proof point */}
+              {point.value && point.value !== "✓" && (
+                <span style={{ fontSize: 12, fontWeight: 800, color: "#16A34A", flexShrink: 0, marginLeft: 8 }}>
+                  {point.value}
+                </span>
+              )}
             </div>
           ))}
         </div>

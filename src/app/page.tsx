@@ -66,6 +66,19 @@ export default function GeolandOS() {
   const { user, signOut } = useAuth();
   const isMobile = useIsMobile();
 
+  // UX-FIX-01: Coordinación loader ↔ fetch
+  // El marketplace aparece solo cuando AMBOS terminaron (fetch + loader mínimo 6s)
+  const [fetchDone, setFetchDone] = useState(false);
+  const [loaderDone, setLoaderDone] = useState(false);
+
+  // Cuando ambos terminan, apagar isRefining
+  useEffect(() => {
+    if (fetchDone && loaderDone && isRefining) {
+      setIsRefining(false);
+      setFetchDone(false);
+      setLoaderDone(false);
+    }
+  }, [fetchDone, loaderDone, isRefining, setIsRefining]);
 
   // EFECTO COMBINADO: Límite + Tracking + Persistencia + Búsqueda
   useEffect(() => {
@@ -98,15 +111,21 @@ export default function GeolandOS() {
         }
       }
 
-      // 4. Ejecutar búsqueda (Lógica original)
+      // 3. Ejecutar búsqueda
       timeoutId = setTimeout(() => {
         if (!cancelled) {
           setError('El análisis tardó demasiado. Verificá tu conexión e intentá de nuevo.');
           setIsRefining(false);
+          setFetchDone(false);
+          setLoaderDone(false);
         }
       }, 30000);
 
+      // UX-FIX-01: resetear flags antes de arrancar
+      setFetchDone(false);
+      setLoaderDone(false);
       setIsRefining(true);
+
       try {
         const { fetchMatch, buildMatchPayloadFromV6 } = await import('@/lib/api/geolandService');
         const store = useGeolandStore.getState();
@@ -116,12 +135,10 @@ export default function GeolandOS() {
           clearTimeout(timeoutId);
           
           if (data.length === 0) {
-            // ── ZERO RESULTS: revertir transición y dejar al profiler activo ──
+            // ZERO RESULTS: revertir transición y dejar al profiler activo
             setAssets([]);
             useGeolandStore.getState().setOriginalAssets([]);
-            // Revertir perfilCompletado para que AiChatProfiler siga activo
             useGeolandStore.getState().setPerfilCompletado(false);
-            // Inyectar mensaje en el historial del profiler
             useGeolandStore.getState().setChatHistory((prev) => [
               ...prev,
               {
@@ -129,10 +146,16 @@ export default function GeolandOS() {
                 content: 'Analicé el mercado pero no encontré activos que coincidan exactamente con tu perfil actual. Podemos ajustar la búsqueda: ¿querés ampliar el mercado, cambiar la estrategia, o revisar el presupuesto?'
               }
             ]);
+            // Con 0 resultados no necesitamos esperar al loader
+            setIsRefining(false);
+            setFetchDone(false);
+            setLoaderDone(false);
           } else {
             setAssets(data);
             useGeolandStore.getState().setOriginalAssets(data);
             if (user) trackAction(user.id, 'search');
+            // UX-FIX-01: marcar fetch completo, esperar al loader
+            if (!cancelled) setFetchDone(true);
           }
         }
       } catch (err: any) {
@@ -154,9 +177,11 @@ export default function GeolandOS() {
           } else {
             setError('No se pudieron cargar los resultados. Intentá de nuevo.');
           }
+          // En error: apagar todo inmediatamente
+          setIsRefining(false);
+          setFetchDone(false);
+          setLoaderDone(false);
         }
-      } finally {
-        if (!cancelled) setIsRefining(false);
       }
     };
 
@@ -176,13 +201,14 @@ export default function GeolandOS() {
     }
   };
 
+  // UX-FIX-01 + UX-FIX-03: El loader avisa que terminó su duración mínima.
+  // Solo actúa si isRefining sigue activo (guard contra doble llamada).
+  // El marketplace aparece cuando fetch Y loader terminaron.
   const handleLoaderComplete = useCallback(() => {
-    // FIX: Always allow the loader to finish to avoid infinite loops
-    // especially when assets.length is 0. The finally block in the fetch 
-    // also handles this, but this ensures the 6s minimum duration 
-    // doesn't block the UI if the fetch is already done with 0 results.
-    setIsRefining(false);
-  }, [setIsRefining]);
+    if (useGeolandStore.getState().isRefining) {
+      setLoaderDone(true);
+    }
+  }, [setLoaderDone]);
 
   const filteredAssets = useMemo(() => {
     if (!perfilCompletado || isRefining) return [];
@@ -236,6 +262,10 @@ export default function GeolandOS() {
       const photos = extractPhotos(a);
       const hasFallbackData = !realPrice || realIrr === null || realGScore === null;
 
+      // F1-FIX: risk_score viene del proxy (route.ts) en el root del asset
+      // El proxy ya lo calcula desde riskLevel. Lo propagamos explícitamente.
+      const riskScore = a.risk_score ?? 50;
+
       return {
         ...a,
         id,
@@ -246,6 +276,8 @@ export default function GeolandOS() {
         precio_usd: realPrice,
         irr_equivalente: realIrr,
         g_score: realGScore,
+        // F1-FIX: propagar risk_score al root para que Capa0 Hero lo lea
+        risk_score: riskScore,
         datos_estimados: hasFallbackData || a.datos_estimados || false,
         photo_urls: photos,
         confidenceScore: realConfidence,
@@ -260,14 +292,19 @@ export default function GeolandOS() {
           metrics: {
             ...(a.layer2?.metrics || {}),
             baseCapex: a.layer2?.metrics?.baseCapex ?? realPrice ?? 0,
-            roiTotal: realIrr ?? 0,
+            // C2-FIX: solo setear roiTotal si no viene ya calculado por estrategia
+            // El proxy aplana metrics al root — si ya hay roiTotal, respetarlo
+            roiTotal: a.layer2?.metrics?.roiTotal ?? realIrr ?? 0,
           }
         }
       };
     }).sort((a, b) => (b.layer1?.gScore || 0) - (a.layer1?.gScore || 0));
   }, [assets, perfilCompletado, isRefining]);
 
-  const activeAsset = filteredAssets.find(a => a.id === activeAssetId);
+  // AEC-FIX: buscar por id O asset_id — el backend puede enviar cualquiera
+  const activeAsset = filteredAssets.find(a => 
+    a.id === activeAssetId || a.asset_id === activeAssetId
+  );
 
   return (
     <main className={`${inter.variable} min-h-screen w-full overflow-auto font-sans`} style={{ backgroundColor: '#FFFFFF', color: '#0F1117' }}>

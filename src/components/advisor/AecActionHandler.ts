@@ -92,6 +92,8 @@ async function executeSingleAction(action: AecAction): Promise<void> {
 
     case 'refetch_match': {
       store.setIsRefining(true)
+      // Pequeño delay para que el loader se monte antes del fetch
+      await new Promise(resolve => setTimeout(resolve, 100))
       try {
         const { buildMatchPayloadFromV6, fetchMatch } = await import('@/lib/api/geolandService')
         const currentIsv = useGeolandStore.getState().isvV6

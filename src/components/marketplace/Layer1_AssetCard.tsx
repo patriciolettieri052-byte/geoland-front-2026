@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useGeolandStore } from '@/store/useGeolandStore';
@@ -10,6 +8,24 @@ import {
   formatMetric, 
   getConfidenceBadge 
 } from './layer1.config';
+
+// V1-FIX: importar labels para mostrar nombre legible en el badge
+const STRATEGY_LABELS_DISPLAY: Record<string, string> = {
+  FIX_FLIP: 'Fix & Flip',
+  RENTAL_LONG_TERM: 'Renta Larga',
+  SHORT_TERM_RENTAL: 'Short-term Rental',
+  BUY_AND_HOLD: 'Buy & Hold',
+  NNN_COMERCIAL: 'NNN Comercial',
+  GREENFIELD: 'Development',
+  DISTRESSED: 'Distressed',
+  LAND_BANKING: 'Land Banking',
+  VALUE_ADD: 'Value Add',
+  FARMLAND: 'Agriculture',
+  LIVESTOCK: 'Livestock',
+  MIXED_FARMLAND: 'Mixed Farmland',
+  FORESTRY: 'Forestry',
+  SUBDIVISION: 'Subdivisión',
+};
 
 interface Layer1AssetCardProps {
     asset: any; 
@@ -26,6 +42,8 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
     const strategyRaw = asset.strategy || asset.estrategia || 'RENTAL_LONG_TERM';
     const strategyKey = STRATEGY_KEY_MAP[strategyRaw] || strategyRaw;
     const metricsConfig = STRATEGY_CARD_METRICS[strategyKey] || STRATEGY_CARD_METRICS.RENTAL_LONG_TERM;
+    // V1-FIX: usar nombre legible en el badge
+    const stratLabel = STRATEGY_LABELS_DISPLAY[strategyKey] || strategyKey.replace(/_/g, ' ');
     
     // Datos de la Layer 2
     const layer2Metrics = asset.layer2?.metrics || {};
@@ -44,7 +62,14 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
         ? `$${(precioRaw / 1000).toFixed(0)}K USD` 
         : '—';
     
-    const superficie = asset.superficie_m2 || asset.layer2?.metrics?.superficie_m2;
+    // V2-FIX: superficie con formato legible — ha si > 5000 m²
+    const superficieRaw = asset.superficie_m2 || asset.layer2?.metrics?.superficie_m2;
+    const superficieLabel = superficieRaw
+        ? superficieRaw > 5000
+            ? `${(superficieRaw / 10000).toFixed(1)} ha`
+            : `${superficieRaw.toLocaleString('es-AR')} m²`
+        : null;
+
     const location = asset.barrio || asset.location || asset.mercado || 'MERCADO GLOBAL';
     const title = asset.nombre || asset.descripcion?.substring(0, 60) || 'Sin descripción';
     
@@ -102,14 +127,14 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                     <div style={{ width: 5, height: 5, background: badge.color, borderRadius: '50%' }} />
                     {badge.label}
                 </div>
-                {/* Strategy badge */}
+                {/* Strategy badge — V1-FIX: nombre legible */}
                 <div style={{
                     position: 'absolute', bottom: 10, left: 10,
                     background: 'rgba(0,0,0,0.6)', color: 'white',
                     fontSize: 9, padding: '3px 8px', borderRadius: 4,
                     textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em',
                 }}>
-                    {strategyKey.replace(/_/g, ' ')}
+                    {stratLabel}
                 </div>
             </div>
 
@@ -138,7 +163,7 @@ export function Layer1AssetCard({ asset, onClick, rank }: Layer1AssetCardProps) 
                 <div style={{
                     fontSize: 13, fontWeight: 700, color: '#0F1117', marginBottom: 14,
                 }}>
-                    {precio}{superficie ? ` · ${superficie} m²` : ''}
+                    {precio}{superficieLabel ? ` · ${superficieLabel}` : ''}
                 </div>
 
                 {/* G-Score box */}

@@ -3,6 +3,8 @@
 import { AssetMatchItem } from '@/types/geoland';
 import { Layer1AssetCard } from './Layer1_AssetCard';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
+import { useGeolandStore } from '@/store/useGeolandStore';
 
 interface Layer1GlassGridProps {
     assets: AssetMatchItem[];
@@ -27,6 +29,20 @@ const itemVariants = {
 };
 
 export function Layer1GlassGrid({ assets, onAssetClick }: Layer1GlassGridProps) {
+    const { user } = useAuth();
+    const setAuthModalOpen = useGeolandStore((state) => state.setAuthModalOpen);
+    const setAuthModalView = useGeolandStore((state) => state.setAuthModalView);
+
+    const handleClick = (assetId: string) => {
+        // C1-FIX: guard de auth en el Grid — única fuente de verdad para el click
+        if (!user) {
+            setAuthModalView('register');
+            setAuthModalOpen(true);
+            return;
+        }
+        onAssetClick(assetId);
+    };
+
     return (
         <motion.div
             className="flex flex-col gap-3 w-full max-w-[1700px] mx-auto"
@@ -36,12 +52,12 @@ export function Layer1GlassGrid({ assets, onAssetClick }: Layer1GlassGridProps) 
         >
             {assets.map((asset, index) => (
                 <motion.div 
-                    key={asset.id} 
+                    key={asset.id || asset.asset_id || index} 
                     variants={itemVariants} 
                     className="w-full cursor-pointer"
-                    onClick={() => onAssetClick(asset.id)}
+                    onClick={() => handleClick(asset.id || (asset as any).asset_id)}
                 >
-                    {/* onClick passed to card is a no-op since wrapper handles it */}
+                    {/* C1-FIX: onClick no-op al Card — el auth guard vive en el Grid */}
                     <Layer1AssetCard asset={asset as any} onClick={() => {}} rank={index + 1} />
                 </motion.div>
             ))}

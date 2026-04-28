@@ -23,6 +23,13 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
   const vars = FINANCIAL_VARS_CONFIG[estrategia] || FINANCIAL_VARS_CONFIG.FIX_FLIP;
   const data = asset as Record<string, unknown>;
 
+  // V7-FIX: moneda dinámica según mercado
+  const mercado = ((asset as any).mercado || '').toLowerCase();
+  const monedaLabel = mercado.includes('dubai') ? 'AED'
+    : mercado.includes('miami') ? 'USD'
+    : mercado.includes('buenos') || mercado.includes('ba') ? 'ARS'
+    : 'EUR';
+
   return (
     <div style={{ padding: "24px", borderTop: "1px solid #E5E7EB", background: "#FFFFFF" }}>
       {/* Header de sección */}
@@ -33,7 +40,7 @@ export default function Layer2Capa1Financiero({ asset }: { asset: AssetMatchItem
             Validación Financiera · Unit Economics
           </span>
         </div>
-        <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 700 }}>VALORES ESTIMADOS €</span>
+        <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 700 }}>VALORES ESTIMADOS {monedaLabel}</span>
       </div>
 
       {/* Grid 4 Columnas */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { AssetMatchItem, RedFlag } from "@/types/geoland";
 
@@ -46,14 +47,21 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: {
   // Datos del veredicto (inyectados por el proxy o backend)
   const layer4 = asset.layer4 || {};
   const veredicto = layer4.verdict || layer4.veredicto || "approved_with_conditions";
-  const auditId = layer4.audit_id || `S11-${Math.floor(Math.random() * 9000) + 1000}`;
-  const recommendedAction = layer4.recommended_next_action || layer4.proximo_paso || "Verificar documentación legal y técnica antes de proceder con la reserva.";
+  
+  // F2-FIX: audit_id estable — no regenerar en cada render
+  const auditId = useMemo(() => {
+    return layer4.audit_id || layer4.traceability_score 
+      ? `S11-${layer4.traceability_score || 50}`
+      : `S11-${(asset.g_score || 50)}${String(asset.id || '').slice(-4)}`;
+  }, [asset.id, asset.g_score, layer4.audit_id, layer4.traceability_score]);
+
+  const recommendedAction = layer4.recommended_action || layer4.recommended_next_action || layer4.proximo_paso || "Verificar documentación legal y técnica antes de proceder con la reserva.";
 
   // Mapeo de veredicto visual
   const getVerdictStyle = (v: string) => {
     const val = String(v).toLowerCase();
     if (val.includes("approve") || val.includes("aprobado")) {
-        if (val.includes("condition") || val.includes("condicion")) {
+        if (val.includes("condition") || val.includes("condicion") || val === "conditional") {
             return { label: "Veredicto: Aprobado con condiciones", bg: "#FEF3C7", text: "#D97706", border: "#FDE68A" };
         }
         return { label: "Veredicto: Aprobado", bg: "#DCFCE7", text: "#16A34A", border: "#BBF7D0" };
@@ -66,8 +74,17 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: {
 
   const vStyle = getVerdictStyle(veredicto);
 
-  // Red Flags
-  const redFlags: RedFlag[] = asset.layer4?.red_flags || asset.red_flags || [];
+  // F3-FIX: red_flags acepta tanto string[] como objeto[] (con description/severity)
+  const rawFlags: any[] = asset.layer4?.red_flags || asset.red_flags || [];
+  const redFlags = rawFlags.map(flag => {
+    if (typeof flag === 'string') {
+      return { label: flag, severity: 'Medio' };
+    }
+    return {
+      label: flag.description || flag.name || flag.label || "Riesgo detectado",
+      severity: flag.severity || flag.nivel || 'Medio',
+    };
+  });
 
   return (
     <div style={{ padding: "24px", borderTop: "1px solid #E5E7EB" }}>
@@ -110,8 +127,8 @@ export default function Layer2Capa4Riesgos({ asset, onRequestLayer3 }: {
           redFlags.map((flag, idx) => (
             <RiskItem 
               key={idx} 
-              label={flag.description || flag.name || "Riesgo detectado"} 
-              severity={flag.severity || "Medio"} 
+              label={flag.label} 
+              severity={flag.severity} 
             />
           ))
         ) : (

@@ -35,6 +35,8 @@ export function AiChatProfiler() {
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [hasSentSystemCommand, setHasSentSystemCommand] = useState(false);
+    // UX-FIX-02: bloquear input durante los 3s de transición al marketplace
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -138,8 +140,10 @@ export function AiChatProfiler() {
 
             // Transición a Capa 1 cuando el ISV es suficiente
             if (data.perfil_completado && !perfilCompletado) {
+                setIsTransitioning(true);  // UX-FIX-02: bloquear input inmediatamente
                 setTimeout(() => {
                     setPerfilCompletado(true);
+                    setIsTransitioning(false);
                 }, 3000);
             }
 
@@ -294,8 +298,8 @@ export function AiChatProfiler() {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder={t.chat.placeholder}
-                        disabled={isLoading}
+                        placeholder={isTransitioning ? 'Preparando tu búsqueda...' : t.chat.placeholder}
+                        disabled={isLoading || isTransitioning}
                         ref={inputRef}
                         autoFocus
                         className="w-full rounded-full py-[13px] pl-[20px] pr-12 text-[13px] font-normal focus:outline-none transition-colors"
@@ -304,11 +308,12 @@ export function AiChatProfiler() {
                             border: '1px solid #E5E7EB',
                             boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                             color: '#0F1117',
+                            opacity: isTransitioning ? 0.5 : 1,
                         }}
                     />
                     <button
                         type="submit"
-                        disabled={isLoading || !input.trim()}
+                        disabled={isLoading || isTransitioning || !input.trim()}
                         className="absolute right-2 p-[10px] rounded-full disabled:opacity-50 transition-all text-white"
                         style={{ backgroundColor: '#000000' }}
                     >
