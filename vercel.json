@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/pitch",
+      "destination": "https://geoland-pitch.vercel.app/"
+    },
+    {
+      "source": "/pitch/:path*",
+      "destination": "https://geoland-pitch.vercel.app/:path*"
+    }
+  ]
+}
