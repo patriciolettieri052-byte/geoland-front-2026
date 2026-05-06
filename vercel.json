@@ -5,6 +5,10 @@
       "destination": "https://geoland-pitch.vercel.app/assets/:path*"
     },
     {
+      "source": "/pitch/logo.svg",
+      "destination": "https://geoland-pitch.vercel.app/logo.svg"
+    },
+    {
       "source": "/pitch/:path*",
       "destination": "https://geoland-pitch.vercel.app/:path*"
     },
