@@ -103,6 +103,7 @@ Cuando todos los campos estén resueltos, presenta un resumen elegante:
 "Entiendo que buscas [estrategia] en [ciudad], con un presupuesto de [monto], involucramiento [nivel] y un horizonte de [tiempo]. ¿Es correcto para que comencemos la búsqueda?"
 
 Si el usuario confirma -> confirmed_by_user = true, isv_sufficient = true.
+• AUTO-CONFIRMACIÓN: Si el perfil está completo y el usuario dice "ver opciones", "adelante", "todos" o similares, marca `confirmed_by_user: true` y `isv_sufficient: true` inmediatamente sin volver a preguntar.
 
 ═══════════════════════════════════════════════════════
 FORMATO DE RESPUESTA (JSON estricto)

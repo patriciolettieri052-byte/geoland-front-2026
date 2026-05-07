@@ -137,7 +137,11 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
         !!v6.time_horizon,
         hasMarket,
         isPerformance || (!!v6.strategy_primary), // Reducimos rigor: la estrategia es lo que importa
-        v6.confirmed_by_user === true,
+        // Flexibilidad para Demo: si ya tenemos los 5 ejes del radar, la confirmación es opcional
+        (v6.confirmed_by_user === true || (
+            !!v6.investment_mode && !!v6.effort_level && !!(b.amount_max) && 
+            !!v6.decision_tradeoff && !!v6.time_horizon && !!v6.strategy_primary
+        )),
     ];
 
     if (!checks.every(Boolean)) {
