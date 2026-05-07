@@ -136,7 +136,7 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
         !!v6.decision_tradeoff,
         !!v6.time_horizon,
         hasMarket,
-        isPerformance || (!!v6.asset_class && !!v6.strategy_primary),
+        isPerformance || (!!v6.strategy_primary), // Reducimos rigor: la estrategia es lo que importa
         v6.confirmed_by_user === true,
     ];
 
@@ -148,7 +148,7 @@ function applyIsvV6SufficiencyGuard(jsonOutput: any): any {
             'decision_tradeoff':    'tolerancia al riesgo',
             'time_horizon':         'horizonte de inversión',
             'market':               'mercado o ciudad',
-            'asset_class+strategy': 'tipo de activo y estrategia',
+            'asset_class+strategy': 'estrategia de inversión',
             'confirmed_by_user':    'confirmación del resumen',
         };
         const fieldKeys = [
@@ -191,8 +191,8 @@ function getFirstMissingField(isv: Record<string, any>): string | null {
     if (!mode) return 'investment_mode';
 
     if (!isPerformance) {
-        if (!isv?.asset_class) return 'asset_class';
-        if (isv.asset_class === 'real_estate' && !isv?.sub_asset_class) return 'sub_asset_class';
+        // Asset class y sub_asset_class son deseables pero si ya tenemos strategy_primary 
+        // podemos considerarlo suficiente para avanzar al perfilado (FIX-ISV-V6-LENIENT)
         if (!isv?.strategy_primary) return 'strategy_primary';
     }
 
