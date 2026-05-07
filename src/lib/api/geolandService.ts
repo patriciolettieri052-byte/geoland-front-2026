@@ -149,13 +149,44 @@ const TRADEOFF_MAP: Record<string, string> = {
   conservative: 'Bajo', balanced: 'Medio', growth_tolerant: 'Alto'
 };
 
+// FIX: Tasas de cambio aproximadas a USD para filtro de precio
+// Se usan solo para el filtro max_price — el backend trabaja en USD
+const FX_TO_USD: Record<string, number> = {
+    USD: 1.0,
+    EUR: 1.08,   // EUR → USD
+    AED: 0.272,  // AED → USD
+    ARS: 0.001,  // ARS → USD (aproximado)
+    UYU: 0.026,
+    CLP: 0.0011,
+    MXN: 0.052,
+    BRL: 0.20,
+    COP: 0.00025,
+};
+
+function toUSD(amount: number | null | undefined, currency: string | null | undefined): number | undefined {
+    if (!amount || amount <= 0) return undefined;
+    const rate = FX_TO_USD[currency ?? 'USD'] ?? 1.0;
+    return Math.round(amount * rate);
+}
+
 export function buildMatchPayloadFromV6(
     isvV6: import('@/store/useGeolandStore').IsvV6
 ): MatchPayload {
     const strategyKey = isvV6.main_strategy ?? isvV6.strategy_primary ?? '';
-    const estrategia  = STRATEGY_MAP[strategyKey] ?? 'todas';
-    const mercado     = isvV6.preferred_markets?.[0] ?? 'todos';
-    const tipoActivo  = isvV6.asset_class === 'farmland'
+    const currency    = isvV6.budget?.currency ?? 'USD';
+
+    // FIX 1: investment_mode determina si filtramos por estrategia o mostramos todo
+    const isPerformanceDriven = isvV6.investment_mode === 'performance_driven' || 
+                                 isvV6.investment_mode === 'exploratory';
+    const estrategia = isPerformanceDriven
+        ? 'todas'
+        : (STRATEGY_MAP[strategyKey] ?? 'todas');
+
+    // FIX 2: multi-mercado — usar primer mercado para el filtro principal
+    // (el backend acepta un solo mercado por query — multi-mercado es v2)
+    const mercado = isvV6.preferred_markets?.[0] ?? 'todos';
+
+    const tipoActivo = isvV6.asset_class === 'farmland'
         ? 'farmland'
         : (isvV6.sub_asset_class ?? 'todos');
 
@@ -164,41 +195,57 @@ export function buildMatchPayloadFromV6(
         tipoActivo:        tipoActivo,
         presupuestoMinimo: isvV6.budget?.amount_min ?? 0,
         presupuestoMaximo: isvV6.budget?.amount_max ?? 0,
-        moneda:            isvV6.budget?.currency   ?? 'USD',
+        moneda:            currency,
     };
 
     const filtrosBlandosIsv: FiltrosBlandosIsv = {
         estrategiaObjetivo: estrategia,
-        horizonteAnos:      HORIZON_MAP[isvV6.time_horizon ?? '']    ?? 'todos',
-        involucramiento:    EFFORT_MAP[isvV6.effort_level ?? '']     ?? 'todos',
+        horizonteAnos:      HORIZON_MAP[isvV6.time_horizon ?? '']       ?? 'todos',
+        involucramiento:    EFFORT_MAP[isvV6.effort_level ?? '']        ?? 'todos',
         riesgoTolerancia:   TRADEOFF_MAP[isvV6.decision_tradeoff ?? ''] ?? 'todos',
         financiacion:       'todos',
         mercadoPreferencia: mercado,
     };
 
+    // FIX 3: convertir presupuesto a USD antes de enviar al backend
+    // El backend filtra precios en USD — sin conversión un budget en EUR filtra mal
+    const minPriceUSD = toUSD(isvV6.budget?.amount_min, currency);
+    const maxPriceUSD = toUSD(isvV6.budget?.amount_max, currency);
+
+    // FIX 4: market_mode open_exploration → bajar umbral AQS para mostrar más resultados
+    const minAqs = (isvV6.market_mode === 'open_exploration' || isPerformanceDriven)
+        ? 30
+        : undefined; // usa el default del backend (45)
+
     const payload: MatchPayload = { 
         filtrosDuros, 
         filtrosBlandosIsv,
-        min_price: isvV6.budget?.amount_min,
-        max_price: isvV6.budget?.amount_max
+        min_price: minPriceUSD,
+        max_price: maxPriceUSD,
+        ...(minAqs !== undefined && { min_aqs: minAqs }),
     };
 
-    // Farmland extras
-    if (isvV6.asset_class === 'farmland' && isvV6.strategy_cluster?.length) {
-        payload.sub_strategies = isvV6.strategy_cluster as any;
+    // FIX 5: strategy_secondary también va al backend, no solo farmland
+    const strategies: string[] = [];
+    if (isvV6.strategy_cluster?.length) {
+        strategies.push(...isvV6.strategy_cluster);
     }
-    if (isvV6.confidence_score) {
-        payload.experience_level = isvV6.confidence_score.toString();
+    if (isvV6.strategy_secondary && !strategies.includes(isvV6.strategy_secondary as string)) {
+        strategies.push(isvV6.strategy_secondary as string);
+    }
+    if (strategies.length) {
+        payload.sub_strategies = strategies as any;
     }
 
-    // use_potential — incluir si tiene valores (el backend lo soportará en v2)
+    // Eliminar confidence_score → experience_level (mapping incorrecto)
+    // use_potential — incluir si tiene valores
     if ((isvV6 as any).use_potential?.length) {
         (payload as any).use_potential = (isvV6 as any).use_potential;
     }
 
-    // market_proxy — incluir si existe
-    if ((isvV6 as any).market_proxy) {
-        (payload as any).market_proxy = (isvV6 as any).market_proxy;
+    // user_name → pasarlo para que el AEC pueda usarlo en el saludo
+    if (isvV6.user_name) {
+        (payload as any).user_name = isvV6.user_name;
     }
 
     return payload;

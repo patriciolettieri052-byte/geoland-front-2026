@@ -64,9 +64,16 @@ export async function GET(req: NextRequest) {
                     : riskLevel === 'Medio-Alto' ? 70
                     : riskLevel === 'Alto'     ? 85
                     : 50,
-          payback_meses: metrics.payback_meses ?? 0,
+          payback_meses: metrics.payback_meses
+            ?? (metrics.noi_anual && metrics.precio_usd
+              ? Math.round((metrics.precio_usd / metrics.noi_anual) * 12)
+              : 0),
           // Ensure core identification fields are always at root
           asset_id: asset.id || asset.asset_id,
+          // Propagar user_name si viene en el request (para personalización AEC)
+          ...(req.nextUrl.searchParams.get('user_name')
+            ? { user_name: req.nextUrl.searchParams.get('user_name') }
+            : {}),
         }
       })
     }

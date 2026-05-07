@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ONBOARDING_SYSTEM_PROMPT, REFINAMIENTO_SYSTEM_PROMPT } from '@/lib/ai/prompts';
 import { checkRateLimit } from '@/lib/rateLimiter';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
 });
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'dummy_key');
 
 function cleanJsonMarkdown(text: string): string {
     let cleaned = text.trim();
@@ -288,22 +291,28 @@ export async function POST(req: NextRequest) {
 
             console.log('[ISV] currentIsv keys:', Object.keys(currentIsv).filter(k => (currentIsv as any)[k]));
 
-            const response = await openai.chat.completions.create({
-                model: 'gpt-4o',
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    {
-                        role: 'user',
-                        content: `HISTORIAL:\n${conversationHistory}\n\nMENSAJE DEL USUARIO: ${message}\n\nESTADO ACTUAL DEL ISV (No borres campos ya resueltos):\n${isvActual}\n\nResponde SOLO con el JSON indicado.`
-                    }
-                ],
-                temperature: 0.2,
-                max_completion_tokens: 1500,
-                response_format: { type: 'json_object' },
+            // Cambio a Gemini 2.5 Flash para Onboarding
+            const model = genAI.getGenerativeModel({ 
+                model: 'gemini-2.5-flash',
+                systemInstruction: systemPrompt,
+                generationConfig: {
+                    responseMimeType: 'application/json',
+                    temperature: 0.2,
+                }
             });
 
-            const rawText = response.choices[0]?.message?.content;
-            if (!rawText) throw new Error('Empty response from OpenAI');
+            const result = await model.generateContent({
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: `HISTORIAL:\n${conversationHistory}\n\nMENSAJE DEL USUARIO: ${message}\n\nESTADO ACTUAL DEL ISV (No borres campos ya resueltos):\n${isvActual}\n\nResponde SOLO con el JSON indicado.` }]
+                    }
+                ]
+            });
+
+            const response = await result.response;
+            const rawText = response.text();
+            if (!rawText) throw new Error('Empty response from Gemini');
 
             const cleanText = cleanJsonMarkdown(rawText);
             let jsonOutput: any;
