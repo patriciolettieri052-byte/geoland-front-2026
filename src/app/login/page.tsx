@@ -31,8 +31,8 @@ function LoginContent() {
 
     // Credenciales hardcodeadas
     if (username === 'geoland' && password === 'geoland_2026_infraestructure') {
-      // Establecer cookie de sesión simple
-      document.cookie = "geoland_auth=true; path=/; max-age=86400"; // 24 horas
+      // Establecer cookie de sesión simple con SameSite para compatibilidad en despliegue
+      document.cookie = "geoland_auth=true; path=/; max-age=86400; SameSite=Lax"; // 24 horas
       
       router.push('/');
       router.refresh();

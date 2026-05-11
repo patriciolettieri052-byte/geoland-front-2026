@@ -19,7 +19,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const checkAuth = () => {
-    const isAuth = document.cookie.includes('geoland_auth=true');
+    // Buscar la cookie geoland_auth de forma más precisa
+    const cookies = document.cookie.split('; ');
+    const authCookie = cookies.find(row => row.startsWith('geoland_auth='));
+    const isAuth = authCookie?.split('=')[1] === 'true';
+
     if (isAuth) {
       setUser({ id: 'geoland-user', email: 'admin@geoland.io', role: 'admin' });
     } else {
