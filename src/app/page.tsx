@@ -31,6 +31,8 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+export const dynamic = 'force-dynamic';
+
 export default function GeolandOS() {
   const {
     perfilCompletado,
