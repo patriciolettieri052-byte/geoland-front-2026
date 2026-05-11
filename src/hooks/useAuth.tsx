@@ -1,103 +1,64 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: any | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  session: null,
   loading: true,
-  signOut: async () => {},
+  signOut: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const checkAuth = () => {
+    const isAuth = document.cookie.includes('geoland_auth=true');
+    if (isAuth) {
+      setUser({ id: 'geoland-user', email: 'admin@geoland.io', role: 'admin' });
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    // Check active sessions and sets the user
-    const setData = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Error getting session:', error);
-      }
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-
-      // Importar store de forma dinámica para evitar ciclos si fuera necesario, 
-      // o usar getState() directamente.
-      const { useGeolandStore } = await import('@/store/useGeolandStore');
-
-      // Cargar ISV guardado al hacer login
-      if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          const { data } = await supabase
-            .from('profiles')
-            .select('isv_v6')
-            .eq('id', session.user.id)
-            .single();
-
-          if (data?.isv_v6) {
-            const { updateIsvV6, setPerfilCompletado } = useGeolandStore.getState();
-            updateIsvV6(data.isv_v6);
-            setPerfilCompletado(true);
-            console.log('ISV cargado desde Supabase');
-          }
-
-        } catch (error) {
-          console.error('Error cargando ISV guardado (no bloqueante):', error);
-        }
-      }
-
-      // Limpiar todo el estado al cerrar sesión — FIX-FRONT-P1-04
-      if (event === 'SIGNED_OUT') {
-        const store = useGeolandStore.getState();
-        store.resetIsvV6();
-        store.setPerfilCompletado(false);
-        store.setAssets([]);
-        // Limpiar historiales de chat
-        store.setChatHistory(() => []);
-        store.setAecHistory(() => []);
-        // Limpiar estado AEC
-        store.setAecPendingActions([]);
-        store.setAecProactiveAlert(null);
-        store.setSimulationPreview(null);
-        store.setCompareAssetIds(null);
-      }
-
-    });
-
-
-    setData();
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    checkAuth();
+    
+    // Escuchar cambios en el almacenamiento local o cookies si fuera necesario
+    // Por simplicidad, checkAuth al montar es suficiente dado el middleware
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Borrar cookie
+    document.cookie = "geoland_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    setUser(null);
+    
+    // Limpiar store
+    const { useGeolandStore } = await import('@/store/useGeolandStore');
+    const store = useGeolandStore.getState();
+    store.resetIsvV6();
+    store.setPerfilCompletado(false);
+    store.setAssets([]);
+    store.setChatHistory(() => []);
+    store.setAecHistory(() => []);
+    store.setAecPendingActions([]);
+    store.setAecProactiveAlert(null);
+    store.setSimulationPreview(null);
+    store.setCompareAssetIds(null);
+
+    // Redirigir al login
+    window.location.href = '/login';
   };
 
   const value = {
     user,
-    session,
     loading,
     signOut,
   };

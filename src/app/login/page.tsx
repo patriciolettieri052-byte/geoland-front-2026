@@ -2,18 +2,12 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createBrowserClient } from '@supabase/ssr';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Mail, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
-
-const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { Lock, User, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 
 function LoginContent() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,7 +17,7 @@ function LoginContent() {
   useEffect(() => {
     const errorType = searchParams.get('error');
     if (errorType === 'unauthorized') {
-      setError('Acceso restringido. Tu usuario no está en la lista de perfiles autorizados.');
+      setError('Acceso restringido. Debes iniciar sesión para continuar.');
     }
   }, [searchParams]);
 
@@ -32,21 +26,18 @@ function LoginContent() {
     setLoading(true);
     setError(null);
 
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    // Simular un poco de delay para la experiencia de usuario
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-      if (authError) {
-        throw new Error('Credenciales inválidas o error de conexión.');
-      }
-
-      // El AuthProvider/Middleware se encargará de verificar el perfil
+    // Credenciales hardcodeadas
+    if (username === 'geoland' && password === 'geoland_2026_infraestructure') {
+      // Establecer cookie de sesión simple
+      document.cookie = "geoland_auth=true; path=/; max-age=86400"; // 24 horas
+      
       router.push('/');
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } else {
+      setError('Credenciales inválidas. Por favor verifique su usuario y contraseña.');
       setLoading(false);
     }
   };
@@ -85,16 +76,16 @@ function LoginContent() {
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-medium text-zinc-500 ml-1 uppercase tracking-wider">Email</label>
+              <label className="text-xs font-medium text-zinc-500 ml-1 uppercase tracking-wider">Usuario</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
-                  type="email"
+                  type="text"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
-                  placeholder="nombre@empresa.com"
+                  placeholder="Usuario Geoland"
                 />
               </div>
             </div>
