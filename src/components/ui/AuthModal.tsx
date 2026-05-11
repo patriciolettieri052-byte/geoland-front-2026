@@ -43,6 +43,13 @@ export const AuthModal = ({ onClose }: { onClose?: () => void }) => {
     setLoading(true);
     setError(null);
 
+    // Credenciales hardcodeadas (SOPORTE PARA PLATAFORMA INFRA)
+    if (email === 'geoland' && password === 'geoland_2026_infraestructure') {
+      document.cookie = "geoland_auth=true; path=/; max-age=86400; SameSite=Lax";
+      window.location.reload();
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -137,9 +144,9 @@ export const AuthModal = ({ onClose }: { onClose?: () => void }) => {
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                       <input 
-                        type="email" 
+                        type="text" 
                         required
-                        placeholder="nombre@empresa.com"
+                        placeholder="Usuario o Email"
                         className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-black outline-none transition-all text-gray-900"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}

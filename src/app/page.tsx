@@ -646,6 +646,51 @@ export default function GeolandOS() {
 
       </motion.div>
 
+      {/* ── GATE KEEPER (SOLUCION FACIL) ── */}
+      <AnimatePresence>
+        {!user && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden"
+          >
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              className="absolute inset-0 w-full h-full object-cover opacity-50"
+            >
+              <source src="/portada.mp4" type="video/mp4" />
+            </video>
+            
+            <div className="relative z-10 flex flex-col items-center gap-8">
+              <motion.img 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                src="/logo Geoland OS.svg" 
+                alt="GEOLAND OS" 
+                className="w-72 h-auto brightness-0 invert cursor-pointer active:scale-95 transition-transform"
+                onClick={() => {
+                  // Click secreto en el logo para activar el login
+                  setAuthModalView('login');
+                  setAuthModalOpen(true);
+                }}
+              />
+              <div className="h-[1px] w-12 bg-white/20" />
+              <p className="text-white/40 text-[10px] tracking-[0.4em] uppercase font-light">
+                Neural Intelligence OS
+              </p>
+            </div>
+
+            {/* Borde decorativo inferior */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AuthModal onClose={handleAuthModalClose} />
 
       <LimitModal 
